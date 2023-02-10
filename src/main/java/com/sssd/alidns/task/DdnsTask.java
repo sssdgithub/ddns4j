@@ -55,6 +55,7 @@ public class DdnsTask {
                     log.info("realIpv6:{}", realIpv6);
                 } else if (isLinux(inetAddress)) {
                     // FIXME: 2022/12/18 linux系统会在显示的ip地址后方带上%指定网卡名,window系统会直接显示
+                    // FIXME: 2023/2/10 linux系统会在显示的ipv6地址中 有 :0: 导致解析失败
                     String linuxRealIpv6 = getLinuxRealIpv6(hostAddress);
                     if (StringUtils.isEmpty(linuxRealIpv6)) {
                         continue;
@@ -118,25 +119,7 @@ public class DdnsTask {
         if (!NumberUtil.isNumber(lastValue)) {
             return null;
         }
-        List<Integer> indexes = getZeroIndexes(v6Split);
-        if (CollectionUtils.isEmpty(indexes)) {
-            return hostAddress;
-        }
-        ArrayList<String> items = new ArrayList<>(Arrays.asList(v6Split));
-        for (Integer index : indexes) {
-            items.remove("0");
-        }
-        int addIndex = indexes.get(0).intValue();
-        items.add(addIndex, ":");
-        StringBuilder builder = new StringBuilder();
-        for (String item : items) {
-            if (item.equals(items.get(items.size() - 1)) || item.equals(":")) {
-                builder.append(item);
-                continue;
-            }
-            builder.append(item + ":");
-        }
-        return builder.toString();
+        return excludeZeroColon(hostAddress, v6Split);
     }
 
 
@@ -154,7 +137,29 @@ public class DdnsTask {
         if (NumberUtil.isNumber(lastValue)) {
             return null;
         }
-        return hostAddress;
+        return excludeZeroColon(ipv6, v6Split);
+    }
+
+    private String excludeZeroColon(String ipv6, String[] v6Split) {
+        List<Integer> indexes = getZeroIndexes(v6Split);
+        if (CollectionUtils.isEmpty(indexes)) {
+            return ipv6;
+        }
+        ArrayList<String> items = new ArrayList<>(Arrays.asList(v6Split));
+        for (Integer index : indexes) {
+            items.remove("0");
+        }
+        int addIndex = indexes.get(0).intValue();
+        items.add(addIndex, ":");
+        StringBuilder builder = new StringBuilder();
+        for (String item : items) {
+            if (item.equals(items.get(items.size() - 1)) || item.equals(":")) {
+                builder.append(item);
+                continue;
+            }
+            builder.append(item + ":");
+        }
+        return builder.toString();
     }
 
     /**
