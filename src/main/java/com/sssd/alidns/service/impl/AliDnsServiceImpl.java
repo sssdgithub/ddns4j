@@ -26,38 +26,52 @@ public class AliDnsServiceImpl implements AliDnsService {
     private AliyunConfig aliyunConfig;
 
     @Override
-    public String update(String ipv6) throws Exception {
+    public String update(String ipv6)  {
         List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> list = list();
         if (CollectionUtils.isEmpty(list)) {
             log.error("解析列表为空!");
             return "解析列表为空!";
         }
-        for (DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord record : list) {
-            if (ipv6.equals(record.value)) {
+        for (DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord rd : list) {
+            if (ipv6.equals(rd.value)) {
                 log.info("该ipv6已被解析");
                 return "该ipv6已被解析";
             }
         }
-        DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord record = list.get(0);
+        DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord rd = null;
+        rd = list.get(0);
         //修改解析记录
         UpdateDomainRecordRequest req = new UpdateDomainRecordRequest();
         // 主机记录
-        req.RR = record.RR;
+        req.RR = rd.RR;
         // 记录ID
-        req.recordId = record.recordId;
+        req.recordId = rd.recordId;
         // 将主机记录值改为当前主机IP
         req.value = ipv6;
         // 解析记录类型
-        req.type = record.type;
-        AliDnsUtils.updateDomainRecord(createClient(), req);
+        req.type = rd.type;
+        try {
+            AliDnsUtils.updateDomainRecord(createClient(), req);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "解析成功,请在解析列表页面查看对应记录!";
     }
 
     @Override
-    public List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> list() throws Exception {
-        DescribeDomainRecordsResponse resp = AliDnsUtils.getParseList(createClient(), aliyunConfig.getDomainName(), aliyunConfig.getRr(), aliyunConfig.getRecordType());
+    public List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> list()  {
+        DescribeDomainRecordsResponse resp = null;
+        try {
+            resp = AliDnsUtils.getParseList(createClient(), aliyunConfig.getDomainName(), aliyunConfig.getRr(), aliyunConfig.getRecordType());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (Objects.isNull(resp)) {
+            log.error("参数错误: resp");
+            return null;
+        }
         List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> records = resp.body.domainRecords.record;
-        if (Objects.isNull(resp) || CollectionUtils.isEmpty(records)) {
+        if (CollectionUtils.isEmpty(records)) {
             log.error("参数错误");
             return null;
         }

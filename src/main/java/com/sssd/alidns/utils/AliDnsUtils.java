@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AliDnsUtils {
 
+    private AliDnsUtils() {
+    }
+
     /**
      * 使用AK&SK初始化账号Client
      *
@@ -23,7 +26,7 @@ public class AliDnsUtils {
      * @return Client
      * @throws Exception
      */
-    public static com.aliyun.alidns20150109.Client createClient(String accessKeyId, String accessKeySecret) throws Exception {
+    public static com.aliyun.alidns20150109.Client createClient(String accessKeyId, String accessKeySecret) {
         com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
                 // 必填，您的 AccessKey ID
                 .setAccessKeyId(accessKeyId)
@@ -31,7 +34,12 @@ public class AliDnsUtils {
                 .setAccessKeySecret(accessKeySecret);
         // 访问的域名
         config.endpoint = "alidns.cn-hangzhou.aliyuncs.com";
-        return new com.aliyun.alidns20150109.Client(config);
+        try {
+            return new com.aliyun.alidns20150109.Client(config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -52,8 +60,8 @@ public class AliDnsUtils {
             return resp;
         } catch (TeaException error) {
             log.error(error.message);
-        } catch (Exception _error) {
-            log.error(_error.getMessage());
+        } catch (Exception error) {
+            log.error(error.getMessage());
         }
         return null;
     }
@@ -68,8 +76,8 @@ public class AliDnsUtils {
             log.info(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(resp)));
         } catch (TeaException error) {
             log.error(error.message);
-        } catch (Exception _error) {
-            log.error(_error.getMessage());
+        } catch (Exception error) {
+            log.error(error.getMessage());
         }
     }
 }

@@ -10,7 +10,18 @@ import java.util.List;
  */
 public interface AliDnsService {
 
-    String update(String ipv6) throws Exception;
+    /**
+     * 更新解析ipv6地址
+     * @param ipv6
+     * @return
+     * @throws Exception
+     */
+    String update(String ipv6);
 
-    List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> list() throws Exception;
+    /**
+     * 查看配置域名的解析列表
+     * @return
+     * @throws Exception
+     */
+    List<DescribeDomainRecordsResponseBody.DescribeDomainRecordsResponseBodyDomainRecordsRecord> list() ;
 }
