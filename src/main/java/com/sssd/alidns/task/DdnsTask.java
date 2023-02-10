@@ -76,6 +76,7 @@ public class DdnsTask {
         log.info("ddns end...");
     }
 
+
     /**
      * 是否是windows
      *
@@ -129,18 +130,18 @@ public class DdnsTask {
      * @param hostAddress
      * @return
      */
-    private String getLinuxRealIpv6(String hostAddress) {
+    private static String getLinuxRealIpv6(String hostAddress) {
         String[] networkSplit = hostAddress.split("%");
         String ipv6 = networkSplit[0];
         String[] v6Split = ipv6.split(":");
         String lastValue = v6Split[v6Split.length - 1];
-        if (NumberUtil.isNumber(lastValue)) {
+        if (!NumberUtil.isNumber(lastValue)) {
             return null;
         }
         return excludeZeroColon(ipv6, v6Split);
     }
 
-    private String excludeZeroColon(String ipv6, String[] v6Split) {
+    private static String excludeZeroColon(String ipv6, String[] v6Split) {
         List<Integer> indexes = getZeroIndexes(v6Split);
         if (CollectionUtils.isEmpty(indexes)) {
             return ipv6;
@@ -168,7 +169,7 @@ public class DdnsTask {
      * @param splits
      * @return
      */
-    private List<Integer> getZeroIndexes(String[] splits) {
+    private static List<Integer> getZeroIndexes(String[] splits) {
         ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < splits.length; i++) {
             if (splits[i].equals("0")) {
