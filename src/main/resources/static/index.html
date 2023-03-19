@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DDns-Java</title>
+</head>
+<!--引入静态的路径-->
+<script type="text/javascript" src="js/vue.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="css/index.css">
+<!-- 引入组件库 -->
+<!--引入通信框架-->
+<script type="text/javascript" src="js/axios.min.js"></script>
+<body>
+<el-container id="app">
+    <el-header>DDns-Java</el-header>
+    <el-container id="inner-content">
+        <el-aside width="66.6%">
+            <el-row>
+
+            </el-row>
+            <el-row size="mini">
+                <el-col :span="6">
+                    <el-input v-model="queryData" size="mini" placeholder="厂商/域名/记录类型"></el-input>
+                </el-col>
+                <el-col :span="6">
+                    <el-select v-model="selectValue" size="mini" placeholder="状态">
+                        <el-option
+                                v-for="item in selectOptions"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-col>
+                <el-col :span="6">
+                    <div align="left">
+                        <el-date-picker
+                                size="mini"
+                                v-model="datetimeValue"
+                                type="datetimerange"
+                                :picker-options="pickerOptions"
+                                range-separator="至"
+                                start-placeholder="记录更新开始日期"
+                                end-placeholder="记录更新结束日期">
+                        </el-date-picker>
+                    </div>
+                </el-col>
+                <el-col :span="6">
+                    <div align="right">
+                        <el-button size="mini" round>查询</el-button>
+                        <el-button size="mini" round>新增</el-button>
+                        <el-button size="mini" round>批量删除</el-button>
+                    </div>
+                </el-col>
+            </el-row>
+
+            <el-table size="mini" :data="parsingRecords" border stripe style="width: 100%;"
+                      tooltip-effect="dark"
+                      @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="40">
+                </el-table-column>
+                <el-table-column type="index" width="50">
+                </el-table-column>
+                <el-table-column prop="serviceProvider" label="服务商">
+                </el-table-column>
+                <el-table-column prop="domain" label="域名">
+                </el-table-column>
+                <el-table-column prop="recordType" label="记录类型">
+                </el-table-column>
+                <el-table-column prop="state" label="状态" width="70">
+                    <template slot-scope="scope">
+                        <el-switch
+                                active-color="#13ce66"
+                                inactive-color="#ff4949"
+                                v-model="scope.row.state"
+                                :active-value="1"
+                                :inactive-value="0"
+                                @change="changeState(scope.row,scope.row.state,'state')">
+                        </el-switch>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="updatedTime" label="更新时间">
+                </el-table-column>
+                <el-table-column prop="operation" label="操作">
+                    <template slot-scope="scope">
+                    <el-button
+                            size="mini"
+                            round
+                            @click="handleEdit(scope.row.id, scope.row)">修改</el-button>
+                    <el-button
+                            size="mini"
+                            round
+                            @click="handleDelete(scope.row.id, scope.row.cloudTypeId)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="[5, 10, 50, 100]"
+                    :page-size="5"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="totals">
+            </el-pagination>
+        </el-aside>
+        <el-main>Log</el-main>
+    </el-container>
+</el-container>
+</body>
+<script>
+
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                parsingRecords: [
+                    {
+                        serviceProvider: "阿里云",
+                        domain: "test.jjjr.site",
+                        recordType: "AAAA",
+                        state: "开启",
+                        updatedTime: "2023-03-19 08:00:00"
+                    }
+                ],
+                queryData: '',
+                selectOptions: [
+                    {
+                        value: '选项1',
+                        label: '开启'
+                    }, {
+                        value: '选项2',
+                        label: '关闭'
+                    }
+                ],
+                selectValue: '',
+                pickerOptions: {
+                    shortcuts: [
+                        {
+                            text: '最近一周',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近一个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }, {
+                            text: '最近三个月',
+                            onClick(picker) {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                                picker.$emit('pick', [start, end]);
+                            }
+                        }]
+                },
+                multipleSelection: [],
+                totals: 400,
+                currentPage: 1,
+                datetimeValue: ''
+            }
+        },
+        methods: {
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            }
+        }
+    })
+</script>
+<style>
+    body > .el-container {
+        margin-bottom: 40px;
+        height: 100%;
+    }
+
+    body, html {
+        height: 99%;
+    }
+
+    .el-header, .el-footer {
+        background-color: #B3C0D1;
+        color: #333;
+        text-align: -webkit-center;
+        font-size: 26px;
+        line-height: 60px;
+    }
+
+    .el-aside {
+        background-color: #D3DCE6;
+        color: #333;
+        text-align: center;
+        line-height: 25px;
+        font-size: 10px;
+    }
+
+    .el-main {
+        background-color: #E9EEF3;
+        color: #333;
+        text-align: center;
+        line-height: 160px;
+    }
+
+    body > .el-container {
+        margin-bottom: 40px;
+    }
+
+    .el-container:nth-child(5) .el-aside,
+    .el-container:nth-child(6) .el-aside {
+        line-height: 260px;
+    }
+
+    .el-container:nth-child(7) .el-aside {
+        line-height: 320px;
+    }
+</style>
+</html>
