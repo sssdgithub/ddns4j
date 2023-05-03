@@ -28,14 +28,14 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         this.strictInsertFill(metaObject, CREATE_DATE, LocalDateTime.class, LocalDateTime.now());
         this.strictInsertFill(metaObject, UPDATE_DATE, LocalDateTime.class, LocalDateTime.now());
 
-        this.strictInsertFill(metaObject, CREATOR, Integer.class, 0);
-        this.strictInsertFill(metaObject, UPDATER, Integer.class, 0);
+        this.strictInsertFill(metaObject, CREATOR, Long.class, 0L);
+        this.strictInsertFill(metaObject, UPDATER, Long.class, 0L);
 
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         this.strictUpdateFill(metaObject,UPDATE_DATE,LocalDateTime.class, LocalDateTime.now());
-        this.strictUpdateFill(metaObject,UPDATER,Integer.class, 0);
+        this.strictUpdateFill(metaObject,UPDATER,Long.class, 0L);
     }
 }

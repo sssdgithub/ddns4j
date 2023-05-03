@@ -111,7 +111,6 @@
 </el-container>
 </body>
 <script>
-
     new Vue({
         el: '#app',
         data() {
@@ -179,6 +178,9 @@
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
+            },
+            changeState(){
+                console.log('changeState')
             }
         }
     })
