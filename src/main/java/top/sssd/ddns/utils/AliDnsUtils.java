@@ -1,12 +1,13 @@
 package top.sssd.ddns.utils;
 
-import com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest;
-import com.aliyun.alidns20150109.models.DescribeDomainRecordsResponse;
-import com.aliyun.alidns20150109.models.UpdateDomainRecordRequest;
-import com.aliyun.alidns20150109.models.UpdateDomainRecordResponse;
+import com.aliyun.alidns20150109.models.*;
 import com.aliyun.tea.TeaException;
 import com.aliyun.tea.TeaModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import top.sssd.ddns.common.BizException;
+
+import java.util.List;
 
 /**
  * @author sssd
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class AliDnsUtils {
+
+    private static final String ENDPOINT = "alidns.cn-hangzhou.aliyuncs.com";
 
     private AliDnsUtils() {
     }
@@ -32,31 +35,47 @@ public class AliDnsUtils {
                 .setAccessKeyId(accessKeyId)
                 // 必填，您的 AccessKey Secret
                 .setAccessKeySecret(accessKeySecret);
-        // 访问的域名
-        config.endpoint = "alidns.cn-hangzhou.aliyuncs.com";
+        config.endpoint = ENDPOINT;
         try {
             return new com.aliyun.alidns20150109.Client(config);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
+    }
+
+    /**
+     * 获取子域名的所有解析记录列表
+     */
+    public static DescribeSubDomainRecordsResponse getSubDomainParseList(com.aliyun.alidns20150109.Client client, String subDomain, String recordType) {
+        com.aliyun.alidns20150109.models.DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new com.aliyun.alidns20150109.models.DescribeSubDomainRecordsRequest()
+                .setSubDomain(subDomain)
+                .setType(recordType);
+        try {
+            DescribeSubDomainRecordsResponse describeSubDomainRecordsResponse = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
+            log.info("-------------------获取主域名的所有解析记录列表--------------------");
+            log.info(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(describeSubDomainRecordsResponse)));
+            return describeSubDomainRecordsResponse;
+        } catch (TeaException error) {
+            log.error(error.message);
+        } catch (Exception error) {
+            log.error(error.getMessage());
+        }
+        return null;
     }
 
     /**
      * 获取主域名的所有解析记录列表
+     *
+     * @param client
+     * @param domain
+     * @return
      */
-    public static DescribeDomainRecordsResponse getParseList(com.aliyun.alidns20150109.Client client, String domainName, String RR, String recordType) throws Exception {
-        DescribeDomainRecordsRequest req = new DescribeDomainRecordsRequest();
-        // 主域名 一级 域名 jjjr.site
-        req.domainName = domainName;
-        // 主机记录 ?.jjjr.site  ? > RR
-        req.RRKeyWord = RR;
-        // 解析记录类型 type > AAAA
-        req.type = recordType;
+    public static DescribeDomainRecordsResponse getParseList(com.aliyun.alidns20150109.Client client, String domain) {
+        com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest describeDomainRecordsRequest = new com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest()
+                .setDomainName(domain);
         try {
-            DescribeDomainRecordsResponse resp = client.describeDomainRecords(req);
-            log.info("-------------------获取主域名的所有解析记录列表--------------------");
-            log.info(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(resp)));
+            DescribeDomainRecordsResponse resp = client.describeDomainRecords(describeDomainRecordsRequest);
             return resp;
         } catch (TeaException error) {
             log.error(error.message);
@@ -67,17 +86,121 @@ public class AliDnsUtils {
     }
 
     /**
-     * 修改解析记录
+     * 添加一条解析记录
+     *
+     * @param client
+     * @param domain
+     * @param Rr
+     * @param recordType
+     * @param ip
+     * @return
      */
-    public static void updateDomainRecord(com.aliyun.alidns20150109.Client client, UpdateDomainRecordRequest req) throws Exception {
+    public static AddDomainRecordResponse add(com.aliyun.alidns20150109.Client client, String domain, String Rr, String recordType, String ip) {
         try {
-            UpdateDomainRecordResponse resp = client.updateDomainRecord(req);
-            log.info("-------------------修改解析记录--------------------");
-            log.info(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(resp)));
+            AddDomainRecordRequest addDomainRecordRequest = new AddDomainRecordRequest()
+                    .setDomainName(domain)
+                    .setRR(Rr)
+                    .setType(recordType)
+                    .setValue(ip);
+            AddDomainRecordResponse response = client.addDomainRecord(addDomainRecordRequest);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 修改解析记录
+     *
+     * @param client
+     * @param recordId
+     * @param Rr
+     * @param recordType
+     * @param ip
+     * @return
+     */
+    public static UpdateDomainRecordResponse update(com.aliyun.alidns20150109.Client client, String recordId, String Rr, String recordType, String ip) {
+        try {
+            UpdateDomainRecordRequest updateDomainRecordRequest = new UpdateDomainRecordRequest()
+                    .setRecordId(recordId)
+                    .setRR(Rr)
+                    .setType(recordType)
+                    .setValue(ip);
+            UpdateDomainRecordResponse resp = client.updateDomainRecord(updateDomainRecordRequest);
+            return resp;
         } catch (TeaException error) {
             log.error(error.message);
         } catch (Exception error) {
             log.error(error.getMessage());
         }
+        return null;
+    }
+
+
+    /**
+     * 删除解析记录
+     * @param client
+     * @param recordId
+     * @return
+     */
+    public static DeleteDomainRecordResponse delete(com.aliyun.alidns20150109.Client client,String recordId){
+        try {
+            DeleteDomainRecordRequest deleteDomainRecordRequest = new DeleteDomainRecordRequest()
+                    .setRecordId(recordId);
+            DeleteDomainRecordResponse response = client.deleteDomainRecord(deleteDomainRecordRequest);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /**
+     * 查询并返回记录ID
+     *
+     * @param client
+     * @param subDomain
+     * @param recordType
+     * @param ip
+     * @return
+     */
+    public static String getDomainRecordId(com.aliyun.alidns20150109.Client client, String subDomain, String recordType, String ip) {
+        DescribeSubDomainRecordsResponse response = getSubDomainParseList(client, subDomain, recordType);
+        if (response.getStatusCode() != HttpStatus.OK.value()) {
+            throw new BizException("查询并返回记录ID时,调用阿里云DNS解析失败,请检查传入的serviceProviderId,serviceProviderSecret,域名是否正确");
+        }
+        List<DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord> records
+                = response.getBody().getDomainRecords().getRecord();
+        for (DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord record : records) {
+            if (ip.equals(record.getValue())) {
+                return record.getRecordId();
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 根据域名和解析类型查询ip
+     * @param client
+     * @param subDomain
+     * @param recordType
+     * @return
+     */
+    public static String getIpBySubDomainWithType(com.aliyun.alidns20150109.Client client,String subDomain, String recordType){
+        try {
+            DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new DescribeSubDomainRecordsRequest()
+                    .setSubDomain(subDomain)
+                    .setType(recordType);
+            DescribeSubDomainRecordsResponse response = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
+            List<DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord> records = response.getBody().getDomainRecords().getRecord();
+            DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord record = records.get(0);
+            return record.getValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
