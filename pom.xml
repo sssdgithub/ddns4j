@@ -8,6 +8,7 @@
     <version>v1.0-RELEASE</version>
     <name>ddns4j</name>
     <description>使用java实现动态域名解析</description>
+    <packaging>jar</packaging>
 
 
     <properties>
@@ -183,6 +184,12 @@
             <groupId>com.deepoove</groupId>
             <artifactId>poi-tl</artifactId>
             <version>1.10.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -202,6 +209,12 @@
             <groupId>com.aliyun</groupId>
             <artifactId>alidns20150109</artifactId>
             <version>3.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dom4j</artifactId>
+                    <groupId>org.dom4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -232,6 +245,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.3.12.RELEASE</version>
+                <configuration>
+                    <mainClass>top.sssd.ddns.DynamicDnsApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
