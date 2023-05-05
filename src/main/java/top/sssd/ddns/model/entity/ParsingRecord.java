@@ -1,9 +1,9 @@
 package top.sssd.ddns.model.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,11 +31,17 @@ public class ParsingRecord extends PageEntity implements Serializable {
 
     @ApiModelProperty("id")
     @NotNull(groups = ValidGroup.UpdateGroup.class, message = "id不能为空")
+    @TableId(type = IdType.ASSIGN_ID)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @ApiModelProperty("服务提供商1 阿里云 2 腾讯云 3 cloudflare")
     @NotNull(groups = {ValidGroup.SaveGroup.class, ValidGroup.UpdateGroup.class}, message = "服务提供商不能为空,1 阿里云 2 腾讯云 3 cloudflare")
     private Integer serviceProvider;
+
+    @ApiModelProperty("服务提供商名称")
+    @TableField(exist = false)
+    private String serviceProviderName;
 
     @NotBlank(groups = {ValidGroup.SaveGroup.class, ValidGroup.UpdateGroup.class}, message = "服务提供商密钥key不能为空,1 阿里云 2 腾讯云 ")
     private String serviceProviderId;
@@ -46,6 +52,10 @@ public class ParsingRecord extends PageEntity implements Serializable {
     @ApiModelProperty("解析类型:1 AAAA 2 A")
     @NotNull(groups = {ValidGroup.SaveGroup.class, ValidGroup.UpdateGroup.class}, message = "解析类型不能为空,解析类型:1 AAAA 2 A")
     private Integer recordType;
+
+    @ApiModelProperty("解析类型名称")
+    @TableField(exist = false)
+    private String recordTypeName;
 
     @ApiModelProperty("真实ip")
     private String ip;

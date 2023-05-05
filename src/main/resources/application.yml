@@ -16,11 +16,3 @@ mybatis-plus:
 logging:
   file:
     path: ./
-#自定义配置
-aliyun:
-  accessKeyId: LTAI5tH3yQeiFNAuEA5aN5ZJ
-  accessKeySecret: aaT7phpgYHu3gWNgKHjwvq6Wr9wIhP
-  domainName: sssd.top
-  RR: k8s
-  recordType: AAAA
-cron: 0 0/1 * * * ?
