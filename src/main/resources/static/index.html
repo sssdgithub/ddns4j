@@ -250,7 +250,12 @@
                 </el-dialog>
             </el-aside>
             <el-main>
-                <div id="log"></div>
+                <div class="console">
+                    <div class="output" v-for="(log, index) in logs" :key="index">
+                        <span class="timestamp">{{ getTimeStamp() }}</span>
+                        <span class="message">{{ log }}</span>
+                    </div>
+                </div>
             </el-main>
         </el-container>
     </el-container>
@@ -381,7 +386,9 @@
                     updateFrequency: [
                         {required: true, message: '更新频率不能为空', trigger: 'blur'}
                     ]
-                }
+                },
+                socket:null,
+                logs:[]
             }
         },
         computed: {
@@ -408,8 +415,24 @@
             this.socket.close();
         },
         mounted() {
+            this.socket = new WebSocket('ws://127.0.0.1:10000/logs');
+            this.socket.onmessage = this.handleMessage;
         },
         methods: {
+            getTimeStamp() {
+                const date = new Date();
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                const hour = date.getHours().toString().padStart(2, '0');
+                const minute = date.getMinutes().toString().padStart(2, '0');
+                const second = date.getSeconds().toString().padStart(2, '0');
+                const formattedTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`; /* 修改格式 */
+                return formattedTime;
+            },
+            handleMessage(event) {
+                this.logs.push(event.data);
+            },
             // 获取数据列表
             getDataList() {
                 this.dataListLoading = true
@@ -636,6 +659,9 @@
         color: #333;
         text-align: center;
         line-height: 160px;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
     body > .el-container {
@@ -649,6 +675,33 @@
 
     .el-container:nth-child(7) .el-aside {
         line-height: 320px;
+    }
+
+    .console {
+        background-color: black;
+        color: white;
+        font-family: monospace;
+        overflow-y: scroll;
+        height: 100%;
+    }
+
+    .output {
+        display: flex;
+        align-items: center;
+        line-height: 1.2;
+        padding: 0;
+    }
+
+    .timestamp {
+        color: gray;
+        margin-right: 8px;
+    }
+
+    .message {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.2;
+        color: lime;
     }
 </style>
 </html>
