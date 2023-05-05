@@ -1,15 +1,21 @@
 # DDNS4J 使用指南
 ![这是图片](./doc/效果图.png "Magic Gardens")
+
 阅读前需知悉:
 
 该<<使用指南>>由gpt生成,如果有错误欢迎大家指正,目前该项目由于只有我一个人闲暇时间开发,目前只支持阿里云,后续版本会加上腾讯云及cloudflare.
 
+[![Fork me on Gitee](https://gitee.com/Xsssd/ddns4j/widgets/widget_4.svg)](https://gitee.com/Xsssd/ddns4j)
+
 DDNS4J 是一个基于 SpringBoot 和 Vue2 开发的开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。在本篇文章中，我们将介绍如何使用 DDNS4J 来轻松管理你的域名，并探讨 DDNS 在 IPv6 时代的重要性。
 
 ## 项目演示地址
+
 https://ddns4j.sssd.top
 
 演示地址中的数据均为演示数据,非真实数据,如要使用,请在发布版下载jar包或使用构建工具自己打包部署,部署步骤可参照下面部署章节
+
+[![sssd/ddns4j](https://gitee.com/Xsssd/ddns4j/widgets/widget_card.svg?colors=393222,ebdfc1,fffae5,d8ca9f,393222,a28b40)](https://gitee.com/Xsssd/ddns4j)
 
 ## DDNS 的发展
 DDNS 即动态 DNS，是一种可以自动更新域名解析记录的 DNS 服务。传统 DNS 服务需要手动维护域名解析记录，这对于动态 IP 地址来说非常不方便。因此，DDNS 应运而生，能够实现自动更新域名解析记录，让用户更加方便地访问网络资源。DDNS（Dynamic Domain Name System，动态域名系统）是一种通过将域名与动态 IP 地址进行绑定，使得能够通过一个不变的域名来访问处于动态 IP 环境下的主机的技术。在 IPv4 时代，DDNS 技术已经成为了广泛应用的网络技术，它为个人用户提供了一种简单易用的方式来管理自己的网络设备。而在 IPv6 时代，由于 IPv6 地址的数量庞大，DDNS 将变得更加重要，因为动态 IPv6 地址变化的频率更高，使用 DDNS 可以方便地将域名与新的 IP 地址进行绑定。
