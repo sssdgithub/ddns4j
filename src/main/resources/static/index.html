@@ -162,9 +162,11 @@
                         :close-on-click-modal="false"
                         :visible.sync="visible"
                         width="20%">
-                    <el-form :model="addOrUpdateForm" :rules="dataRule" ref="addOrUpdateForm" size="mini" @keyup.enter.native="addOrUpdateFormSubmit()" label-width="140px">
+                    <el-form :model="addOrUpdateForm" :rules="dataRule" ref="addOrUpdateForm" size="mini"
+                             @keyup.enter.native="addOrUpdateFormSubmit()" label-width="140px">
                         <el-form-item label="服务提供商" prop="serviceProvider">
-                            <el-select v-model="addOrUpdateForm.serviceProvider" size="mini" placeholder="服务提供商" clearable="true">
+                            <el-select v-model="addOrUpdateForm.serviceProvider" size="mini" placeholder="服务提供商"
+                                       clearable="true">
                                 <el-option
                                         v-for="item in dataForm.serviceOptions"
                                         :key="item.value"
@@ -175,13 +177,16 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="serviceProviderId" prop="serviceProviderId" size="small">
-                            <el-input v-model="addOrUpdateForm.serviceProviderId" size="small"  placeholder=""></el-input>
+                            <el-input v-model="addOrUpdateForm.serviceProviderId" size="small"
+                                      placeholder=""></el-input>
                         </el-form-item>
                         <el-form-item label="serviceProviderSecret" prop="serviceProviderSecret">
-                            <el-input v-model="addOrUpdateForm.serviceProviderSecret" size="small"  placeholder=""></el-input>
+                            <el-input v-model="addOrUpdateForm.serviceProviderSecret" size="small"
+                                      placeholder=""></el-input>
                         </el-form-item>
                         <el-form-item label="解析类型" prop="recordType">
-                            <el-select v-model="addOrUpdateForm.recordType" size="mini" placeholder="记录类型" clearable="true">
+                            <el-select v-model="addOrUpdateForm.recordType" size="mini" placeholder="记录类型"
+                                       clearable="true">
                                 <el-option
                                         v-for="item in dataForm.recordOptions"
                                         :key="item.value"
@@ -192,7 +197,8 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="获取ip方式:" prop="getIpMode">
-                            <el-select v-model="addOrUpdateForm.getIpMode" size="mini" placeholder="获取ip方式" clearable="true">
+                            <el-select v-model="addOrUpdateForm.getIpMode" size="mini" placeholder="获取ip方式"
+                                       clearable="true">
                                 <el-option
                                         v-for="item in getIpModeOptions"
                                         :key="item.value"
@@ -204,7 +210,8 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="interface" prop="getIpModeValue" hidden="true">
-                            <el-input v-model="addOrUpdateForm.getIpModeValue" size="small" placeholder="interface"></el-input>
+                            <el-input v-model="addOrUpdateForm.getIpModeValue" size="small"
+                                      placeholder="interface"></el-input>
                         </el-form-item>
                         <el-form-item label="公网ip" prop="ip" hidden="true">
                             <el-input v-model="addOrUpdateForm.ip" size="small" placeholder="公网ip"></el-input>
@@ -224,13 +231,14 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="更新频率" prop="updateFrequency">
-                            <el-select v-model="addOrUpdateForm.updateFrequency" size="mini" placeholder="状态" clearable="true">
+                            <el-select v-model="addOrUpdateForm.updateFrequency" size="mini" placeholder="状态"
+                                       clearable="true">
                                 <el-option
                                         v-for="item in updateFrequencyOptions"
                                         :key="item.value"
                                         :label="item.label"
                                         :value="item.value"
-                                        >
+                                >
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -241,7 +249,9 @@
                     </span>
                 </el-dialog>
             </el-aside>
-            <el-main>Log</el-main>
+            <el-main>
+                <div id="log"></div>
+            </el-main>
         </el-container>
     </el-container>
 </div>
@@ -299,7 +309,7 @@
                 dataListSelections: [],
                 addOrUpdateVisible: false,
                 visible: false,
-                getIpModeOptions:[
+                getIpModeOptions: [
                     {
                         value: 1,
                         label: 'interface'
@@ -315,7 +325,7 @@
                         disabled: true
                     }
                 ],
-                updateFrequencyOptions:[
+                updateFrequencyOptions: [
                     {
                         value: 1,
                         label: '1分钟'
@@ -348,28 +358,28 @@
                 },
                 dataRule: {
                     serviceProvider: [
-                        { required: true, message: '服务提供商1 阿里云 2 腾讯云 3 cloudflare不能为空', trigger: 'blur' }
+                        {required: true, message: '服务提供商1 阿里云 2 腾讯云 3 cloudflare不能为空', trigger: 'blur'}
                     ],
                     serviceProviderId: [
-                        { required: true, message: '不能为空', trigger: 'blur' }
+                        {required: true, message: '不能为空', trigger: 'blur'}
                     ],
                     serviceProviderSecret: [
-                        { required: true, message: '不能为空', trigger: 'blur' }
+                        {required: true, message: '不能为空', trigger: 'blur'}
                     ],
                     recordType: [
-                        { required: true, message: '解析类型:1 AAAA 2 A不能为空', trigger: 'blur' }
+                        {required: true, message: '解析类型:1 AAAA 2 A不能为空', trigger: 'blur'}
                     ],
                     getIpMode: [
-                        { required: true, message: '获取ip方式: 1 interface 2 network 3 cmd不能为空', trigger: 'blur' }
+                        {required: true, message: '获取ip方式: 1 interface 2 network 3 cmd不能为空', trigger: 'blur'}
                     ],
                     domain: [
-                        { required: true, message: '域名不能为空', trigger: 'blur' }
+                        {required: true, message: '域名不能为空', trigger: 'blur'}
                     ],
                     state: [
-                        { required: true, message: '1 启用 0 禁用不能为空', trigger: 'blur' }
+                        {required: true, message: '1 启用 0 禁用不能为空', trigger: 'blur'}
                     ],
                     updateFrequency: [
-                        { required: true, message: '更新频率不能为空', trigger: 'blur' }
+                        {required: true, message: '更新频率不能为空', trigger: 'blur'}
                     ]
                 }
             }
@@ -392,6 +402,12 @@
         },
         created() {
             this.getDataList()
+        },
+        beforeDestroy() {
+            // 关闭 WebSocket 连接
+            this.socket.close();
+        },
+        mounted() {
         },
         methods: {
             // 获取数据列表
@@ -509,7 +525,7 @@
                     });
                 })
             },
-            init (id) {
+            init(id) {
                 this.addOrUpdateForm.id = id || 0
                 this.visible = true
                 this.$nextTick(() => {
@@ -544,7 +560,7 @@
                 })
             },
             // 表单提交
-            addOrUpdateFormSubmit () {
+            addOrUpdateFormSubmit() {
                 console.log(this.$refs['addOrUpdateForm'])
                 this.$refs['addOrUpdateForm'].validate((valid) => {
                     if (valid) {
@@ -583,7 +599,9 @@
                         });
                     }
                 })
-            }
+            },
+
+
         }
     })
 </script>
