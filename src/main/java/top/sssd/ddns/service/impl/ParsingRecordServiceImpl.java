@@ -51,6 +51,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         ParsingRecord checkParsingRecord = this.lambdaQuery()
                 .eq(ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
                 .eq(ParsingRecord::getRecordType, parsingRecord.getRecordType())
+                .eq(ParsingRecord::getDomain, parsingRecord.getDomain())
                 .eq(ParsingRecord::getIp, parsingRecord.getIp())
                 .last("limit 1").one();
         if (Objects.nonNull(checkParsingRecord)) {
@@ -80,6 +81,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 .eq(ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
                 .eq(ParsingRecord::getRecordType, parsingRecord.getRecordType())
                 .eq(ParsingRecord::getIp, parsingRecord.getIp())
+                .eq(ParsingRecord::getDomain, parsingRecord.getDomain())
                 .ne(ParsingRecord::getId, parsingRecord.getId())
                 .last("limit 1").one();
         if (Objects.nonNull(checkParsingRecord)) {
