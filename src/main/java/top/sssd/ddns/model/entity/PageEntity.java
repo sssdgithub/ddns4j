@@ -1,6 +1,7 @@
 package top.sssd.ddns.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,7 +13,9 @@ import java.io.Serializable;
 @Data
 public class PageEntity implements Serializable {
     @TableField(exist = false)
-    private long page = 1;
+    @JsonProperty("page")
+    private Long page ;
     @TableField(exist = false)
-    private long pageSize = 10;
+    @JsonProperty("pageSize")
+    private Long pageSize ;
 }

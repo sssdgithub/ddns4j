@@ -51,4 +51,13 @@ public enum ServiceProviderEnum {
     public void setName(String name) {
         this.name = name;
     }
+
+    public static String getNameByIndex(Integer index) {
+        for (ServiceProviderEnum el : ServiceProviderEnum.values()) {
+            if (el.getIndex().equals(index)) {
+                return el.getName();
+            }
+        }
+        return null;
+    }
 }

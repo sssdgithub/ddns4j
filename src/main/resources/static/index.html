@@ -4,183 +4,585 @@
     <meta charset="UTF-8">
     <title>DDns-Java</title>
 </head>
+<!-- 引入样式 -->
+<link rel="stylesheet" href="css/index.css">
 <!--引入静态的路径-->
 <script type="text/javascript" src="js/vue.min.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
-<!-- 引入样式 -->
-<link rel="stylesheet" href="css/index.css">
 <!-- 引入组件库 -->
 <!--引入通信框架-->
 <script type="text/javascript" src="js/axios.min.js"></script>
 <body>
-<el-container id="app">
-    <el-header>DDns-Java</el-header>
-    <el-container id="inner-content">
-        <el-aside width="66.6%">
-            <el-row>
+<div id="app">
+    <el-container>
+        <el-header>DDns-Java</el-header>
+        <el-container id="inner-content">
+            <el-aside width="66.6%">
+                <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+                    <el-form-item>
+                        <el-input v-model="dataForm.domain" clearable="true" size="mini" placeholder="域名"
+                                  clearable></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-select v-model="dataForm.serviceProvider" size="mini" placeholder="厂商" clearable="true">
+                            <el-option
+                                    v-for="item in dataForm.serviceOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                            >
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
 
-            </el-row>
-            <el-row size="mini">
-                <el-col :span="6">
-                    <el-input v-model="queryData" size="mini" placeholder="厂商/域名/记录类型"></el-input>
-                </el-col>
-                <el-col :span="6">
-                    <el-select v-model="selectValue" size="mini" placeholder="状态">
-                        <el-option
-                                v-for="item in selectOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-col>
-                <el-col :span="6">
-                    <div align="left">
-                        <el-date-picker
-                                size="mini"
-                                v-model="datetimeValue"
-                                type="datetimerange"
-                                :picker-options="pickerOptions"
-                                range-separator="至"
-                                start-placeholder="记录更新开始日期"
-                                end-placeholder="记录更新结束日期">
-                        </el-date-picker>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div align="right">
-                        <el-button size="mini" round>查询</el-button>
-                        <el-button size="mini" round>新增</el-button>
-                        <el-button size="mini" round>批量删除</el-button>
-                    </div>
-                </el-col>
-            </el-row>
+                    <el-form-item>
+                        <el-select v-model="dataForm.recordType" size="mini" placeholder="记录类型" clearable="true">
+                            <el-option
+                                    v-for="item in dataForm.recordOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                    clearable>
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
 
-            <el-table size="mini" :data="parsingRecords" border stripe style="width: 100%;"
-                      tooltip-effect="dark"
-                      @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="40">
-                </el-table-column>
-                <el-table-column type="index" width="50">
-                </el-table-column>
-                <el-table-column prop="serviceProvider" label="服务商">
-                </el-table-column>
-                <el-table-column prop="domain" label="域名">
-                </el-table-column>
-                <el-table-column prop="recordType" label="记录类型">
-                </el-table-column>
-                <el-table-column prop="state" label="状态" width="70">
-                    <template slot-scope="scope">
-                        <el-switch
-                                active-color="#13ce66"
-                                inactive-color="#ff4949"
-                                v-model="scope.row.state"
-                                :active-value="1"
-                                :inactive-value="0"
-                                @change="changeState(scope.row,scope.row.state,'state')">
-                        </el-switch>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="updatedTime" label="更新时间">
-                </el-table-column>
-                <el-table-column prop="operation" label="操作">
-                    <template slot-scope="scope">
-                    <el-button
-                            size="mini"
-                            round
-                            @click="handleEdit(scope.row.id, scope.row)">修改</el-button>
-                    <el-button
-                            size="mini"
-                            round
-                            @click="handleDelete(scope.row.id, scope.row.cloudTypeId)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <el-pagination
-                    @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange"
-                    :current-page="currentPage"
-                    :page-sizes="[5, 10, 50, 100]"
-                    :page-size="5"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="totals">
-            </el-pagination>
-        </el-aside>
-        <el-main>Log</el-main>
+                    <el-form-item>
+                        <el-select v-model="dataForm.state" size="mini" placeholder="状态" clearable="true">
+                            <el-option
+                                    v-for="item in dataForm.stateOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value"
+                                    clearable>
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <el-form-item>
+                        <el-button size="mini" round @click="getDataList()">查询</el-button>
+                        <el-button size="mini" round @click="addOrUpdateHandle()">新增</el-button>
+                    </el-form-item>
+                </el-form>
+                <el-table
+                        :data="dataList"
+                        border
+                        v-loading="dataListLoading"
+                        @selection-change="selectionChangeHandle"
+                        style="width: 100%;"
+                        size="mini">
+                    <el-table-column
+                            type="index"
+                            header-align="center"
+                            align="center"
+                            width="50">
+                    </el-table-column>
+                    <el-table-column
+                            prop="serviceProviderName"
+                            header-align="center"
+                            align="center"
+                            label="服务提供商">
+                    </el-table-column>
+                    <el-table-column
+                            prop="recordTypeName"
+                            header-align="center"
+                            align="center"
+                            label="解析类型">
+                    </el-table-column>
+                    </el-table-column>
+                    <el-table-column
+                            prop="ip"
+                            header-align="center"
+                            align="center"
+                            label="真实的公网ip">
+                    </el-table-column>
+                    <el-table-column
+                            prop="domain"
+                            header-align="center"
+                            align="center"
+                            label="域名">
+                    </el-table-column>
+                    <el-table-column
+                            prop="state"
+                            header-align="center"
+                            align="center"
+                            label="状态">
+                        <template slot-scope="scope">
+                            <el-switch
+                                    active-color="#13ce66"
+                                    inactive-color="#ff4949"
+                                    v-model="scope.row.state"
+                                    :active-value="1"
+                                    :inactive-value="0"
+                                    @change="changeState(scope.row,scope.row.state,'state')">
+                            </el-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            prop="updateFrequency"
+                            header-align="center"
+                            align="center"
+                            label="更新频率 单位:分钟">
+                    </el-table-column>
+                    <el-table-column
+                            prop="createDate"
+                            header-align="center"
+                            align="center"
+                            label="创建时间">
+                    </el-table-column>
+                    <el-table-column
+                            prop="updateDate"
+                            header-align="center"
+                            align="center"
+                            label="更新时间">
+                    </el-table-column>
+                    <el-table-column
+                            fixed="right"
+                            header-align="center"
+                            align="center"
+                            width="150"
+                            label="操作">
+                        <template slot-scope="scope">
+                            <el-button size="mini" round @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+                            <el-button size="mini" round @click="deleteHandle(scope.row.id)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination
+                        @size-change="sizeChangeHandle"
+                        @current-change="currentChangeHandle"
+                        :current-page="pageIndex"
+                        :page-sizes="[5,10, 20, 50, 100]"
+                        :page-size="pageSize"
+                        :total="totalSize"
+                        layout="total, sizes, prev, pager, next, jumper">
+                </el-pagination>
+                <el-dialog
+                        :title="!addOrUpdateForm.id ? '新增' : '修改'"
+                        :close-on-click-modal="false"
+                        :visible.sync="visible"
+                        width="20%">
+                    <el-form :model="addOrUpdateForm" :rules="dataRule" ref="addOrUpdateForm" size="mini" @keyup.enter.native="addOrUpdateFormSubmit()" label-width="140px">
+                        <el-form-item label="服务提供商" prop="serviceProvider">
+                            <el-select v-model="addOrUpdateForm.serviceProvider" size="mini" placeholder="服务提供商" clearable="true">
+                                <el-option
+                                        v-for="item in dataForm.serviceOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                >
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="serviceProviderId" prop="serviceProviderId" size="small">
+                            <el-input v-model="addOrUpdateForm.serviceProviderId" size="small"  placeholder=""></el-input>
+                        </el-form-item>
+                        <el-form-item label="serviceProviderSecret" prop="serviceProviderSecret">
+                            <el-input v-model="addOrUpdateForm.serviceProviderSecret" size="small"  placeholder=""></el-input>
+                        </el-form-item>
+                        <el-form-item label="解析类型" prop="recordType">
+                            <el-select v-model="addOrUpdateForm.recordType" size="mini" placeholder="记录类型" clearable="true">
+                                <el-option
+                                        v-for="item in dataForm.recordOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                        clearable>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="获取ip方式:" prop="getIpMode">
+                            <el-select v-model="addOrUpdateForm.getIpMode" size="mini" placeholder="获取ip方式" clearable="true">
+                                <el-option
+                                        v-for="item in getIpModeOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                        :disabled="item.disabled"
+                                        clearable>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="interface" prop="getIpModeValue" hidden="true">
+                            <el-input v-model="addOrUpdateForm.getIpModeValue" size="small" placeholder="interface"></el-input>
+                        </el-form-item>
+                        <el-form-item label="公网ip" prop="ip" hidden="true">
+                            <el-input v-model="addOrUpdateForm.ip" size="small" placeholder="公网ip"></el-input>
+                        </el-form-item>
+                        <el-form-item label="域名" prop="domain">
+                            <el-input v-model="addOrUpdateForm.domain" size="small" placeholder="域名"></el-input>
+                        </el-form-item>
+                        <el-form-item label="状态" prop="state">
+                            <el-select v-model="addOrUpdateForm.state" size="mini" placeholder="状态" clearable="true">
+                                <el-option
+                                        v-for="item in stateOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                        :disabled=item.disabled>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="更新频率" prop="updateFrequency">
+                            <el-select v-model="addOrUpdateForm.updateFrequency" size="mini" placeholder="状态" clearable="true">
+                                <el-option
+                                        v-for="item in updateFrequencyOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                        >
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                    <el-button size="mini" round @click="visible = false">取消</el-button>
+                    <el-button size="mini" round @click="addOrUpdateFormSubmit()">确定</el-button>
+                    </span>
+                </el-dialog>
+            </el-aside>
+            <el-main>Log</el-main>
+        </el-container>
     </el-container>
-</el-container>
+</div>
 </body>
 <script>
-    new Vue({
+    let vm = new Vue({
         el: '#app',
         data() {
             return {
-                parsingRecords: [
-                    {
-                        serviceProvider: "阿里云",
-                        domain: "test.jjjr.site",
-                        recordType: "AAAA",
-                        state: "开启",
-                        updatedTime: "2023-03-19 08:00:00"
-                    }
-                ],
-                queryData: '',
-                selectOptions: [
-                    {
-                        value: '选项1',
-                        label: '开启'
-                    }, {
-                        value: '选项2',
-                        label: '关闭'
-                    }
-                ],
-                selectValue: '',
-                pickerOptions: {
-                    shortcuts: [
+                dataForm: {
+                    domain: null,
+                    serviceProvider: null,
+                    state: null,
+                    recordType: null,
+                    serviceOptions: [
                         {
-                            text: '最近一周',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                                picker.$emit('pick', [start, end]);
-                            }
+                            value: 1,
+                            label: '阿里云'
+                        },
+                        {
+                            value: 2,
+                            label: '腾讯云'
+                        },
+                        {
+                            value: 3,
+                            label: 'cloudflare'
+                        }
+                    ],
+                    recordOptions: [
+                        {
+                            value: 1,
+                            label: 'AAAA'
+                        },
+                        {
+                            value: 2,
+                            label: 'A'
+                        }
+                    ],
+                    stateOptions: [
+                        {
+                            value: 1,
+                            label: '开启'
                         }, {
-                            text: '最近一个月',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                                picker.$emit('pick', [start, end]);
-                            }
-                        }, {
-                            text: '最近三个月',
-                            onClick(picker) {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                                picker.$emit('pick', [start, end]);
-                            }
-                        }]
+                            value: 0,
+                            label: '关闭',
+                            disabled: false
+                        }
+                    ]
                 },
-                multipleSelection: [],
-                totals: 400,
-                currentPage: 1,
-                datetimeValue: ''
+                dataList: [],
+                pageIndex: 1,
+                pageSize: 10,
+                totalSize: 0,
+                dataListLoading: false,
+                dataListSelections: [],
+                addOrUpdateVisible: false,
+                visible: false,
+                getIpModeOptions:[
+                    {
+                        value: 1,
+                        label: 'interface'
+                    },
+                    {
+                        value: 2,
+                        label: 'network',
+                        disabled: true
+                    },
+                    {
+                        value: 3,
+                        label: 'shell',
+                        disabled: true
+                    }
+                ],
+                updateFrequencyOptions:[
+                    {
+                        value: 1,
+                        label: '1分钟'
+                    },
+                    {
+                        value: 2,
+                        label: '2分钟'
+                    },
+                    {
+                        value: 5,
+                        label: '5分钟'
+                    },
+                    {
+                        value: 10,
+                        label: '10分钟'
+                    }
+                ],
+                addOrUpdateForm: {
+                    id: 0,
+                    serviceProvider: '',
+                    serviceProviderId: '',
+                    serviceProviderSecret: '',
+                    recordType: '',
+                    getIpMode: '',
+                    getIpModeValue: '',
+                    ip: '',
+                    domain: '',
+                    state: '',
+                    updateFrequency: ''
+                },
+                dataRule: {
+                    serviceProvider: [
+                        { required: true, message: '服务提供商1 阿里云 2 腾讯云 3 cloudflare不能为空', trigger: 'blur' }
+                    ],
+                    serviceProviderId: [
+                        { required: true, message: '不能为空', trigger: 'blur' }
+                    ],
+                    serviceProviderSecret: [
+                        { required: true, message: '不能为空', trigger: 'blur' }
+                    ],
+                    recordType: [
+                        { required: true, message: '解析类型:1 AAAA 2 A不能为空', trigger: 'blur' }
+                    ],
+                    getIpMode: [
+                        { required: true, message: '获取ip方式: 1 interface 2 network 3 cmd不能为空', trigger: 'blur' }
+                    ],
+                    domain: [
+                        { required: true, message: '域名不能为空', trigger: 'blur' }
+                    ],
+                    state: [
+                        { required: true, message: '1 启用 0 禁用不能为空', trigger: 'blur' }
+                    ],
+                    updateFrequency: [
+                        { required: true, message: '更新频率不能为空', trigger: 'blur' }
+                    ]
+                }
             }
         },
+        computed: {
+            stateOptions() {
+                const isDisabled = this.addOrUpdateForm.id === 0;
+                return [
+                    {
+                        value: 1,
+                        label: '开启'
+                    },
+                    {
+                        value: 0,
+                        label: '关闭',
+                        disabled: isDisabled
+                    }
+                ];
+            }
+        },
+        created() {
+            this.getDataList()
+        },
         methods: {
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+            // 获取数据列表
+            getDataList() {
+                this.dataListLoading = true
+                axios({
+                    method: 'post',
+                    url: '/parsingRecord/page',
+                    data: {
+                        page: this.pageIndex,
+                        pageSize: this.pageSize,
+                        state: this.dataForm.state,
+                        serviceProvider: this.dataForm.serviceProvider,
+                        recordType: this.dataForm.recordType,
+                        domain: this.dataForm.domain
+                    }
+                }).then((response) => {
+                    if (response && response.data.code === 200) {
+                        this.dataList = response.data.data.data
+                        this.totalSize = response.data.data.totalRecords
+                    } else {
+                        this.dataList = []
+                        this.totalSize = 0
+                    }
+                    this.dataListLoading = false
+                });
             },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+            //状态开关
+            changeState(row, rowState) {
+                this.dataListLoading = true
+                axios({
+                    method: 'post',
+                    url: '/parsingRecord/modify',
+                    data: row
+                }).then((response) => {
+                    if (response && response.data.code === 200) {
+                        this.$message({
+                            message: '更新成功',
+                            type: 'success',
+                            duration: 1500,
+                            onClose: () => {
+                                this.getDataList()
+                            }
+                        })
+                    } else {
+                        this.$message({
+                            message: response.data.data,
+                            type: 'error',
+                            duration: 1500,
+                            onClose: () => {
+                                this.getDataList()
+                            }
+                        })
+                    }
+                    this.dataListLoading = false
+                });
             },
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
+            // 每页数
+            sizeChangeHandle(val) {
+                this.pageSize = val
+                this.pageIndex = 1
+                this.getDataList()
             },
-            changeState(){
-                console.log('changeState')
+            // 当前页
+            currentChangeHandle(val) {
+                this.pageIndex = val
+                this.getDataList()
+            },
+            // 多选
+            selectionChangeHandle(val) {
+                this.dataListSelections = val
+            },
+            // 新增 / 修改
+            addOrUpdateHandle(id) {
+                this.addOrUpdateVisible = true
+                this.$nextTick(() => {
+                    this.init(id)
+                })
+            },
+            // 删除
+            deleteHandle(id) {
+                var ids = id ? [id] : this.dataListSelections.map(item => {
+                    return item.id
+                })
+                this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.dataListLoading = true
+                    axios({
+                        method: 'delete',
+                        url: `/parsingRecord/delete/${id}`
+                    }).then((response) => {
+                        if (response && response.data.code === 200) {
+                            this.$message({
+                                message: '删除成功',
+                                type: 'success',
+                                duration: 1500,
+                                onClose: () => {
+                                    this.getDataList()
+                                }
+                            })
+                        } else {
+                            this.$message({
+                                message: response.data.data,
+                                type: 'error',
+                                duration: 1500,
+                                onClose: () => {
+                                    this.getDataList()
+                                }
+                            })
+                        }
+                        this.dataListLoading = false
+                    });
+                })
+            },
+            init (id) {
+                this.addOrUpdateForm.id = id || 0
+                this.visible = true
+                this.$nextTick(() => {
+                    this.$refs['addOrUpdateForm'].resetFields()
+                    if (this.addOrUpdateForm.id) {
+                        this.dataListLoading = true
+                        axios({
+                            method: 'get',
+                            url: `/parsingRecord/${this.addOrUpdateForm.id}`
+                        }).then((response) => {
+                            if (response && response.data.code === 200) {
+                                this.addOrUpdateForm.serviceProvider = response.data.data.serviceProvider
+                                this.addOrUpdateForm.serviceProviderId = response.data.data.serviceProviderId
+                                this.addOrUpdateForm.serviceProviderSecret = response.data.data.serviceProviderSecret
+                                this.addOrUpdateForm.recordType = response.data.data.recordType
+                                this.addOrUpdateForm.getIpMode = response.data.data.getIpMode
+                                this.addOrUpdateForm.getIpModeValue = response.data.data.getIpModeValue
+                                this.addOrUpdateForm.ip = response.data.data.ip
+                                this.addOrUpdateForm.domain = response.data.data.domain
+                                this.addOrUpdateForm.state = response.data.data.state
+                                this.addOrUpdateForm.updateFrequency = response.data.data.updateFrequency
+                                this.addOrUpdateForm.createDate = response.data.data.createDate
+                                this.addOrUpdateForm.updateDate = response.data.data.updateDate
+                                this.addOrUpdateForm.creator = response.data.data.creator
+                                this.addOrUpdateForm.updater = response.data.data.updater
+                            } else {
+                                this.$message.error(response.data.data)
+                            }
+                            this.dataListLoading = false
+                        });
+                    }
+                })
+            },
+            // 表单提交
+            addOrUpdateFormSubmit () {
+                console.log(this.$refs['addOrUpdateForm'])
+                this.$refs['addOrUpdateForm'].validate((valid) => {
+                    if (valid) {
+                        this.dataListLoading = true
+                        axios({
+                            method: 'post',
+                            url: `/parsingRecord/${!this.addOrUpdateForm.id ? 'add' : 'modify'}`,
+                            data: {
+                                'id': this.addOrUpdateForm.id || undefined,
+                                'serviceProvider': this.addOrUpdateForm.serviceProvider,
+                                'serviceProviderId': this.addOrUpdateForm.serviceProviderId,
+                                'serviceProviderSecret': this.addOrUpdateForm.serviceProviderSecret,
+                                'recordType': this.addOrUpdateForm.recordType,
+                                'getIpMode': this.addOrUpdateForm.getIpMode,
+                                'getIpModeValue': this.addOrUpdateForm.getIpModeValue,
+                                'ip': this.addOrUpdateForm.ip,
+                                'domain': this.addOrUpdateForm.domain,
+                                'state': this.addOrUpdateForm.state,
+                                'updateFrequency': this.addOrUpdateForm.updateFrequency
+                            }
+                        }).then((response) => {
+                            if (response && response.data.code === 200) {
+                                this.$message({
+                                    message: '操作成功',
+                                    type: 'success',
+                                    duration: 1500,
+                                    onClose: () => {
+                                        this.visible = false
+                                        this.getDataList()
+                                    }
+                                })
+                            } else {
+                                this.$message.error(response.data.data)
+                            }
+                            this.dataListLoading = false
+                        });
+                    }
+                })
             }
         }
     })
