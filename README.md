@@ -37,6 +37,6 @@ java -jar ddns-v1.0-RELEASE.jar
 5. 启动成功后，在浏览器中输入 http://localhost:10000/index.html 即可访问 DDNS4J 的可视化界面。
 
 ## 推荐阅读
-如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 https://blog.sssd.top,博客站点就是使用ddn4j搭建而成,访问较慢请大家海涵
+如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 https://blog.sssd.top
 
-了解更多有关网络和开发的知识。
+该博客站点就是使用ddn4j搭建而成,响应较慢请大家海涵!了解更多有关网络和开发的知识。
