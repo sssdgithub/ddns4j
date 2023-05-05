@@ -46,8 +46,17 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
 
     @Override
     public void add(ParsingRecord parsingRecord) {
-        // TODO: 2023/5/4 后端唯一性校验
         String ip = getIp(parsingRecord);
+        //后端唯一性校验
+        ParsingRecord checkParsingRecord = this.lambdaQuery()
+                .eq(ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
+                .eq(ParsingRecord::getRecordType, parsingRecord.getRecordType())
+                .eq(ParsingRecord::getIp, parsingRecord.getIp())
+                .last("limit 1").one();
+        if (Objects.nonNull(checkParsingRecord)) {
+            throw new BizException("同一服务商,同一解析类型,同一ip,不能重复添加");
+        }
+
         if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),
@@ -56,17 +65,27 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         }
         dynamicDnsService.add(parsingRecord, ip);
         this.save(parsingRecord);
-         //添加并启动一个定时任务
+        //添加并启动一个定时任务
         addWithStartTask(parsingRecord);
     }
 
     @Override
     public void modify(ParsingRecord parsingRecord) {
-        // TODO: 2023/5/4 后端唯一性校验
         ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
         if (Objects.isNull(dbParsingRecord)) {
             throw new BizException("该记录不存在");
         }
+        //后端唯一性校验
+        ParsingRecord checkParsingRecord = this.lambdaQuery()
+                .eq(ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
+                .eq(ParsingRecord::getRecordType, parsingRecord.getRecordType())
+                .eq(ParsingRecord::getIp, parsingRecord.getIp())
+                .ne(ParsingRecord::getId, parsingRecord.getId())
+                .last("limit 1").one();
+        if (Objects.nonNull(checkParsingRecord)) {
+            throw new BizException("同一服务商,同一解析类型,同一ip,不允许重复更新");
+        }
+
 //        if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
 //                parsingRecord.getServiceProviderSecret(),
 //                parsingRecord.getDomain(),
@@ -80,7 +99,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             jobTaskService.deleteJobTask(one.getId());
         }
 
-        if(parsingRecord.getState().equals(0)){
+        if (parsingRecord.getState().equals(0)) {
             this.updateById(parsingRecord);
             return;
         }
@@ -132,7 +151,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     @Override
     public PageUtils queryPage(ParsingRecord parsingRecord) {
         Page<ParsingRecord> page = lambdaQuery()
-                .eq(Objects.nonNull(parsingRecord.getServiceProvider()),ParsingRecord::getServiceProvider,parsingRecord.getServiceProvider())
+                .eq(Objects.nonNull(parsingRecord.getServiceProvider()), ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
                 .eq(StringUtils.hasText(parsingRecord.getDomain()), ParsingRecord::getDomain, parsingRecord.getDomain())
                 .eq(Objects.nonNull(parsingRecord.getRecordType()), ParsingRecord::getRecordType, parsingRecord.getRecordType())
                 .eq(Objects.nonNull(parsingRecord.getState()), ParsingRecord::getState, parsingRecord.getState())
