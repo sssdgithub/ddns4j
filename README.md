@@ -19,7 +19,7 @@ DDNS 即动态 DNS，是一种可以自动更新域名解析记录的 DNS 服务
 ## 技术栈
 DDNS4J 使用了以下技术栈：
 
-### 后端：SpringBoot、MyBatis、Thymeleaf
+### 后端：SpringBoot、MyBatisPlus、WebSocket
 ### 前端：Vue2、ElementUI、Axios
 
 ## 部署
