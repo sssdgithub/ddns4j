@@ -3,7 +3,7 @@
 
 阅读前需知悉:
 
-该<<使用指南>>由gpt生成,如果有错误欢迎大家指正,目前该项目由于只有我一个人闲暇时间开发,目前只支持阿里云,后续版本会加上腾讯云及cloudflare.
+该<<使用指南>>由gpt生成,如果有错误欢迎大家指正,目前该项目由于只有我一个人闲暇时间开发,目前只支持阿里云和腾讯云,后续版本会加上cloudflare.
 
 [![Fork me on Gitee](https://gitee.com/Xsssd/ddns4j/widgets/widget_4.svg)](https://gitee.com/Xsssd/ddns4j)
 
