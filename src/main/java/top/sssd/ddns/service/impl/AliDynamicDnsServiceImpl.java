@@ -3,10 +3,10 @@ package top.sssd.ddns.service.impl;
 import com.aliyun.alidns20150109.Client;
 import com.aliyun.alidns20150109.models.DescribeSubDomainRecordsResponse;
 import com.aliyun.alidns20150109.models.DescribeSubDomainRecordsResponseBody;
-import com.aliyun.tea.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.common.utils.DoMainUtil;
@@ -22,7 +22,7 @@ import top.sssd.ddns.utils.AliDnsUtils;
 @Slf4j
 public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) {
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) throws Exception {
         Client client = AliDnsUtils.createClient(serviceProviderId, serviceProviderSecret);
         DescribeSubDomainRecordsResponse response = AliDnsUtils.getSubDomainParseList(client, subDomain, recordType);
         if (response.statusCode != HttpStatus.OK.value()) {
@@ -51,7 +51,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void update(ParsingRecord parsingRecord, String ip,String recordId) {
+    public void update(ParsingRecord parsingRecord, String ip,String recordId) throws Exception {
         //call dns api
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
 
@@ -72,7 +72,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public String getRecordId(ParsingRecord parsingRecord, String ip) {
+    public String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception {
         //call dns api
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
 
@@ -97,10 +97,17 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void remove(ParsingRecord parsingRecord, String ip) {
+    public void remove(ParsingRecord parsingRecord, String ip) throws Exception {
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
         String recordTypeName = RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType());
         String recordId = AliDnsUtils.getDomainRecordId(client, parsingRecord.getDomain(), recordTypeName, ip);
         AliDnsUtils.delete(client, recordId);
+    }
+
+    @Override
+    public String getIpBySubDomainWithType(ParsingRecord parsingRecord) {
+        Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
+        String ip = AliDnsUtils.getIpBySubDomainWithType(client, parsingRecord.getDomain(), RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()));
+        return ip;
     }
 }

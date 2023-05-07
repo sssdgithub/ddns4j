@@ -1,7 +1,6 @@
 package top.sssd.ddns.service.impl;
 
 import cn.hutool.http.HttpUtil;
-import com.aliyun.alidns20150109.Client;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,7 @@ import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.common.enums.ServiceProviderEnum;
 import top.sssd.ddns.common.enums.UpdateFrequencyEnum;
 import top.sssd.ddns.common.utils.PageUtils;
+import top.sssd.ddns.factory.DynamicDnsServiceFactory;
 import top.sssd.ddns.mapper.ParsingRecordMapper;
 import top.sssd.ddns.model.entity.JobTask;
 import top.sssd.ddns.model.entity.ParsingRecord;
@@ -19,7 +19,6 @@ import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.service.IJobTaskService;
 import top.sssd.ddns.service.IParsingRecordService;
 import top.sssd.ddns.task.DynamicDnsJob;
-import top.sssd.ddns.utils.AliDnsUtils;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -40,12 +39,12 @@ import java.util.stream.Collectors;
 public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, ParsingRecord> implements IParsingRecordService {
 
     @Resource
-    private DynamicDnsService dynamicDnsService;
-    @Resource
     private IJobTaskService jobTaskService;
 
     @Override
-    public void add(ParsingRecord parsingRecord) {
+    public void add(ParsingRecord parsingRecord) throws Exception {
+        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+
         String ip = getIp(parsingRecord);
         //后端唯一性校验
         ParsingRecord checkParsingRecord = this.lambdaQuery()
@@ -71,7 +70,9 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     }
 
     @Override
-    public void modify(ParsingRecord parsingRecord) {
+    public void modify(ParsingRecord parsingRecord) throws Exception {
+        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+
         ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
         if (Objects.isNull(dbParsingRecord)) {
             throw new BizException("该记录不存在");
@@ -106,8 +107,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             return;
         }
 
-        Client client = AliDnsUtils.createClient(dbParsingRecord.getServiceProviderId(), dbParsingRecord.getServiceProviderSecret());
-        String dnsIp = AliDnsUtils.getIpBySubDomainWithType(client, dbParsingRecord.getDomain(), RecordTypeEnum.getNameByIndex(dbParsingRecord.getRecordType()));
+        String dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
 
         String ip = getIp(parsingRecord);
@@ -128,11 +128,13 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws Exception {
         ParsingRecord parsingRecord = this.getById(id);
         if (Objects.isNull(parsingRecord)) {
             throw new BizException("该记录不存在");
         }
+        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+
         if (!dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),

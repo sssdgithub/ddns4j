@@ -1,5 +1,6 @@
 package top.sssd.ddns.service;
 
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import top.sssd.ddns.model.entity.ParsingRecord;
 
 import javax.validation.constraints.NotBlank;
@@ -21,21 +22,21 @@ public interface DynamicDnsService {
      */
     boolean exist(@NotBlank(message = "传入的serviceProviderId不能为空") String serviceProviderId,
                   String serviceProviderSecret,@NotBlank(message = "传入的子域名不能为空") String subDomain,
-                  @NotBlank(message = "传入的解析类型不能为空") String recordType);
+                  @NotBlank(message = "传入的解析类型不能为空") String recordType) throws Exception;
 
     /**
      * 新增解析记录
      *
      * @param parsingRecord 解析对象
      */
-    void add(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip);
+    void add(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip) throws TencentCloudSDKException;
 
     /**
      * 更新解析记录
      *
      * @param parsingRecord 解析对象
      */
-    void update(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip,String recordId);
+    void update(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip,String recordId) throws Exception;
 
 
     /**
@@ -44,12 +45,20 @@ public interface DynamicDnsService {
      * @param ip
      * @return
      */
-    String getRecordId(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip);
+    String getRecordId(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip) throws Exception;
 
     /**
      * 根据解析记录Id删除记录
      * @param parsingRecord
      * @param ip
      */
-    void remove(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord, String ip);
+    void remove(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord, String ip) throws Exception;
+
+
+    /**
+     * 根据解析记录获取服务商中的ip
+     * @param parsingRecord
+     * @return
+     */
+    String getIpBySubDomainWithType(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord) throws TencentCloudSDKException;
 }

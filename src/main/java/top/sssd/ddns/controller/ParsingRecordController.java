@@ -36,20 +36,20 @@ public class ParsingRecordController {
 
     @PostMapping("add")
     public Result add(@RequestBody
-                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord) {
+                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord) throws Exception {
         parsingRecordService.add(parsingRecord);
         return Result.ok();
     }
 
     @PostMapping("modify")
     public Result modify(@RequestBody
-                         @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord) {
+                         @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord) throws Exception {
         parsingRecordService.modify(parsingRecord);
         return Result.ok();
     }
 
     @DeleteMapping("delete/{id}")
-    public Result delete(@PathVariable Long id) {
+    public Result delete(@PathVariable Long id) throws Exception {
         parsingRecordService.delete(id);
         return Result.ok();
     }

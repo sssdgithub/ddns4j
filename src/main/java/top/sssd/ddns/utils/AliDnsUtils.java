@@ -1,8 +1,6 @@
 package top.sssd.ddns.utils;
 
 import com.aliyun.alidns20150109.models.*;
-import com.aliyun.tea.TeaException;
-import com.aliyun.tea.TeaModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import top.sssd.ddns.common.BizException;
@@ -47,21 +45,12 @@ public class AliDnsUtils {
     /**
      * 获取子域名的所有解析记录列表
      */
-    public static DescribeSubDomainRecordsResponse getSubDomainParseList(com.aliyun.alidns20150109.Client client, String subDomain, String recordType) {
+    public static DescribeSubDomainRecordsResponse getSubDomainParseList(com.aliyun.alidns20150109.Client client, String subDomain, String recordType) throws Exception {
         com.aliyun.alidns20150109.models.DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new com.aliyun.alidns20150109.models.DescribeSubDomainRecordsRequest()
                 .setSubDomain(subDomain)
                 .setType(recordType);
-        try {
-            DescribeSubDomainRecordsResponse describeSubDomainRecordsResponse = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
-            log.info("-------------------获取主域名的所有解析记录列表--------------------");
-            log.info(com.aliyun.teautil.Common.toJSONString(TeaModel.buildMap(describeSubDomainRecordsResponse)));
-            return describeSubDomainRecordsResponse;
-        } catch (TeaException error) {
-            log.error(error.message);
-        } catch (Exception error) {
-            log.error(error.getMessage());
-        }
-        return null;
+        DescribeSubDomainRecordsResponse describeSubDomainRecordsResponse = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
+        return describeSubDomainRecordsResponse;
     }
 
     /**
@@ -71,18 +60,11 @@ public class AliDnsUtils {
      * @param domain
      * @return
      */
-    public static DescribeDomainRecordsResponse getParseList(com.aliyun.alidns20150109.Client client, String domain) {
+    public static DescribeDomainRecordsResponse getParseList(com.aliyun.alidns20150109.Client client, String domain) throws Exception {
         com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest describeDomainRecordsRequest = new com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest()
                 .setDomainName(domain);
-        try {
-            DescribeDomainRecordsResponse resp = client.describeDomainRecords(describeDomainRecordsRequest);
-            return resp;
-        } catch (TeaException error) {
-            log.error(error.message);
-        } catch (Exception error) {
-            log.error(error.getMessage());
-        }
-        return null;
+        DescribeDomainRecordsResponse resp = client.describeDomainRecords(describeDomainRecordsRequest);
+        return resp;
     }
 
     /**
@@ -120,21 +102,14 @@ public class AliDnsUtils {
      * @param ip
      * @return
      */
-    public static UpdateDomainRecordResponse update(com.aliyun.alidns20150109.Client client, String recordId, String Rr, String recordType, String ip) {
-        try {
-            UpdateDomainRecordRequest updateDomainRecordRequest = new UpdateDomainRecordRequest()
-                    .setRecordId(recordId)
-                    .setRR(Rr)
-                    .setType(recordType)
-                    .setValue(ip);
-            UpdateDomainRecordResponse resp = client.updateDomainRecord(updateDomainRecordRequest);
-            return resp;
-        } catch (TeaException error) {
-            log.error(error.message);
-        } catch (Exception error) {
-            log.error(error.getMessage());
-        }
-        return null;
+    public static UpdateDomainRecordResponse update(com.aliyun.alidns20150109.Client client, String recordId, String Rr, String recordType, String ip) throws Exception {
+        UpdateDomainRecordRequest updateDomainRecordRequest = new UpdateDomainRecordRequest()
+                .setRecordId(recordId)
+                .setRR(Rr)
+                .setType(recordType)
+                .setValue(ip);
+        UpdateDomainRecordResponse resp = client.updateDomainRecord(updateDomainRecordRequest);
+        return resp;
     }
 
 
@@ -166,7 +141,7 @@ public class AliDnsUtils {
      * @param ip
      * @return
      */
-    public static String getDomainRecordId(com.aliyun.alidns20150109.Client client, String subDomain, String recordType, String ip) {
+    public static String getDomainRecordId(com.aliyun.alidns20150109.Client client, String subDomain, String recordType, String ip) throws Exception {
         DescribeSubDomainRecordsResponse response = getSubDomainParseList(client, subDomain, recordType);
         if (response.getStatusCode() != HttpStatus.OK.value()) {
             throw new BizException("查询并返回记录ID时,调用阿里云DNS解析失败,请检查传入的serviceProviderId,serviceProviderSecret,域名是否正确");

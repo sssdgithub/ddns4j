@@ -18,11 +18,11 @@ public interface IParsingRecordService extends IService<ParsingRecord> {
      * 添加解析记录
      * @param parsingRecord
      */
-    void add(ParsingRecord parsingRecord);
+    void add(ParsingRecord parsingRecord) throws Exception;
 
-    void modify(ParsingRecord parsingRecord);
+    void modify(ParsingRecord parsingRecord) throws Exception;
 
-    void delete(Long id);
+    void delete(Long id) throws Exception;
 
     PageUtils queryPage(ParsingRecord parsingRecord);
 
