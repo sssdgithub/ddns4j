@@ -22,7 +22,7 @@ public interface DynamicDnsService {
      */
     boolean exist(@NotBlank(message = "传入的serviceProviderId不能为空") String serviceProviderId,
                   String serviceProviderSecret,@NotBlank(message = "传入的子域名不能为空") String subDomain,
-                  @NotBlank(message = "传入的解析类型不能为空") String recordType) throws Exception;
+                  @NotBlank(message = "传入的解析类型不能为空") String recordType);
 
     /**
      * 新增解析记录
@@ -36,7 +36,7 @@ public interface DynamicDnsService {
      *
      * @param parsingRecord 解析对象
      */
-    void update(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip,String recordId) throws Exception;
+    void update(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip,String recordId);
 
 
     /**
@@ -45,14 +45,14 @@ public interface DynamicDnsService {
      * @param ip
      * @return
      */
-    String getRecordId(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip) throws Exception;
+    String getRecordId(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip);
 
     /**
      * 根据解析记录Id删除记录
      * @param parsingRecord
      * @param ip
      */
-    void remove(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord, String ip) throws Exception;
+    void remove(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord, String ip);
 
 
     /**

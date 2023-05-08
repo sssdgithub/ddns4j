@@ -146,11 +146,10 @@ public class AliDnsUtils {
         if (response.getStatusCode() != HttpStatus.OK.value()) {
             throw new BizException("查询并返回记录ID时,调用阿里云DNS解析失败,请检查传入的serviceProviderId,serviceProviderSecret,域名是否正确");
         }
-        List<DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord> records
-                = response.getBody().getDomainRecords().getRecord();
-        for (DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord record : records) {
-            if (ip.equals(record.getValue())) {
-                return record.getRecordId();
+
+        for (DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord domainRecordsRecord :  response.getBody().getDomainRecords().getRecord()) {
+            if (ip.equals(domainRecordsRecord.getValue())) {
+                return domainRecordsRecord.getRecordId();
             }
         }
         return null;
@@ -171,8 +170,7 @@ public class AliDnsUtils {
                     .setType(recordType);
             DescribeSubDomainRecordsResponse response = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
             List<DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord> records = response.getBody().getDomainRecords().getRecord();
-            DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord record = records.get(0);
-            return record.getValue();
+            return records.get(0).getValue();
         } catch (Exception e) {
             e.printStackTrace();
         }

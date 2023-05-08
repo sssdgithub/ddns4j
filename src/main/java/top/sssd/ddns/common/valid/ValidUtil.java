@@ -14,13 +14,12 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class ValidUtil {
+    private ValidUtil(){}
     public static void serviceValid(Object o) {
         List<InvalidField> errorList = Validation
                 .buildDefaultValidatorFactory()
                 .getValidator().validate(o).stream()
-                .map(item -> {
-                    return new InvalidField(item.getPropertyPath().toString(), item.getMessage(), item.getInvalidValue());
-                })
+                .map(item -> new InvalidField(item.getPropertyPath().toString(), item.getMessage(), item.getInvalidValue()))
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(errorList)){
             return;

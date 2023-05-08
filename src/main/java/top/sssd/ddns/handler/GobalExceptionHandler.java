@@ -44,19 +44,19 @@ public class GobalExceptionHandler {
     private ObjectMapper objectMapper;
 
     @ExceptionHandler({ConstraintViolationException.class})
-    public Result<String> ConstraintViolationExceptionHandler(ConstraintViolationException violationException) throws JsonProcessingException {
+    public Result<String> constraintViolationExceptionHandler(ConstraintViolationException violationException) throws JsonProcessingException {
         log.error("valid exception info:{}", violationException.getMessage());
         return Result.fail(violationException.getMessage());
     }
 
     @ExceptionHandler({BindException.class})
-    public Result<Map> bindExceptionHandler(BindException e) {
+    public Result<Map<String,String>> bindExceptionHandler(BindException e) {
         return Result.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<List> methodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public Result<List<FieldError>> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         return Result.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toList()));
     }
 
@@ -102,7 +102,6 @@ public class GobalExceptionHandler {
         return Result.fail().code(Integer.parseInt(e.getErrorCode())).message(e.getMessage());
     }
 
-    // FIXME: 2022/11/8
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public Result<String> httpMessageNotReadableException(HttpMessageNotReadableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("输入的消息流的堆栈信息:", e.getStackTrace()).map();
@@ -110,7 +109,6 @@ public class GobalExceptionHandler {
         return Result.fail(e.getMessage());
     }
 
-    // FIXME: 2022/11/8
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public Result<String> httpMessageNotWritableException(HttpMessageNotWritableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("输出的消息流的堆栈信息:", e.getStackTrace()).map();
@@ -165,7 +163,7 @@ public class GobalExceptionHandler {
     }
 
     @ExceptionHandler(ValidException.class)
-    public Result<Object> validException(ValidException e) throws JsonProcessingException {
+    public Result<Object> validException(ValidException e) {
         return Result.fail(JSONUtil.toList(e.getMessage(), List.class));
     }
 }

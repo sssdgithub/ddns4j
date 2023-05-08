@@ -6,6 +6,7 @@ package top.sssd.ddns.common.constant;
  * @author sssd
  */
 public class DDNSConstant {
+    private DDNSConstant(){}
     public static final String CREATE_DATE = "createDate";
     public static final String UPDATE_DATE = "updateDate";
     public static final String CREATOR = "creator";

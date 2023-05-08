@@ -8,6 +8,8 @@ import com.tencentcloudapi.dnspod.v20210323.DnspodClient;
 import com.tencentcloudapi.dnspod.v20210323.models.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
 /**
  * @author sssd
  * @careate 2023-05-06-16:13
@@ -15,9 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TencentDnsUtils {
 
-    public static final String endpoint = "dnspod.tencentcloudapi.com";
+    private TencentDnsUtils(){}
 
-    public static final String recordLine = "默认";
+    public static final String ENDPOINT = "dnspod.tencentcloudapi.com";
+
+    public static final String RECORDLINE = "默认";
 
     /**
      * 获取解析记录ID
@@ -30,8 +34,12 @@ public class TencentDnsUtils {
      * @throws TencentCloudSDKException
      */
     public static Long getRecordId(String domain, String subDomain, String recordType,
-                                   String secretId, String secretKey) throws TencentCloudSDKException {
-        RecordListItem recordListItem = getRecordList(domain, subDomain, recordType, secretId, secretKey)[0];
+                                   String secretId, String secretKey)  {
+        RecordListItem[] recordList = getRecordList(domain, subDomain, recordType, secretId, secretKey);
+        if(Objects.isNull(recordList)){
+            return null;
+        }
+        RecordListItem recordListItem = recordList[0];
         return recordListItem.getRecordId();
     }
 
@@ -46,8 +54,12 @@ public class TencentDnsUtils {
      * @throws TencentCloudSDKException
      */
     public static String getIpBySubDomainWithType(String domain, String subDomain, String recordType,
-                                                  String secretId, String secretKey) throws TencentCloudSDKException {
-        RecordListItem recordListItem = getRecordList(domain, subDomain, recordType, secretId, secretKey)[0];
+                                                  String secretId, String secretKey)  {
+        RecordListItem[] recordList = getRecordList(domain, subDomain, recordType, secretId, secretKey);
+        if(Objects.isNull(recordList)){
+            return null;
+        }
+        RecordListItem recordListItem = recordList[0];
         return recordListItem.getValue();
     }
 
@@ -57,7 +69,7 @@ public class TencentDnsUtils {
         Credential cred = new Credential(secretId, secretKey);
         // 实例化一个http选项，可选的，没有特殊需求可以跳过
         HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(endpoint);
+        httpProfile.setEndpoint(ENDPOINT);
         // 实例化一个client选项，可选的，没有特殊需求可以跳过
         ClientProfile clientProfile = new ClientProfile();
         clientProfile.setHttpProfile(httpProfile);
@@ -72,8 +84,8 @@ public class TencentDnsUtils {
         DescribeRecordListResponse resp = null;
         try {
             resp = client.DescribeRecordList(req);
-        } catch (TencentCloudSDKException e) {
-            return null;
+        } catch (TencentCloudSDKException e ) {
+            return new RecordListItem[]{};
         }
         return resp.getRecordList();
     }
@@ -96,7 +108,7 @@ public class TencentDnsUtils {
         Credential cred = new Credential(secretId, secretKey);
         // 实例化一个http选项，可选的，没有特殊需求可以跳过
         HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(endpoint);
+        httpProfile.setEndpoint(ENDPOINT);
         // 实例化一个client选项，可选的，没有特殊需求可以跳过
         ClientProfile clientProfile = new ClientProfile();
         clientProfile.setHttpProfile(httpProfile);
@@ -107,11 +119,10 @@ public class TencentDnsUtils {
         req.setDomain(domain);
         req.setSubDomain(subDomain);
         req.setRecordType(recordType);
-        req.setRecordLine(recordLine);
+        req.setRecordLine(RECORDLINE);
         req.setValue(ip);
         // 返回的resp是一个CreateRecordResponse的实例，与请求对象对应
-        CreateRecordResponse resp = client.CreateRecord(req);
-        return resp;
+        return client.CreateRecord(req);
     }
 
     /**
@@ -131,7 +142,7 @@ public class TencentDnsUtils {
         Credential cred = new Credential(secretId, secretKey);
         // 实例化一个http选项，可选的，没有特殊需求可以跳过
         HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(endpoint);
+        httpProfile.setEndpoint(ENDPOINT);
         // 实例化一个client选项，可选的，没有特殊需求可以跳过
         ClientProfile clientProfile = new ClientProfile();
         clientProfile.setHttpProfile(httpProfile);
@@ -142,12 +153,11 @@ public class TencentDnsUtils {
         req.setDomain(domain);
         req.setSubDomain(subDomain);
         req.setRecordType(recordType);
-        req.setRecordLine(recordLine);
+        req.setRecordLine(RECORDLINE);
         req.setValue(ip);
         req.setRecordId(recordId);
         // 返回的resp是一个ModifyRecordResponse的实例，与请求对象对应
-        ModifyRecordResponse resp = client.ModifyRecord(req);
-        return resp;
+        return client.ModifyRecord(req);
     }
 
     /**
@@ -163,7 +173,7 @@ public class TencentDnsUtils {
         Credential cred = new Credential(secretId, secretKey);
         // 实例化一个http选项，可选的，没有特殊需求可以跳过
         HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(endpoint);
+        httpProfile.setEndpoint(ENDPOINT);
         // 实例化一个client选项，可选的，没有特殊需求可以跳过
         ClientProfile clientProfile = new ClientProfile();
         clientProfile.setHttpProfile(httpProfile);
@@ -174,7 +184,6 @@ public class TencentDnsUtils {
         req.setDomain(domain);
         req.setRecordId(recordId);
         // 返回的resp是一个DeleteRecordResponse的实例，与请求对象对应
-        DeleteRecordResponse resp = client.DeleteRecord(req);
-        return resp;
+        return client.DeleteRecord(req);
     }
 }

@@ -20,7 +20,7 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
 
 
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) throws Exception {
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) {
         String resultDomain = "";
         String subDoMain = "";
         if (DoMainUtil.firstLevel(domain)) {
@@ -30,7 +30,7 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
             subDoMain = domain.substring(0, domain.indexOf('.'));
         }
         RecordListItem[] recordArray = TencentDnsUtils.getRecordList(resultDomain, subDoMain, recordType, serviceProviderId, serviceProviderSecret);
-        return Objects.nonNull(recordArray) ? true : false;
+        return Objects.nonNull(recordArray) && recordArray.length > 0;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void update(ParsingRecord parsingRecord, String ip, String recordId) throws Exception {
+    public void update(ParsingRecord parsingRecord, String ip, String recordId) {
         String domain = parsingRecord.getDomain();
         String resultDomain = "";
         String subDoMain = "";
@@ -58,11 +58,15 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
             resultDomain = domain.substring(domain.indexOf('.') + 1);
             subDoMain = domain.substring(0, domain.indexOf('.'));
         }
-        TencentDnsUtils.updateRecord(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), ip, Long.parseLong(recordId));
+        try {
+            TencentDnsUtils.updateRecord(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), ip, Long.parseLong(recordId));
+        } catch (TencentCloudSDKException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception {
+    public String getRecordId(ParsingRecord parsingRecord, String ip) {
         String domain = parsingRecord.getDomain();
         String resultDomain = "";
         String subDoMain = "";
@@ -77,19 +81,15 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void remove(ParsingRecord parsingRecord, String ip) throws Exception {
+    public void remove(ParsingRecord parsingRecord, String ip) {
         String domain = parsingRecord.getDomain();
-        String resultDomain = "";
-        String subDoMain = "";
-        if (DoMainUtil.firstLevel(domain)) {
-            subDoMain = "@";
-        } else {
-            resultDomain = domain.substring(domain.indexOf('.') + 1);
-            subDoMain = domain.substring(0, domain.indexOf('.'));
-        }
+        String resultDomain = domain.substring(domain.indexOf('.') + 1);
         String recordId = getRecordId(parsingRecord, ip);
-        // TODO: 2023/5/6 待验证
-        TencentDnsUtils.deleteRecord(resultDomain, parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), Long.parseLong(recordId));
+        try {
+            TencentDnsUtils.deleteRecord(resultDomain, parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), Long.parseLong(recordId));
+        } catch (TencentCloudSDKException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -103,7 +103,6 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
             resultDomain = domain.substring(domain.indexOf('.') + 1);
             subDoMain = domain.substring(0, domain.indexOf('.'));
         }
-        String dnsIp = TencentDnsUtils.getIpBySubDomainWithType(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
-        return dnsIp;
+        return TencentDnsUtils.getIpBySubDomainWithType(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
     }
 }

@@ -3,6 +3,7 @@ package top.sssd.ddns.service.impl;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +25,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +44,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     private IJobTaskService jobTaskService;
 
     @Override
-    public void add(ParsingRecord parsingRecord) throws Exception {
+    public void add(ParsingRecord parsingRecord)  {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         String ip = getIp(parsingRecord);
@@ -63,14 +65,18 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
             throw new BizException("该记录已在域名服务商中存在");
         }
-        dynamicDnsService.add(parsingRecord, ip);
+        try {
+            dynamicDnsService.add(parsingRecord, ip);
+        } catch (TencentCloudSDKException e) {
+            e.printStackTrace();
+        }
         this.save(parsingRecord);
         //添加并启动一个定时任务
         addWithStartTask(parsingRecord);
     }
 
     @Override
-    public void modify(ParsingRecord parsingRecord) throws Exception {
+    public void modify(ParsingRecord parsingRecord)  {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
@@ -89,13 +95,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             throw new BizException("同一服务商,同一解析类型,同一ip,不允许重复更新");
         }
 
-//        if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
-//                parsingRecord.getServiceProviderSecret(),
-//                parsingRecord.getDomain(),
-//                RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
-//            throw new BizException("该记录已在域名服务商中存在");
-//        }
-
         // 删除之前的定时任务
         JobTask one = jobTaskService.lambdaQuery().eq(JobTask::getName, dbParsingRecord.getId().toString()).one();
         if (Objects.nonNull(one)) {
@@ -107,7 +106,12 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             return;
         }
 
-        String dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
+        String dnsIp = null;
+        try {
+            dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
+        } catch (TencentCloudSDKException e) {
+            e.printStackTrace();
+        }
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
 
         String ip = getIp(parsingRecord);
@@ -128,7 +132,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     }
 
     @Override
-    public void delete(Long id) throws Exception {
+    public void delete(Long id)  {
         ParsingRecord parsingRecord = this.getById(id);
         if (Objects.isNull(parsingRecord)) {
             throw new BizException("该记录不存在");
@@ -141,7 +145,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
             throw new BizException("该记录在域名服务商中不存在");
         }
-        // FIXME: 2023/5/4 这可能导致数据不同步的问题
         String ip = getIp(parsingRecord);
         dynamicDnsService.remove(parsingRecord, ip);
         this.removeById(id);
@@ -153,7 +156,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     }
 
     @Override
-    public PageUtils queryPage(ParsingRecord parsingRecord) {
+    public PageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord) {
         Page<ParsingRecord> page = lambdaQuery()
                 .eq(Objects.nonNull(parsingRecord.getServiceProvider()), ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
                 .eq(StringUtils.hasText(parsingRecord.getDomain()), ParsingRecord::getDomain, parsingRecord.getDomain())
@@ -162,15 +165,15 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 .ge(Objects.nonNull(parsingRecord.getCreateDate()), ParsingRecord::getCreateDate, parsingRecord.getCreateDate())
                 .le(Objects.nonNull(parsingRecord.getUpdateDate()), ParsingRecord::getUpdateDate, parsingRecord.getUpdateDate())
                 .page(new Page<ParsingRecord>(parsingRecord.getPage(), parsingRecord.getPageSize()));
-        List<ParsingRecord> records = page.getRecords();
-        records = records.stream().map(item -> {
+        List<ParsingRecord> resultList = page.getRecords().stream().map(item -> {
             String serviceProviderName = ServiceProviderEnum.getNameByIndex(item.getServiceProvider());
             String recordTypeName = RecordTypeEnum.getNameByIndex(item.getRecordType());
             item.setServiceProviderName(serviceProviderName);
             item.setRecordTypeName(recordTypeName);
             return item;
         }).collect(Collectors.toList());
-        return new PageUtils(page);
+        page.setRecords(resultList);
+        return new PageUtils<ParsingRecord>(page);
     }
 
     @Override
@@ -178,13 +181,12 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         //解析类型:1 AAAA 2 A
         Integer getIpMode = parsingRecord.getGetIpMode();
         //获取ip方式: 1 interface 2 network 3 cmd
-        String getIpModeValue = parsingRecord.getGetIpModeValue();
-        // TODO: 2023/5/2 目前只支持 interface
         if (getIpMode.equals(1)) {
             //ipv6
             List<String> ipInterfaces =
                     Arrays.asList("https://v6.ip.zxinc.org/getip", "https://api6.ipify.org", "https://api.ip.sb/ip", "https://api.myip.la");
-            String ipv6Interface = ipInterfaces.stream().findAny().orElseGet(null);
+            Optional<String> any = ipInterfaces.stream().findAny();
+            String ipv6Interface = any.orElse("https://v6.ip.zxinc.org/getip");
             parsingRecord.setGetIpModeValue(ipv6Interface);
             parsingRecord.setRecordType(1);
             String ipv6 = HttpUtil.get(ipv6Interface);
@@ -194,7 +196,8 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             //ipv4
             List<String> ipInterfaces =
                     Arrays.asList("https://ip.3322.net", "https://4.ipw.cn");
-            String ipv4Interface = ipInterfaces.stream().findAny().orElseGet(null);
+            Optional<String> any = ipInterfaces.stream().findAny();
+            String ipv4Interface = any.orElse("https://ip.3322.net");
             parsingRecord.setGetIpModeValue(ipv4Interface);
             parsingRecord.setRecordType(2);
             String ipv4 = HttpUtil.get(ipv4Interface);
