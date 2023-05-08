@@ -17,8 +17,6 @@ import static top.sssd.ddns.common.constant.DDNSConstant.*;
 public class MyMetaObjectHandler implements MetaObjectHandler {
 
     /**
-     * FIXME: 2023/3/19 暂未支持用户功能,预留此填充接口
-     *
      * @author sssd
      */
 

@@ -11,6 +11,8 @@ import top.sssd.ddns.service.impl.TencentDynamicDnsServiceImpl;
  */
 public class DynamicDnsServiceFactory {
 
+    private DynamicDnsServiceFactory(){}
+
     public static DynamicDnsService getServiceInstance(Integer serviceProvider) {
         DynamicDnsService service;
         switch (serviceProvider) {

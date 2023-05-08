@@ -42,7 +42,7 @@ public class DynamicDnsJob implements Job {
 
 
         String nowIp = parsingRecordService.getIp(parsingRecord);
-        if(dnsIp.equals(nowIp)){
+        if(nowIp.equals(dnsIp)){
             log.info("域名为:{}的记录,域名服务商中的ip:{}与现在的ip:{},未发生改变",parsingRecord.getDomain(),dnsIp,nowIp);
             logWebSocketHandler.sendToAllSessions(String.format("域名为:%s的记录,域名服务商中的ip:%s与现在的ip:%s,未发生改变",parsingRecord.getDomain(),dnsIp,nowIp));
             return;

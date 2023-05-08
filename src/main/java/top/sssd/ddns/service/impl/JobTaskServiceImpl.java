@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.mapper.JobTaskMapper;
 import top.sssd.ddns.model.entity.JobTask;
 import top.sssd.ddns.service.IJobTaskService;
@@ -44,7 +45,7 @@ public class JobTaskServiceImpl extends ServiceImpl<JobTaskMapper, JobTask> impl
                 scheduler.scheduleJob(jobDetail, cronTrigger);
             } catch (ClassNotFoundException | SchedulerException e) {
                 log.error("addJobTask failed", e);
-                throw new RuntimeException("addJobTask failed");
+                throw new BizException("addJobTask failed");
             }
         }
         return result;
@@ -61,7 +62,7 @@ public class JobTaskServiceImpl extends ServiceImpl<JobTaskMapper, JobTask> impl
 
                 if (cronTrigger == null) {
                     log.error("updateJobTask failed: trigger not found");
-                    throw new RuntimeException("updateJobTask failed: trigger not found");
+                    throw new BizException("updateJobTask failed: trigger not found");
                 }
 
                 JobDetail jobDetail = scheduler.getJobDetail(jobKey);
@@ -78,7 +79,7 @@ public class JobTaskServiceImpl extends ServiceImpl<JobTaskMapper, JobTask> impl
                 scheduler.rescheduleJob(triggerKey, cronTrigger);
             } catch (SchedulerException e) {
                 log.error("updateJobTask failed", e);
-                throw new RuntimeException("updateJobTask failed");
+                throw new BizException("updateJobTask failed");
             }
         }
         return result;
@@ -96,7 +97,7 @@ public class JobTaskServiceImpl extends ServiceImpl<JobTaskMapper, JobTask> impl
                 scheduler.deleteJob(jobKey);
             } catch (SchedulerException e) {
                 log.error("deleteJobTask failed", e);
-                throw new RuntimeException("deleteJobTask failed");
+                throw new BizException("deleteJobTask failed");
             }
         }
         return this.removeById(id);
@@ -121,7 +122,7 @@ public class JobTaskServiceImpl extends ServiceImpl<JobTaskMapper, JobTask> impl
                 scheduler.resumeJob(jobKey);
             } catch (SchedulerException e) {
                 log.error("startJobTask failed", e);
-                throw new RuntimeException("startJobTask failed");
+                throw new BizException("startJobTask failed");
             }
             jobTask.setStatus(1);
             this.updateById(jobTask);
@@ -139,7 +140,7 @@ public class JobTaskServiceImpl extends ServiceImpl<JobTaskMapper, JobTask> impl
                 scheduler.pauseJob(jobKey);
             } catch (SchedulerException e) {
                 log.error("stopJobTask failed", e);
-                throw new RuntimeException("stopJobTask failed");
+                throw new BizException("stopJobTask failed");
             }
             jobTask.setStatus(0);
             this.updateById(jobTask);

@@ -9,7 +9,7 @@ import top.sssd.ddns.service.DynamicDnsService;
  */
 public class CloudflareDynamicDnsServiceImpl implements DynamicDnsService {
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) throws Exception {
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType)  {
         return false;
     }
 
@@ -19,17 +19,17 @@ public class CloudflareDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void update(ParsingRecord parsingRecord, String ip, String recordId) throws Exception {
+    public void update(ParsingRecord parsingRecord, String ip, String recordId)  {
 
     }
 
     @Override
-    public String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception {
+    public String getRecordId(ParsingRecord parsingRecord, String ip)  {
         return null;
     }
 
     @Override
-    public void remove(ParsingRecord parsingRecord, String ip) throws Exception {
+    public void remove(ParsingRecord parsingRecord, String ip) {
 
     }
 

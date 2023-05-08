@@ -23,33 +23,33 @@ public class ParsingRecordController {
     private IParsingRecordService parsingRecordService;
 
     @PostMapping("page")
-    public Result queryPage(@RequestBody ParsingRecord parsingRecord) {
-        PageUtils page = parsingRecordService.queryPage(parsingRecord);
+    public Result<PageUtils<ParsingRecord>> queryPage(@RequestBody ParsingRecord parsingRecord) {
+        PageUtils<ParsingRecord> page = parsingRecordService.queryPage(parsingRecord);
         return Result.ok(page);
     }
 
 
     @GetMapping("{id}")
-    public Result getId(@PathVariable("id") Long id){
+    public Result<ParsingRecord> getId(@PathVariable("id") Long id){
         return Result.ok(parsingRecordService.getById(id));
     }
 
     @PostMapping("add")
-    public Result add(@RequestBody
-                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord) throws Exception {
+    public Result<String> add(@RequestBody
+                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord)  {
         parsingRecordService.add(parsingRecord);
         return Result.ok();
     }
 
     @PostMapping("modify")
-    public Result modify(@RequestBody
-                         @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord) throws Exception {
+    public Result<String> modify(@RequestBody
+                         @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord)  {
         parsingRecordService.modify(parsingRecord);
         return Result.ok();
     }
 
     @DeleteMapping("delete/{id}")
-    public Result delete(@PathVariable Long id) throws Exception {
+    public Result<String> delete(@PathVariable Long id)  {
         parsingRecordService.delete(id);
         return Result.ok();
     }
