@@ -11,7 +11,7 @@ DDNS4J 是一个基于 SpringBoot 和 Vue2 开发的开源 DDNS 服务，支持 
 
 ## 项目演示地址
 
-https://ddns4j.sssd.top
+http://ddns4j.sssd.top
 
 演示地址中的数据均为演示数据,非真实数据,如要使用,请在发布版下载jar包或使用构建工具自己打包部署,部署步骤可参照下面部署章节
 
