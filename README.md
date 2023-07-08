@@ -3,8 +3,8 @@
 
 [![star](https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/stargazers)
 [![fork](https://gitee.com/Xsssd/ddns4j/badge/fork.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/members)
+![Static Badge](https://img.shields.io/badge/license-apache-blue)
 
-[![fork](https://img.shields.io/badge/license-apache-blue)](https://img.shields.io/badge/license-apache-blue)
 
 阅读前需知悉:
 
