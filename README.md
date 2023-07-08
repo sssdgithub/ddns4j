@@ -4,6 +4,8 @@
 [![star](https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/stargazers)
 [![fork](https://gitee.com/Xsssd/ddns4j/badge/fork.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/members)
 
+[![fork](https://img.shields.io/badge/license-apache-blue)](https://img.shields.io/badge/license-apache-blue)
+
 阅读前需知悉:
 
 目前只支持阿里云和腾讯云,后续版本会加上cloudflare.
