@@ -22,7 +22,7 @@ import top.sssd.ddns.utils.AliDnsUtils;
 @Slf4j
 public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType)  {
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) {
         Client client = AliDnsUtils.createClient(serviceProviderId, serviceProviderSecret);
         DescribeSubDomainRecordsResponse response = null;
         try {
@@ -49,14 +49,32 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
             domain = subDoMain;
             rr = "@";
         } else {
-            domain = subDoMain.substring(subDoMain.indexOf('.') + 1);
-            rr = subDoMain.substring(0, subDoMain.indexOf('.'));
+            domain = subDoMain.substring(findNthOccurrence(subDoMain, ".", 1) + 1);
+            rr = subDoMain.substring(0, findNthOccurrence(subDoMain, ".", 1));
         }
         AliDnsUtils.add(client, domain, rr, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), ip);
     }
 
+
+    public static  int findNthOccurrence(String str, String subStr, int n) {
+        // 记录出现次数
+        int count = 0;
+        // 从后往前查找最后一次出现的位置
+        int index = str.lastIndexOf(subStr);
+        // 如果找到了并且出现次数小于n
+        while (index != -1 && count < n) {
+            // 继续往前查找下一次出现的位置
+            index = str.lastIndexOf(subStr, index - 1);
+            // 更新出现次数
+            count++;
+        }
+        // 返回最后一次出现的位置的索引
+        return index;
+    }
+
+
     @Override
-    public void update(ParsingRecord parsingRecord, String ip,String recordId)  {
+    public void update(ParsingRecord parsingRecord, String ip,String recordId) throws Exception {
         //call dns api
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
 
@@ -66,19 +84,15 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
         if (DoMainUtil.firstLevel(subDoMain)) {
             rr = "@";
         } else {
-            rr = subDoMain.substring(0, subDoMain.indexOf('.'));
+            rr = subDoMain.substring(0, findNthOccurrence(subDoMain, ".", 1));
         }
         String recordTypeName = RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType());
 
-        try {
-            AliDnsUtils.update(client, recordId, rr, recordTypeName, ip);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        AliDnsUtils.update(client, recordId, rr, recordTypeName, ip);
     }
 
     @Override
-    public String getRecordId(ParsingRecord parsingRecord, String ip)  {
+    public String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception {
         //call dns api
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
 
@@ -86,12 +100,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
 
         String recordTypeName = RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType());
 
-        String recordId = null;
-        try {
-            recordId = AliDnsUtils.getDomainRecordId(client, subDoMain, recordTypeName, ip);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String recordId = AliDnsUtils.getDomainRecordId(client, subDoMain, recordTypeName, ip);;
         if (StringUtils.isEmpty(recordId)) {
             throw new BizException("没有该域名对应的解析记录");
         }
@@ -99,15 +108,11 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void remove(ParsingRecord parsingRecord, String ip)  {
+    public void remove(ParsingRecord parsingRecord, String ip) throws Exception {
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
         String recordTypeName = RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType());
-        String recordId = null;
-        try {
-            recordId = AliDnsUtils.getDomainRecordId(client, parsingRecord.getDomain(), recordTypeName, ip);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String recordId = AliDnsUtils.getDomainRecordId(client, parsingRecord.getDomain(), recordTypeName, ip);
+
         AliDnsUtils.delete(client, recordId);
     }
 

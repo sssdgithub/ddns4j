@@ -1,5 +1,6 @@
 package top.sssd.ddns.controller;
 
+import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.sssd.ddns.common.Result;
@@ -36,20 +37,20 @@ public class ParsingRecordController {
 
     @PostMapping("add")
     public Result<String> add(@RequestBody
-                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord)  {
+                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord) throws TencentCloudSDKException {
         parsingRecordService.add(parsingRecord);
         return Result.ok();
     }
 
     @PostMapping("modify")
     public Result<String> modify(@RequestBody
-                         @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord)  {
+                         @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord) throws Exception {
         parsingRecordService.modify(parsingRecord);
         return Result.ok();
     }
 
     @DeleteMapping("delete/{id}")
-    public Result<String> delete(@PathVariable Long id)  {
+    public Result<String> delete(@PathVariable Long id) throws Exception {
         parsingRecordService.delete(id);
         return Result.ok();
     }

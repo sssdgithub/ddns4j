@@ -44,7 +44,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     private IJobTaskService jobTaskService;
 
     @Override
-    public void add(ParsingRecord parsingRecord)  {
+    public void add(ParsingRecord parsingRecord) throws TencentCloudSDKException {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         String ip = getIp(parsingRecord);
@@ -65,18 +65,14 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
             throw new BizException("该记录已在域名服务商中存在");
         }
-        try {
-            dynamicDnsService.add(parsingRecord, ip);
-        } catch (TencentCloudSDKException e) {
-            e.printStackTrace();
-        }
+        dynamicDnsService.add(parsingRecord, ip);
         this.save(parsingRecord);
         //添加并启动一个定时任务
         addWithStartTask(parsingRecord);
     }
 
     @Override
-    public void modify(ParsingRecord parsingRecord)  {
+    public void modify(ParsingRecord parsingRecord) throws Exception {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
@@ -132,7 +128,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     }
 
     @Override
-    public void delete(Long id)  {
+    public void delete(Long id) throws Exception {
         ParsingRecord parsingRecord = this.getById(id);
         if (Objects.isNull(parsingRecord)) {
             throw new BizException("该记录不存在");
