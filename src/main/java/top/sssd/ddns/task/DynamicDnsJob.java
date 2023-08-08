@@ -1,10 +1,8 @@
 package top.sssd.ddns.task;
 
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import top.sssd.ddns.factory.DynamicDnsServiceFactory;
 import top.sssd.ddns.handler.LogWebSocketHandler;
 import top.sssd.ddns.model.entity.ParsingRecord;
@@ -28,18 +26,17 @@ public class DynamicDnsJob implements Job {
     private LogWebSocketHandler logWebSocketHandler;
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(JobExecutionContext context) {
         Object executeParams = context.getJobDetail().getJobDataMap().get("executeParams");
         ParsingRecord parsingRecord = (ParsingRecord) executeParams;
 
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
-        String dnsIp = null;
+        String dnsIp   = null;
         try {
             dnsIp = dynamicDnsService.getIpBySubDomainWithType(parsingRecord);
-        } catch (TencentCloudSDKException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         String nowIp = parsingRecordService.getIp(parsingRecord);
         if(nowIp.equals(dnsIp)){

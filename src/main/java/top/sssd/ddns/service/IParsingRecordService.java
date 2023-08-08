@@ -19,7 +19,7 @@ public interface IParsingRecordService extends IService<ParsingRecord> {
      * 添加解析记录
      * @param parsingRecord
      */
-    void add(ParsingRecord parsingRecord) throws TencentCloudSDKException;
+    void add(ParsingRecord parsingRecord) throws Exception;
 
     void modify(ParsingRecord parsingRecord) throws Exception;
 

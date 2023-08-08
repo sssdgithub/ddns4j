@@ -27,26 +27,21 @@ public class AliDnsUtils {
      * @return Client
      * @throws Exception
      */
-    public static com.aliyun.alidns20150109.Client createClient(String accessKeyId, String accessKeySecret) {
+    public static com.aliyun.alidns20150109.Client createClient(String accessKeyId, String accessKeySecret) throws Exception {
         com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
                 // 必填，您的 AccessKey ID
                 .setAccessKeyId(accessKeyId)
                 // 必填，您的 AccessKey Secret
                 .setAccessKeySecret(accessKeySecret);
         config.endpoint = ENDPOINT;
-        try {
-            return new com.aliyun.alidns20150109.Client(config);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new com.aliyun.alidns20150109.Client(config);
     }
 
     /**
      * 获取子域名的所有解析记录列表
      */
     public static DescribeSubDomainRecordsResponse getSubDomainParseList(com.aliyun.alidns20150109.Client client, String subDomain, String recordType) throws Exception {
-        com.aliyun.alidns20150109.models.DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new com.aliyun.alidns20150109.models.DescribeSubDomainRecordsRequest()
+        DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new DescribeSubDomainRecordsRequest()
                 .setSubDomain(subDomain)
                 .setType(recordType);
         DescribeSubDomainRecordsResponse describeSubDomainRecordsResponse = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
@@ -61,7 +56,7 @@ public class AliDnsUtils {
      * @return
      */
     public static DescribeDomainRecordsResponse getParseList(com.aliyun.alidns20150109.Client client, String domain) throws Exception {
-        com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest describeDomainRecordsRequest = new com.aliyun.alidns20150109.models.DescribeDomainRecordsRequest()
+        DescribeDomainRecordsRequest describeDomainRecordsRequest = new DescribeDomainRecordsRequest()
                 .setDomainName(domain);
         DescribeDomainRecordsResponse resp = client.describeDomainRecords(describeDomainRecordsRequest);
         return resp;
@@ -77,19 +72,14 @@ public class AliDnsUtils {
      * @param ip
      * @return
      */
-    public static AddDomainRecordResponse add(com.aliyun.alidns20150109.Client client, String domain, String Rr, String recordType, String ip) {
-        try {
-            AddDomainRecordRequest addDomainRecordRequest = new AddDomainRecordRequest()
-                    .setDomainName(domain)
-                    .setRR(Rr)
-                    .setType(recordType)
-                    .setValue(ip);
-            AddDomainRecordResponse response = client.addDomainRecord(addDomainRecordRequest);
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static AddDomainRecordResponse add(com.aliyun.alidns20150109.Client client, String domain, String Rr, String recordType, String ip) throws Exception {
+        AddDomainRecordRequest addDomainRecordRequest = new AddDomainRecordRequest()
+                .setDomainName(domain)
+                .setRR(Rr)
+                .setType(recordType)
+                .setValue(ip);
+        AddDomainRecordResponse response = client.addDomainRecord(addDomainRecordRequest);
+        return response;
     }
 
     /**
@@ -119,16 +109,11 @@ public class AliDnsUtils {
      * @param recordId
      * @return
      */
-    public static DeleteDomainRecordResponse delete(com.aliyun.alidns20150109.Client client,String recordId){
-        try {
-            DeleteDomainRecordRequest deleteDomainRecordRequest = new DeleteDomainRecordRequest()
-                    .setRecordId(recordId);
-            DeleteDomainRecordResponse response = client.deleteDomainRecord(deleteDomainRecordRequest);
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static DeleteDomainRecordResponse delete(com.aliyun.alidns20150109.Client client,String recordId) throws Exception {
+        DeleteDomainRecordRequest deleteDomainRecordRequest = new DeleteDomainRecordRequest()
+                .setRecordId(recordId);
+        DeleteDomainRecordResponse response = client.deleteDomainRecord(deleteDomainRecordRequest);
+        return response;
     }
 
 
@@ -163,17 +148,12 @@ public class AliDnsUtils {
      * @param recordType
      * @return
      */
-    public static String getIpBySubDomainWithType(com.aliyun.alidns20150109.Client client,String subDomain, String recordType){
-        try {
-            DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new DescribeSubDomainRecordsRequest()
-                    .setSubDomain(subDomain)
-                    .setType(recordType);
-            DescribeSubDomainRecordsResponse response = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
-            List<DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord> records = response.getBody().getDomainRecords().getRecord();
-            return records.get(0).getValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static String getIpBySubDomainWithType(com.aliyun.alidns20150109.Client client,String subDomain, String recordType) throws Exception {
+        DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new DescribeSubDomainRecordsRequest()
+                .setSubDomain(subDomain)
+                .setType(recordType);
+        DescribeSubDomainRecordsResponse response = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
+        List<DescribeSubDomainRecordsResponseBody.DescribeSubDomainRecordsResponseBodyDomainRecordsRecord> records = response.getBody().getDomainRecords().getRecord();
+        return records.get(0).getValue();
     }
 }

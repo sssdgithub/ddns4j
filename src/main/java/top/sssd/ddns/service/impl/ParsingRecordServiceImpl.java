@@ -44,7 +44,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     private IJobTaskService jobTaskService;
 
     @Override
-    public void add(ParsingRecord parsingRecord) throws TencentCloudSDKException {
+    public void add(ParsingRecord parsingRecord) throws Exception {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         String ip = getIp(parsingRecord);
