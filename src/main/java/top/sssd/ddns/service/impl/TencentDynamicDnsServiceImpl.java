@@ -20,7 +20,7 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
 
 
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) {
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) throws TencentCloudSDKException {
         String resultDomain = "";
         String subDoMain = "";
         if (DoMainUtil.firstLevel(domain)) {
@@ -66,7 +66,7 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public String getRecordId(ParsingRecord parsingRecord, String ip) {
+    public String getRecordId(ParsingRecord parsingRecord, String ip) throws TencentCloudSDKException {
         String domain = parsingRecord.getDomain();
         String resultDomain = "";
         String subDoMain = "";
@@ -81,7 +81,7 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void remove(ParsingRecord parsingRecord, String ip) {
+    public void remove(ParsingRecord parsingRecord, String ip) throws TencentCloudSDKException {
         String domain = parsingRecord.getDomain();
         String resultDomain = domain.substring(domain.indexOf('.') + 1);
         String recordId = getRecordId(parsingRecord, ip);

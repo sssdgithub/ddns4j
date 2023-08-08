@@ -22,7 +22,7 @@ import top.sssd.ddns.utils.AliDnsUtils;
 @Slf4j
 public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) {
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) throws Exception {
         Client client = AliDnsUtils.createClient(serviceProviderId, serviceProviderSecret);
         DescribeSubDomainRecordsResponse response = null;
         try {
@@ -39,7 +39,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public void add(ParsingRecord parsingRecord, String ip) {
+    public void add(ParsingRecord parsingRecord, String ip) throws Exception {
         //call dns api
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
         String subDoMain = parsingRecord.getDomain();
@@ -117,7 +117,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
     }
 
     @Override
-    public String getIpBySubDomainWithType(ParsingRecord parsingRecord) {
+    public String getIpBySubDomainWithType(ParsingRecord parsingRecord) throws Exception {
         Client client = AliDnsUtils.createClient(parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
         return AliDnsUtils.getIpBySubDomainWithType(client, parsingRecord.getDomain(), RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()));
     }

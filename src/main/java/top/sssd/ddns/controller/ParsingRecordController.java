@@ -1,6 +1,5 @@
 package top.sssd.ddns.controller;
 
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.sssd.ddns.common.Result;
@@ -37,7 +36,7 @@ public class ParsingRecordController {
 
     @PostMapping("add")
     public Result<String> add(@RequestBody
-                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord) throws TencentCloudSDKException {
+                      @Validated(ValidGroup.SaveGroup.class) ParsingRecord parsingRecord) throws Exception {
         parsingRecordService.add(parsingRecord);
         return Result.ok();
     }

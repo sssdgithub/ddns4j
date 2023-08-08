@@ -1,6 +1,5 @@
 package top.sssd.ddns.service;
 
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import top.sssd.ddns.model.entity.ParsingRecord;
 
 import javax.validation.constraints.NotBlank;
@@ -22,14 +21,14 @@ public interface DynamicDnsService {
      */
     boolean exist(@NotBlank(message = "传入的serviceProviderId不能为空") String serviceProviderId,
                   String serviceProviderSecret,@NotBlank(message = "传入的子域名不能为空") String subDomain,
-                  @NotBlank(message = "传入的解析类型不能为空") String recordType);
+                  @NotBlank(message = "传入的解析类型不能为空") String recordType) throws Exception;
 
     /**
      * 新增解析记录
      *
      * @param parsingRecord 解析对象
      */
-    void add(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip) throws TencentCloudSDKException;
+    void add(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord,String ip) throws Exception;
 
     /**
      * 更新解析记录
@@ -60,5 +59,5 @@ public interface DynamicDnsService {
      * @param parsingRecord
      * @return
      */
-    String getIpBySubDomainWithType(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord) throws TencentCloudSDKException;
+    String getIpBySubDomainWithType(@NotNull(message = "传入的解析对象不能为空") ParsingRecord parsingRecord) throws Exception;
 }
