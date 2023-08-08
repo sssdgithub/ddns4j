@@ -8,13 +8,13 @@
 
 阅读前需知悉:
 
-目前只支持阿里云和腾讯云,后续版本会加上cloudflare.
+目前已支持阿里云,腾讯云,Cloudflare,并默认开启Cloudflare代理.
 
 DDNS4J 是一个基于 SpringBoot 和 Vue2 开发的开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。在本篇文章中，我们将介绍如何使用 DDNS4J 来轻松管理你的域名，并探讨 DDNS 在 IPv6 时代的重要性。
 
 ## 项目演示地址
 
-http://ddns4j.sssd.top
+https://ddns4j.sssd.top
 
 演示地址中的数据均为演示数据,非真实数据,如要使用,请在发布版下载jar包或使用构建工具自己打包部署,部署步骤可参照下面部署章节
 
@@ -45,11 +45,11 @@ git clone https://gitee.com/Xsssd/ddns4j.git
 4. 构建并运行项目：
 ```
 mvn clean package
-java -jar ddns-v1.0-RELEASE.jar
+java -jar ddns-v1.2-RELEASE.jar
 ```
 5. 启动成功后，在浏览器中输入 http://localhost:10000/index.html 即可访问 DDNS4J 的可视化界面。
 
 ## 推荐阅读
-如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 http://blog.sssd.top
+如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 https://blog.sssd.top
 
 该博客站点就是使用ddn4j搭建而成,响应较慢请大家海涵!了解更多有关网络和开发的知识。
