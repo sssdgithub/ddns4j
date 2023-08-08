@@ -44,8 +44,7 @@ public class AliDnsUtils {
         DescribeSubDomainRecordsRequest describeSubDomainRecordsRequest = new DescribeSubDomainRecordsRequest()
                 .setSubDomain(subDomain)
                 .setType(recordType);
-        DescribeSubDomainRecordsResponse describeSubDomainRecordsResponse = client.describeSubDomainRecords(describeSubDomainRecordsRequest);
-        return describeSubDomainRecordsResponse;
+        return client.describeSubDomainRecords(describeSubDomainRecordsRequest);
     }
 
     /**
@@ -58,8 +57,7 @@ public class AliDnsUtils {
     public static DescribeDomainRecordsResponse getParseList(com.aliyun.alidns20150109.Client client, String domain) throws Exception {
         DescribeDomainRecordsRequest describeDomainRecordsRequest = new DescribeDomainRecordsRequest()
                 .setDomainName(domain);
-        DescribeDomainRecordsResponse resp = client.describeDomainRecords(describeDomainRecordsRequest);
-        return resp;
+        return client.describeDomainRecords(describeDomainRecordsRequest);
     }
 
     /**
@@ -78,8 +76,7 @@ public class AliDnsUtils {
                 .setRR(Rr)
                 .setType(recordType)
                 .setValue(ip);
-        AddDomainRecordResponse response = client.addDomainRecord(addDomainRecordRequest);
-        return response;
+        return client.addDomainRecord(addDomainRecordRequest);
     }
 
     /**
@@ -98,8 +95,7 @@ public class AliDnsUtils {
                 .setRR(Rr)
                 .setType(recordType)
                 .setValue(ip);
-        UpdateDomainRecordResponse resp = client.updateDomainRecord(updateDomainRecordRequest);
-        return resp;
+        return client.updateDomainRecord(updateDomainRecordRequest);
     }
 
 
@@ -112,8 +108,7 @@ public class AliDnsUtils {
     public static DeleteDomainRecordResponse delete(com.aliyun.alidns20150109.Client client,String recordId) throws Exception {
         DeleteDomainRecordRequest deleteDomainRecordRequest = new DeleteDomainRecordRequest()
                 .setRecordId(recordId);
-        DeleteDomainRecordResponse response = client.deleteDomainRecord(deleteDomainRecordRequest);
-        return response;
+        return client.deleteDomainRecord(deleteDomainRecordRequest);
     }
 
 
