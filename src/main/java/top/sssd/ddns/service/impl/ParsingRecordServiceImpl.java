@@ -175,9 +175,8 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     @Override
     public String getIp(ParsingRecord parsingRecord) {
         //解析类型:1 AAAA 2 A
-        Integer getIpMode = parsingRecord.getGetIpMode();
-        //获取ip方式: 1 interface 2 network 3 cmd
-        if (getIpMode.equals(1)) {
+        Integer recordType = parsingRecord.getRecordType();
+        if (recordType.equals(1)) {
             //ipv6
             List<String> ipInterfaces =
                     Arrays.asList("https://v6.ip.zxinc.org/getip", "https://api6.ipify.org", "https://api.ip.sb/ip", "https://api.myip.la");
@@ -188,7 +187,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             String ipv6 = HttpUtil.get(ipv6Interface);
             parsingRecord.setIp(ipv6);
             return ipv6;
-        } else if (getIpMode.equals(2)) {
+        } else if (recordType.equals(2)) {
             //ipv4
             List<String> ipInterfaces =
                     Arrays.asList("https://ip.3322.net", "https://4.ipw.cn");
