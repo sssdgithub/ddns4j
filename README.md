@@ -1,5 +1,6 @@
 # DDNS4J 使用指南
 ![这是图片](./doc/效果图.png "Magic Gardens")
+![这是图片](./doc/ddns4j-network-view.png "Magic Gardens")
 
 [![star](https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/stargazers)
 [![fork](https://gitee.com/Xsssd/ddns4j/badge/fork.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/members)
@@ -45,7 +46,7 @@ git clone https://gitee.com/Xsssd/ddns4j.git
 4. 构建并运行项目：
 ```
 mvn clean package
-java -jar ddns-v1.2-RELEASE.jar
+java -jar ddns-v1.4-RELEASE.jar
 ```
 5. 启动成功后，在浏览器中输入 http://localhost:10000/index.html 即可访问 DDNS4J 的可视化界面。
 
