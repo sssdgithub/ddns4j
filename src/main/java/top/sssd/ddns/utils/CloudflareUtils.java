@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * @author sssd
- * @careate 2023-08-08-10:57
+ * @created 2023-08-08-10:57
  */
 
 public class CloudflareUtils {

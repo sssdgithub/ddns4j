@@ -5,7 +5,7 @@ import top.sssd.ddns.model.entity.JobTask;
 
 /**
  * @author sssd
- * @careate 2023-05-02-11:02
+ * @created 2023-05-02-11:02
  */
 public interface JobTaskMapper extends BaseMapper<JobTask> {
 }

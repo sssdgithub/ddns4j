@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author sssd
- * @careate 2023-05-05-12:58
+ * @created 2023-05-05-12:58
  */
 @Component
 @Slf4j

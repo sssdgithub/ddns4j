@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * @author sssd
- * @careate 2023-03-20-15:27
+ * @created 2023-03-20-15:27
  */
 public enum RecordTypeEnum {
     IPV6(1,"AAAA"),

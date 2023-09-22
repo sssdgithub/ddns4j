@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 
 /**
  * @author sssd
- * @careate 2023-05-05-12:57
+ * @created 2023-05-05-12:57
  */
 @Configuration
 @EnableWebSocket

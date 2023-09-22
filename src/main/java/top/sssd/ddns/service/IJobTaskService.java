@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * @author sssd
- * @careate 2023-05-02-11:05
+ * @created 2023-05-02-11:05
  */
 public interface IJobTaskService extends IService<JobTask> {
     /**

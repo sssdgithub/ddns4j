@@ -15,7 +15,7 @@ import static top.sssd.ddns.common.constant.DDNSConstant.RECORD_TYPE_AAAA;
 
 /**
  * @author sssd
- * @careate 2023-09-22-13:59
+ * @created 2023-09-22-13:59
  */
 @Service
 @Slf4j

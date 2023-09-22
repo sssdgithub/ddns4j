@@ -16,7 +16,7 @@ import top.sssd.ddns.utils.AliDnsUtils;
 
 /**
  * @author sssd
- * @careate 2023-03-20-13:41
+ * @created 2023-03-20-13:41
  */
 @Service
 @Slf4j

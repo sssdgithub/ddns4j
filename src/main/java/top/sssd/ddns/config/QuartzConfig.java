@@ -9,7 +9,7 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 /**
  * @author sssd
- * @careate 2023-05-02-11:07
+ * @created 2023-05-02-11:07
  */
 public class QuartzConfig implements SchedulerFactoryBeanCustomizer {
     @Autowired

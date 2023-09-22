@@ -12,7 +12,7 @@ import java.util.Objects;
 
 /**
  * @author sssd
- * @careate 2023-05-06-16:13
+ * @created 2023-05-06-16:13
  */
 @Slf4j
 public class TencentDnsUtils {

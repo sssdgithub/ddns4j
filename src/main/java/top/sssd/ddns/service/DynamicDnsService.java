@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @author sssd
- * @careate 2023-03-19-21:43
+ * @created 2023-03-19-21:43
  */
 public interface DynamicDnsService {
 

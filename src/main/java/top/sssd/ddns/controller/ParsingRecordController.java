@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * @author sssd
- * @careate 2023-05-02-5:09
+ * @created 2023-05-02-5:09
  */
 @RestController
 @RequestMapping("parsingRecord")

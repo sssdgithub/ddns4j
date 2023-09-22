@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * 域名工具类
  * @author sssd
- * @careate 2023-03-20-14:58
+ * @created 2023-03-20-14:58
  */
 public class DoMainUtil {
     private DoMainUtil() {
