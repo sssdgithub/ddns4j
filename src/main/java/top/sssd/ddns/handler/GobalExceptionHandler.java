@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.validation.BindException;
@@ -28,10 +27,13 @@ import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.Result;
 import top.sssd.ddns.common.valid.ValidException;
 
+import javax.annotation.Resource;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static top.sssd.ddns.common.constant.ExceptionConstant.RECORD_EXISTS;
 
 /**
  * @author sssd
@@ -40,8 +42,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GobalExceptionHandler {
 
-    @Autowired
+    @Resource
     private ObjectMapper objectMapper;
+
+    @ExceptionHandler({Exception.class})
+    public Result<String> teaExceptionHandler(Exception exception) throws JsonProcessingException {
+        log.error("teaException info:{}", exception.getMessage());
+        if(exception.getMessage().contains(RECORD_EXISTS)){
+            return Result.fail("DNS记录已存在");
+        }
+        return Result.fail(exception.getMessage());
+    }
 
     @ExceptionHandler({ConstraintViolationException.class})
     public Result<String> constraintViolationExceptionHandler(ConstraintViolationException violationException) throws JsonProcessingException {

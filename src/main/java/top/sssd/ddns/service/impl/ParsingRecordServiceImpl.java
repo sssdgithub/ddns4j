@@ -25,8 +25,9 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static top.sssd.ddns.common.constant.DDNSConstant.*;
 
 /**
  * <p>
@@ -47,7 +48,14 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     public void add(ParsingRecord parsingRecord) throws Exception {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
-        String ip = getIp(parsingRecord);
+        String ip = null;
+        Integer getIpMode = parsingRecord.getGetIpMode();
+        if (getIpMode.equals(IP_MODE_INTERFACE)) {
+            ip = getIp(parsingRecord);
+        }else if(getIpMode.equals(IP_MODE_NETWORK)){
+            ip = parsingRecord.getIp();
+        }
+
         //后端唯一性校验
         ParsingRecord checkParsingRecord = this.lambdaQuery()
                 .eq(ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
@@ -58,7 +66,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         if (Objects.nonNull(checkParsingRecord)) {
             throw new BizException("同一服务商,同一解析类型,同一ip,不能重复添加");
         }
-
         if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),
@@ -110,7 +117,14 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         }
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
 
-        String ip = getIp(parsingRecord);
+        String ip = null;
+        Integer getIpMode = parsingRecord.getGetIpMode();
+        if (getIpMode.equals(IP_MODE_INTERFACE)) {
+            ip = getIp(parsingRecord);
+        }else if(getIpMode.equals(IP_MODE_NETWORK)){
+             ip = parsingRecord.getIp();
+        }
+
         dynamicDnsService.update(parsingRecord, ip, recordId);
         this.updateById(parsingRecord);
         // 添加并启动一个定时任务
@@ -141,7 +155,13 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
             throw new BizException("该记录在域名服务商中不存在");
         }
-        String ip = getIp(parsingRecord);
+        String ip = null;
+        Integer getIpMode = parsingRecord.getGetIpMode();
+        if (getIpMode.equals(IP_MODE_INTERFACE)) {
+            ip = getIp(parsingRecord);
+        }else if(getIpMode.equals(IP_MODE_NETWORK)){
+            ip = parsingRecord.getIp();
+        }
         dynamicDnsService.remove(parsingRecord, ip);
         this.removeById(id);
         //  2023/5/2 删除定时任务
@@ -176,25 +196,19 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     public String getIp(ParsingRecord parsingRecord) {
         //解析类型:1 AAAA 2 A
         Integer recordType = parsingRecord.getRecordType();
-        if (recordType.equals(1)) {
+        if (recordType.equals(RECORD_TYPE_AAAA)) {
             //ipv6
-            List<String> ipInterfaces =
-                    Arrays.asList("https://v6.ip.zxinc.org/getip", "https://api6.ipify.org", "https://api.ip.sb/ip", "https://api.myip.la");
-            Optional<String> any = ipInterfaces.stream().findAny();
-            String ipv6Interface = any.orElse("https://v6.ip.zxinc.org/getip");
+            String ipv6Interface = Arrays.stream(IPV6_INTERFACE_VALUES).findAny().get();
             parsingRecord.setGetIpModeValue(ipv6Interface);
-            parsingRecord.setRecordType(1);
+            parsingRecord.setRecordType(RECORD_TYPE_AAAA);
             String ipv6 = HttpUtil.get(ipv6Interface);
             parsingRecord.setIp(ipv6);
             return ipv6;
-        } else if (recordType.equals(2)) {
+        } else if (recordType.equals(RECORD_TYPE_A)) {
             //ipv4
-            List<String> ipInterfaces =
-                    Arrays.asList("https://ip.3322.net", "https://4.ipw.cn");
-            Optional<String> any = ipInterfaces.stream().findAny();
-            String ipv4Interface = any.orElse("https://ip.3322.net");
+            String ipv4Interface = Arrays.stream(IPV4_INTERFACE_VALUES).findAny().get();
             parsingRecord.setGetIpModeValue(ipv4Interface);
-            parsingRecord.setRecordType(2);
+            parsingRecord.setRecordType(RECORD_TYPE_A);
             String ipv4 = HttpUtil.get(ipv4Interface);
             parsingRecord.setIp(ipv4);
             return ipv4;

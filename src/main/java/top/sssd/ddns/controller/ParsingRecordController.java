@@ -6,9 +6,13 @@ import top.sssd.ddns.common.Result;
 import top.sssd.ddns.common.utils.PageUtils;
 import top.sssd.ddns.common.valid.ValidGroup;
 import top.sssd.ddns.model.entity.ParsingRecord;
+import top.sssd.ddns.model.response.NetWorkSelectResponse;
 import top.sssd.ddns.service.IParsingRecordService;
+import top.sssd.ddns.service.NetWorkService;
 
 import javax.annotation.Resource;
+import java.net.SocketException;
+import java.util.List;
 
 /**
  * @author sssd
@@ -21,6 +25,15 @@ public class ParsingRecordController {
 
     @Resource
     private IParsingRecordService parsingRecordService;
+
+    @Resource
+    private NetWorkService netWorkService;
+
+
+    @GetMapping("network/{recordType}")
+    public Result<List<NetWorkSelectResponse>> network(@PathVariable Integer recordType) throws SocketException {
+        return Result.ok(netWorkService.networks(recordType));
+    }
 
     @PostMapping("page")
     public Result<PageUtils<ParsingRecord>> queryPage(@RequestBody ParsingRecord parsingRecord) {
