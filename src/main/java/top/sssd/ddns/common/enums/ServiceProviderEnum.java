@@ -3,7 +3,7 @@ package top.sssd.ddns.common.enums;
 /**
  * 服务商枚举
  * @author sssd
- * @careate 2023-03-20-15:10
+ * @created 2023-03-20-15:10
  */
 public enum ServiceProviderEnum {
     ALI_YUN(1,"阿里云"),

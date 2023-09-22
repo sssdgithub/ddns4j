@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * 返回前端下拉框模型
  * @author sssd
- * @careate 2023-09-22-15:56
+ * @created 2023-09-22-15:56
  */
 @Data
 public class NetWorkSelectResponse {

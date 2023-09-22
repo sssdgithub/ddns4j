@@ -8,7 +8,7 @@ import lombok.Data;
 
 /**
  * @author sssd
- * @careate 2023-05-02-11:01
+ * @created 2023-05-02-11:01
  */
 @Data
 @TableName("job_task")

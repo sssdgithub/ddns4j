@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 /**
  * @author sssd
- * @careate 2023-05-02-11:51
+ * @created 2023-05-02-11:51
  */
 @Slf4j
 public class DynamicDnsJob implements Job {

@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * @author sssd
- * @careate 2023-04-18-15:13
+ * @created 2023-04-18-15:13
  */
 @Data
 public class PageEntity implements Serializable {

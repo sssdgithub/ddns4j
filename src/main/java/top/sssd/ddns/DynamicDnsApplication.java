@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author sssd
- * @careate 2023-03-19-1:24
+ * @created 2023-03-19-1:24
  */
 @MapperScan("top.sssd.ddns.mapper")
 @SpringBootApplication

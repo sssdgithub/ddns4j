@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * @author sssd
- * @careate 2023-09-22-13:56
+ * @created 2023-09-22-13:56
  */
 public interface NetWorkService {
 

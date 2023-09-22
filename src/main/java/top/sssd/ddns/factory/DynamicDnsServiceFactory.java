@@ -7,7 +7,7 @@ import top.sssd.ddns.service.impl.TencentDynamicDnsServiceImpl;
 
 /**
  * @author sssd
- * @careate 2023-05-06-17:07
+ * @created 2023-05-06-17:07
  */
 public class DynamicDnsServiceFactory {
 

@@ -11,7 +11,7 @@ import top.sssd.ddns.utils.CloudflareUtils;
 
 /**
  * @author sssd
- * @careate 2023-05-06-17:13
+ * @created 2023-05-06-17:13
  */
 @Service
 @Slf4j

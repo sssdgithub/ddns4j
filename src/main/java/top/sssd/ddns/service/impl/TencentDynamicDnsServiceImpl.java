@@ -13,7 +13,7 @@ import java.util.Objects;
 
 /**
  * @author sssd
- * @careate 2023-05-06-17:11
+ * @created 2023-05-06-17:11
  */
 @Service
 public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
