@@ -1,17 +1,42 @@
+**旨在帮助用户动态更新域名解析记录**
+
+**这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
 # DDNS4J 使用指南
-![这是图片](./doc/效果图.png "Magic Gardens")
-![这是图片](./doc/ddns4j-network-view.png "Magic Gardens")
+- 功能区介绍
+![ddns4j-功能区介绍](./doc/ddns4j-功能区介绍.png "ddns4j-功能区介绍")
+![效果图](./doc/效果图.png "效果图")
+- 新版本功能截图
+![新版本功能截图](./doc/ddns4j-network-view.png "新版本功能截图")
 
 [![star](https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/stargazers)
 [![fork](https://gitee.com/Xsssd/ddns4j/badge/fork.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/members)
 ![Static Badge](https://img.shields.io/badge/license-apache-blue)
 
+## 新手使用步骤
+1. 购买域名
+ - [阿里云域名](https://wanwang.aliyun.com/domain)
+ - [腾讯云域名](https://dnspod.cloud.tencent.com/)
+ - [cloudflare](https://www.cloudflare.com/zh-cn/products/registrar/)
+2. 申请密钥
+  - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak?spm=5176.12818093.nav-right.dak.488716d0mHaMgg)
+  - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
+  - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
+3. 部署ddns4j
+   - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases) 
+   - [引入ddns4j脚本](./doc/ddns4j.sql)
+   - 启动jar包
+   - 浏览器输入 http://ip:10000 进入使用
+4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
+   ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
+5. 恭喜您!已成功接入互联网
 
-阅读前需知悉:
+****
+
+DDNS4j基本介绍:
 
 目前已支持阿里云,腾讯云,Cloudflare,并默认开启Cloudflare代理.
 
-DDNS4J 是一个基于 SpringBoot 和 Vue2 开发的开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。在本篇文章中，我们将介绍如何使用 DDNS4J 来轻松管理你的域名，并探讨 DDNS 在 IPv6 时代的重要性。
+DDNS4J 是一个基于 SpringBoot 和 Vue2 开发的完全免费开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。
 
 ## 项目演示地址
 
@@ -19,6 +44,41 @@ https://ddns4j.sssd.top
 
 演示地址中的数据均为演示数据,非真实数据,如要使用,请在发布版下载jar包或使用构建工具自己打包部署,部署步骤可参照下面部署章节
 
+## 项目目录结构
+```
+├─doc mysql脚本,项目效果展示相关
+└─src 源码总目录
+    └─main  核心源码总目录
+        ├─java  
+        │  └─top
+        │      └─sssd
+        │          └─ddns
+        │              ├─common  通用项目代码
+        │              │  ├─constant 项目中使用的常量
+        │              │  ├─enums    项目中使用的枚举
+        │              │  ├─utils    项目使用的工具类
+        │              │  └─valid    项目使用的校验相关工具类
+        │              ├─config      项目配置相关类
+        │              ├─controller   处理前端路由的控制器处理器
+        │              ├─factory      项目中使用的工厂类
+        │              ├─handler      项目中使用的处理器,全局异常处理器,日志处理处理器,元数据处理器
+        │              ├─mapper       持久层数据访问接口
+        │              ├─model        项目中使用的实体类及业务相关类
+        │              │  ├─entity     实体类
+        │              │  ├─request    接收到请求的类
+        │              │  └─response   需要返回响应的类
+        │              ├─service       项目中使用到的服务类接口
+        │              │  └─impl       服务类接口实现
+        │              ├─task          定时任务类
+        │              └─utils         封装好的ddns相关厂商的工具类 
+        └─resources
+            ├─mapper            持久层接口与实体类的映射文件
+            └─static
+                ├─css           前端相关css文件
+                │  └─fonts      前端相关字体
+                └─js            前端相关js
+                └─index.html    前端操作页面
+```
 
 ## DDNS 的发展
 DDNS 即动态 DNS，是一种可以自动更新域名解析记录的 DNS 服务。传统 DNS 服务需要手动维护域名解析记录，这对于动态 IP 地址来说非常不方便。因此，DDNS 应运而生，能够实现自动更新域名解析记录，让用户更加方便地访问网络资源。DDNS（Dynamic Domain Name System，动态域名系统）是一种通过将域名与动态 IP 地址进行绑定，使得能够通过一个不变的域名来访问处于动态 IP 环境下的主机的技术。在 IPv4 时代，DDNS 技术已经成为了广泛应用的网络技术，它为个人用户提供了一种简单易用的方式来管理自己的网络设备。而在 IPv6 时代，由于 IPv6 地址的数量庞大，DDNS 将变得更加重要，因为动态 IPv6 地址变化的频率更高，使用 DDNS 可以方便地将域名与新的 IP 地址进行绑定。
