@@ -1,11 +1,8 @@
 server:
   port: 10000
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/ddns4j?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
+  profiles:
+    active: h2  # h2,mysql
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8

@@ -1,0 +1,13 @@
+spring:
+  # h2 数据库支持
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:./ddns4j
+    username: ddns4j
+    password: ddns4j
+
+  h2:
+    console:
+      path: /h2-console
+      enabled: false # 线上环境务必设置为false,调试时可以开启true
+

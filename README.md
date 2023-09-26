@@ -23,7 +23,7 @@
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
 3. 部署ddns4j
    - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases) 
-   - [引入ddns4j脚本](./doc/ddns4j.sql)
+   - [引入ddns4j脚本](./doc/ddns4j-mysql.sql)
    - 启动jar包
    - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
@@ -97,7 +97,7 @@ DDNS4J 使用了以下技术栈：
 ### 前端：Vue2、ElementUI、Axios
 
 ## 部署
-1. 环境要求：Java 8+、Maven 3.5+、MySQL 5.7+。
+1. 环境要求：Java 8
 2. 克隆项目到本地：
 ```
 git clone https://gitee.com/Xsssd/ddns4j.git
