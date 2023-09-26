@@ -5,7 +5,7 @@
 
     <groupId>top.sssd</groupId>
     <artifactId>ddns</artifactId>
-    <version>v1.4-RELEASE</version>
+    <version>v1.5-RELEASE</version>
     <name>ddns4j</name>
     <description>使用java实现动态域名解析</description>
     <packaging>jar</packaging>
@@ -94,14 +94,23 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
         </dependency>
+        <!--持久层框架 mybatis plus-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
+        <!--mysql 驱动-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <!--h2-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

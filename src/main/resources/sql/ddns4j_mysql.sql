@@ -1,12 +1,9 @@
-
 SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
 
--- ----------------------------
--- Table structure for job_task
--- ----------------------------
-DROP TABLE IF EXISTS `job_task`;
-CREATE TABLE `job_task`  (
+CREATE DATABASE IF NOT EXISTS ddns4j CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE ddns4j;
+
+CREATE TABLE IF NOT EXISTS `job_task`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '任务名称',
   `group_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '任务分组',
@@ -15,17 +12,9 @@ CREATE TABLE `job_task`  (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '任务描述',
   `status` int(1) NULL DEFAULT 0 COMMENT '任务状态：0-停止，1-运行',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务调度表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '任务调度表' ROW_FORMAT = Dynamic;
 
--- ----------------------------
--- Records of job_task
--- ----------------------------
-
--- ----------------------------
--- Table structure for parsing_record
--- ----------------------------
-DROP TABLE IF EXISTS `parsing_record`;
-CREATE TABLE `parsing_record`  (
+CREATE TABLE IF NOT EXISTS `parsing_record`  (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `service_provider` int(11) NOT NULL COMMENT '服务提供商1 阿里云 2 腾讯云 3 cloudflare',
   `service_provider_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
@@ -42,6 +31,6 @@ CREATE TABLE `parsing_record`  (
   `creator` bigint(20) NULL DEFAULT NULL COMMENT '创建者',
   `updater` bigint(20) NULL DEFAULT NULL COMMENT '更新者',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1654354705997905922 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '解析记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '解析记录表' ROW_FORMAT = Dynamic;
 
-SET FOREIGN_KEY_CHECKS = 1;
+
