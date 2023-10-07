@@ -21,11 +21,18 @@
   - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak?spm=5176.12818093.nav-right.dak.488716d0mHaMgg)
   - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
-3. 部署ddns4j
-   - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases) 
-   - [引入ddns4j脚本](./doc/ddns4j-mysql.sql)
-   - 启动jar包
-   - 浏览器输入 http://ip:10000 进入使用
+3. 使用ddns4j
+    -方式一(jar包方式,需要安装jdk环境):
+       - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases) 
+       - 启动jar包 
+        ```
+        java -jar ddns-v1.6-RELEASE.jar
+        ```
+    方式二(docker方式,需要安装docker):
+        ```
+        docker run -itd --name=ddns4j --network=host  topsssd/ddns4j:v1.6
+        ```
+    - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
    ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
 5. 恭喜您!已成功接入互联网
@@ -106,7 +113,7 @@ git clone https://gitee.com/Xsssd/ddns4j.git
 4. 构建并运行项目：
 ```
 mvn clean package
-java -jar ddns-v1.4-RELEASE.jar
+java -jar ddns-v1.6-RELEASE.jar
 ```
 5. 启动成功后，在浏览器中输入 http://localhost:10000/index.html 即可访问 DDNS4J 的可视化界面。
 
