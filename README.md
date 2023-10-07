@@ -22,17 +22,18 @@
   - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
 3. 使用ddns4j
-    -方式一(jar包方式,需要安装jdk环境):
-       - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases) 
-       - 启动jar包 
-        ```
-        java -jar ddns-v1.6-RELEASE.jar
-        ```
-    方式二(docker方式,需要安装docker):
-        ```
-        docker run -itd --name=ddns4j --network=host  topsssd/ddns4j:v1.6
-        ```
-    - 浏览器输入 http://ip:10000 进入使用
+   - jar包方式
+      - 需要安装jdk或者jre环境(后续版本会出整合包,不用安装jdk环境)
+      - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases)
+      - 启动jar包
+     ```
+     java -jar ddns-v1.6-RELEASE.jar
+     ```
+   - docker方式
+     ```
+     docker run -itd --name=ddns4j --network=host  topsssd/ddns4j:v1.6
+     ```
+   - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
    ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
 5. 恭喜您!已成功接入互联网
@@ -102,20 +103,6 @@ DDNS4J 使用了以下技术栈：
 
 ### 后端：SpringBoot、MyBatisPlus、WebSocket
 ### 前端：Vue2、ElementUI、Axios
-
-## 部署
-1. 环境要求：Java 8
-2. 克隆项目到本地：
-```
-git clone https://gitee.com/Xsssd/ddns4j.git
-```
-3. 在doc文件夹中拿到ddns4j的mysql脚本,并修改 application.yml 配置文件中的数据库连接信息;也可以在发布版中直接下载使用的jar包,前提是必须提前安装了jdk
-4. 构建并运行项目：
-```
-mvn clean package
-java -jar ddns-v1.6-RELEASE.jar
-```
-5. 启动成功后，在浏览器中输入 http://localhost:10000/index.html 即可访问 DDNS4J 的可视化界面。
 
 ## 推荐阅读
 如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 https://blog.sssd.top
