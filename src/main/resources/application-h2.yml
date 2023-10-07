@@ -5,7 +5,19 @@ spring:
     url: jdbc:h2:file:./ddns4j
     username: ddns4j
     password: ddns4j
-
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: quartzScheduler
+            instanceId: AUTO
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    job-store-type: jdbc
   h2:
     console:
       path: /h2-console

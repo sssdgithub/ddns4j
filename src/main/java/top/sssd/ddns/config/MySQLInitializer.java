@@ -1,14 +1,13 @@
 package top.sssd.ddns.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.sql.SQLException;
 
@@ -19,7 +18,7 @@ import java.sql.SQLException;
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "spring.datasource.driver-class-name", havingValue = "com.mysql.cj.jdbc.Driver")
-public class MySQLInitializer implements ApplicationRunner {
+public class MySQLInitializer {
 
     private static final String TABLE_EXIST_SQL = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?";
 
@@ -32,8 +31,9 @@ public class MySQLInitializer implements ApplicationRunner {
     @Resource
     private JdbcTemplate jdbcTemplate;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
+
+    @PostConstruct
+    public void initSQL() throws SQLException {
         log.info("开始检查项目是否是第一次启动");
         if (!isTableExists(TABLE_JOB_TASK) && !isTableExists(TABLE_PARSING_RECORD)) {
             log.info("初始化mysql数据库脚本开始...");
