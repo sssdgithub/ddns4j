@@ -5,7 +5,7 @@
 
     <groupId>top.sssd</groupId>
     <artifactId>ddns</artifactId>
-    <version>v1.6-RELEASE</version>
+    <version>v1.6.1-RELEASE</version>
     <name>ddns4j</name>
     <description>使用java实现动态域名解析</description>
     <packaging>jar</packaging>
