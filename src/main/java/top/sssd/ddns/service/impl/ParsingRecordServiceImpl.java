@@ -203,7 +203,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             parsingRecord.setRecordType(RECORD_TYPE_AAAA);
             String ipv6 = HttpUtil.get(ipv6Interface);
             parsingRecord.setIp(ipv6);
-            return ipv6;
+            return ipv6.trim();
         } else if (recordType.equals(RECORD_TYPE_A)) {
             //ipv4
             String ipv4Interface = Arrays.stream(IPV4_INTERFACE_VALUES).findAny().get();
@@ -211,7 +211,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             parsingRecord.setRecordType(RECORD_TYPE_A);
             String ipv4 = HttpUtil.get(ipv4Interface);
             parsingRecord.setIp(ipv4);
-            return ipv4;
+            return ipv4.trim();
         }
         return null;
     }
