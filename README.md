@@ -1,6 +1,17 @@
 **旨在帮助用户动态更新域名解析记录**
 
 **这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
+
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.1</h1>
+<h4 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J -- 让动态域名解析变的更简单</h4>
+
+<p align="center">
+<a href='https://gitee.com/Xsssd/ddns4j/stargazers'><img src='https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark' alt='star'></img></a>
+<a href='https://gitee.com/Xsssd/ddns4j/members'><img src='https://gitee.com/Xsssd/ddns4j/badge/fork.svg?theme=dark' alt='fork'></img></a>
+<a href='https://img.shields.io/badge/license-apache-blue'><img src='https://img.shields.io/badge/license-apache-blue'></img></a>
+</p>
+
+
 # DDNS4J 使用指南
 - 功能区介绍
 ![ddns4j-功能区介绍](./doc/ddns4j-功能区介绍.png "ddns4j-功能区介绍")
@@ -8,9 +19,7 @@
 - 新版本功能截图
 ![新版本功能截图](./doc/ddns4j-network-view.png "新版本功能截图")
 
-[![star](https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/stargazers)
-[![fork](https://gitee.com/Xsssd/ddns4j/badge/fork.svg?theme=dark)](https://gitee.com/Xsssd/ddns4j/members)
-![Static Badge](https://img.shields.io/badge/license-apache-blue)
+
 
 ## 新手使用步骤
 1. 购买域名
