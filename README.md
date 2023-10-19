@@ -114,6 +114,9 @@ DDNS4J 使用了以下技术栈：
 ### 前端：Vue2、ElementUI、Axios
 ### 数据库 支持mysql、h2
 
+## 交流群
+![群二维码](./doc/ddns4j交流群(一)群二维码.png "QQ群二维码")
+
 ## 推荐阅读
 如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 https://blog.sssd.top
 
