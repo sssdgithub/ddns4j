@@ -42,7 +42,7 @@
      ```
      docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.1
      ```
-   - 浏览器输入 http://ip:10000 进入使用
+   - 浏览器输入 http://ip:10000/ddns4j.html 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
    ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
 5. 恭喜您!已成功接入互联网
