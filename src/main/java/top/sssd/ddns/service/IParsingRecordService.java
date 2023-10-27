@@ -1,8 +1,7 @@
 package top.sssd.ddns.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
-import top.sssd.ddns.common.utils.PageUtils;
+import top.sssd.ddns.common.utils.AmisPageUtils;
 import top.sssd.ddns.model.entity.ParsingRecord;
 
 /**
@@ -25,7 +24,12 @@ public interface IParsingRecordService extends IService<ParsingRecord> {
 
     void delete(Long id) throws Exception;
 
-    PageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord);
+//    PageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord);
+
+    AmisPageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord);
 
     String getIp(ParsingRecord parsingRecord);
+
+
+
 }

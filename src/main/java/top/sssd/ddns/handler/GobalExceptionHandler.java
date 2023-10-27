@@ -24,7 +24,7 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import top.sssd.ddns.common.BizException;
-import top.sssd.ddns.common.Result;
+import top.sssd.ddns.common.AmisResult;
 import top.sssd.ddns.common.valid.ValidException;
 
 import javax.annotation.Resource;
@@ -46,135 +46,135 @@ public class GobalExceptionHandler {
     private ObjectMapper objectMapper;
 
     @ExceptionHandler({Exception.class})
-    public Result<String> teaExceptionHandler(Exception exception) throws JsonProcessingException {
+    public AmisResult<String> teaExceptionHandler(Exception exception) throws JsonProcessingException {
         log.error("teaException info:{}", exception.getMessage());
         if(exception.getMessage().contains(RECORD_EXISTS)){
-            return Result.fail("DNS记录已存在");
+            return AmisResult.fail("DNS记录已存在");
         }
-        return Result.fail(exception.getMessage());
+        return AmisResult.fail(exception.getMessage());
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
-    public Result<String> constraintViolationExceptionHandler(ConstraintViolationException violationException) throws JsonProcessingException {
+    public AmisResult<String> constraintViolationExceptionHandler(ConstraintViolationException violationException) throws JsonProcessingException {
         log.error("valid exception info:{}", violationException.getMessage());
-        return Result.fail(violationException.getMessage());
+        return AmisResult.fail(violationException.getMessage());
     }
 
     @ExceptionHandler({BindException.class})
-    public Result<Map<String,String>> bindExceptionHandler(BindException e) {
-        return Result.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+    public AmisResult<Map<String,String>> bindExceptionHandler(BindException e) {
+        return AmisResult.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<List<FieldError>> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return Result.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toList()));
+    public AmisResult<List<FieldError>> methodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return AmisResult.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toList()));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public Result<String> noHandlerFoundException(NoHandlerFoundException e) throws JsonProcessingException {
+    public AmisResult<String> noHandlerFoundException(NoHandlerFoundException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("传入的头信息:", e.getHeaders().toSingleValueMap()).put("请求的方法:", e.getHttpMethod()).put("请求的url:", e.getRequestURL()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public Result<String> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) throws JsonProcessingException {
+    public AmisResult<String> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求的方法:", e.getMethod()).put("支持请求的方法:", e.getSupportedMethods()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public Result<String> httpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) throws JsonProcessingException {
+    public AmisResult<String> httpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求的文件类型:", e.getContentType()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(MissingPathVariableException.class)
-    public Result<String> missingPathVariableException(MissingPathVariableException e) throws JsonProcessingException {
+    public AmisResult<String> missingPathVariableException(MissingPathVariableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("路径参数的名称:", e.getVariableName()).put("请求参数:", e.getParameter()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public Result<String> missingServletRequestParameterException(MissingServletRequestParameterException e) throws JsonProcessingException {
+    public AmisResult<String> missingServletRequestParameterException(MissingServletRequestParameterException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求参数的名称:", e.getParameterName()).put("请求参数的类型:", e.getParameterType()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(TypeMismatchException.class)
-    public Result<Object> typeMismatchException(TypeMismatchException e) throws JsonProcessingException {
+    public AmisResult<Object> typeMismatchException(TypeMismatchException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("要求的类型:", e.getRequiredType()).put("传入的值:", e.getValue()).put("属性名称:", e.getPropertyName()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail().code(Integer.parseInt(e.getErrorCode())).message(e.getMessage());
+        return AmisResult.fail().code(Integer.parseInt(e.getErrorCode())).message(e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public Result<String> httpMessageNotReadableException(HttpMessageNotReadableException e) throws JsonProcessingException {
+    public AmisResult<String> httpMessageNotReadableException(HttpMessageNotReadableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("输入的消息流的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotWritableException.class)
-    public Result<String> httpMessageNotWritableException(HttpMessageNotWritableException e) throws JsonProcessingException {
+    public AmisResult<String> httpMessageNotWritableException(HttpMessageNotWritableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("输出的消息流的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
-    public Result<String> httpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) throws JsonProcessingException {
+    public AmisResult<String> httpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("媒体类型不支持的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
 
     @ExceptionHandler(ServletRequestBindingException.class)
-    public Result<String> servletRequestBindingException(ServletRequestBindingException e) throws JsonProcessingException {
+    public AmisResult<String> servletRequestBindingException(ServletRequestBindingException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求绑定异常的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
 
     @ExceptionHandler(ConversionNotSupportedException.class)
-    public Result<String> conversionNotSupportedException(ConversionNotSupportedException e) throws JsonProcessingException {
+    public AmisResult<String> conversionNotSupportedException(ConversionNotSupportedException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("不支持转换异常的属性名称:", e.getPropertyName()).put("不支持转换异常的所需的类型:", e.getRequiredType()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
 
     @ExceptionHandler(MissingServletRequestPartException.class)
-    public Result<String> missingServletRequestPartException(MissingServletRequestPartException e) throws JsonProcessingException {
+    public AmisResult<String> missingServletRequestPartException(MissingServletRequestPartException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求附件的名称:", e.getRequestPartName()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
 
     @ExceptionHandler(AsyncRequestTimeoutException.class)
-    public Result<String> asyncRequestTimeoutException(AsyncRequestTimeoutException e) throws JsonProcessingException {
+    public AmisResult<String> asyncRequestTimeoutException(AsyncRequestTimeoutException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("异步请求超时异常的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(BizException.class)
-    public Result<Object> bizException(BizException e) throws JsonProcessingException {
+    public AmisResult<Object> bizException(BizException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put(e.getMessage() + ":", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return Result.fail(e.getMessage());
+        return AmisResult.fail(e.getMessage());
     }
 
     @ExceptionHandler(ValidException.class)
-    public Result<Object> validException(ValidException e) {
-        return Result.fail(JSONUtil.toList(e.getMessage(), List.class));
+    public AmisResult<Object> validException(ValidException e) {
+        return AmisResult.fail(JSONUtil.toList(e.getMessage(), List.class));
     }
 }
