@@ -6,9 +6,11 @@ import top.sssd.ddns.common.AmisResult;
 import top.sssd.ddns.common.utils.AmisPageUtils;
 import top.sssd.ddns.common.valid.ValidGroup;
 import top.sssd.ddns.model.entity.ParsingRecord;
+import top.sssd.ddns.model.response.NetWorkSelectResponse;
 import top.sssd.ddns.service.IParsingRecordService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author sssd
@@ -34,4 +36,12 @@ public class AmisController {
         parsingRecordService.add(parsingRecord);
         return AmisResult.ok();
     }
+
+
+    @GetMapping("getIpModeValue")
+    public AmisResult<List> getModeValue(@RequestParam Integer getIpMode,@RequestParam Integer recordType) throws Exception {
+        List<NetWorkSelectResponse> list = parsingRecordService.getModeIpValue(getIpMode,recordType);
+        return AmisResult.ok(list);
+    }
+
 }

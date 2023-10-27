@@ -3,6 +3,10 @@ package top.sssd.ddns.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.sssd.ddns.common.utils.AmisPageUtils;
 import top.sssd.ddns.model.entity.ParsingRecord;
+import top.sssd.ddns.model.response.NetWorkSelectResponse;
+
+import java.net.SocketException;
+import java.util.List;
 
 /**
  * <p>
@@ -31,5 +35,5 @@ public interface IParsingRecordService extends IService<ParsingRecord> {
     String getIp(ParsingRecord parsingRecord);
 
 
-
+    List<NetWorkSelectResponse> getModeIpValue(Integer getIpMode,Integer recordType) throws SocketException;
 }
