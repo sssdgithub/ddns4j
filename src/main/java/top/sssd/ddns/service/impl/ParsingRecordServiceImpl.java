@@ -16,12 +16,15 @@ import top.sssd.ddns.factory.DynamicDnsServiceFactory;
 import top.sssd.ddns.mapper.ParsingRecordMapper;
 import top.sssd.ddns.model.entity.JobTask;
 import top.sssd.ddns.model.entity.ParsingRecord;
+import top.sssd.ddns.model.response.NetWorkSelectResponse;
 import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.service.IJobTaskService;
 import top.sssd.ddns.service.IParsingRecordService;
+import top.sssd.ddns.service.NetWorkService;
 import top.sssd.ddns.task.DynamicDnsJob;
 
 import javax.annotation.Resource;
+import java.net.SocketException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -48,13 +51,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     public void add(ParsingRecord parsingRecord) throws Exception {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
-        String ip = null;
-        Integer getIpMode = parsingRecord.getGetIpMode();
-        if (getIpMode.equals(IP_MODE_INTERFACE)) {
-            ip = getIp(parsingRecord);
-        }else if(getIpMode.equals(IP_MODE_NETWORK)){
-            ip = parsingRecord.getIp();
-        }
+        String ip = getIp(parsingRecord);
 
         //后端唯一性校验
         ParsingRecord checkParsingRecord = this.lambdaQuery()
@@ -177,20 +174,51 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         Integer recordType = parsingRecord.getRecordType();
         if (recordType.equals(RECORD_TYPE_AAAA)) {
             //ipv6
-            String ipv6Interface = Arrays.stream(IPV6_INTERFACE_VALUES).findAny().get();
-            parsingRecord.setGetIpModeValue(ipv6Interface);
-            parsingRecord.setRecordType(RECORD_TYPE_AAAA);
-            String ipv6 = HttpUtil.get(ipv6Interface);
-            parsingRecord.setIp(ipv6);
-            return ipv6.trim();
+            if(parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)){
+                String ipv6 = HttpUtil.get(parsingRecord.getGetIpModeValue().trim());
+                parsingRecord.setIp(ipv6);
+                return ipv6.trim();
+            }else if(parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)){
+                parsingRecord.setIp(parsingRecord.getGetIpModeValue());
+                return parsingRecord.getGetIpModeValue().trim();
+            }
         } else if (recordType.equals(RECORD_TYPE_A)) {
             //ipv4
-            String ipv4Interface = Arrays.stream(IPV4_INTERFACE_VALUES).findAny().get();
-            parsingRecord.setGetIpModeValue(ipv4Interface);
-            parsingRecord.setRecordType(RECORD_TYPE_A);
-            String ipv4 = HttpUtil.get(ipv4Interface);
-            parsingRecord.setIp(ipv4);
-            return ipv4.trim();
+            if(parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)){
+                String ipv4 = HttpUtil.get(parsingRecord.getGetIpModeValue().trim());
+                parsingRecord.setIp(ipv4);
+                return ipv4.trim();
+            }else if(parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)){
+                parsingRecord.setIp(parsingRecord.getGetIpModeValue());
+                return parsingRecord.getGetIpModeValue().trim();
+            }
+        }
+        return null;
+    }
+
+    @Resource
+    private NetWorkService netWorkService;
+
+    @Override
+    public List<NetWorkSelectResponse> getModeIpValue(Integer getIpMode,Integer recordType) throws SocketException {
+        if(IP_MODE_INTERFACE.equals(getIpMode)){
+            if (RECORD_TYPE_AAAA.equals(recordType)) {
+                return Arrays.stream(IPV6_INTERFACE_VALUES).map(item->{
+                    NetWorkSelectResponse netWorkSelectResponse = new NetWorkSelectResponse();
+                    netWorkSelectResponse.setLabel(item);
+                    netWorkSelectResponse.setValue(item);
+                    return netWorkSelectResponse;
+                }).collect(Collectors.toList());
+            }else if(RECORD_TYPE_A.equals(recordType)){
+                return Arrays.stream(IPV4_INTERFACE_VALUES).map(item->{
+                    NetWorkSelectResponse netWorkSelectResponse = new NetWorkSelectResponse();
+                    netWorkSelectResponse.setLabel(item);
+                    netWorkSelectResponse.setValue(item);
+                    return netWorkSelectResponse;
+                }).collect(Collectors.toList());
+            }
+        }else if(IP_MODE_NETWORK.equals(getIpMode)){
+            return netWorkService.networks(recordType);
         }
         return null;
     }
