@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  */
 @TableName("parsing_record")
 @Data
-public class ParsingRecord extends PageEntity implements Serializable {
+public class ParsingRecord extends AmisPageEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

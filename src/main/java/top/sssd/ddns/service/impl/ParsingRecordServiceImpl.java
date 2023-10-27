@@ -11,7 +11,7 @@ import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.common.enums.ServiceProviderEnum;
 import top.sssd.ddns.common.enums.UpdateFrequencyEnum;
-import top.sssd.ddns.common.utils.PageUtils;
+import top.sssd.ddns.common.utils.AmisPageUtils;
 import top.sssd.ddns.factory.DynamicDnsServiceFactory;
 import top.sssd.ddns.mapper.ParsingRecordMapper;
 import top.sssd.ddns.model.entity.JobTask;
@@ -172,27 +172,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     }
 
     @Override
-    public PageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord) {
-        Page<ParsingRecord> page = lambdaQuery()
-                .eq(Objects.nonNull(parsingRecord.getServiceProvider()), ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
-                .eq(StringUtils.hasText(parsingRecord.getDomain()), ParsingRecord::getDomain, parsingRecord.getDomain())
-                .eq(Objects.nonNull(parsingRecord.getRecordType()), ParsingRecord::getRecordType, parsingRecord.getRecordType())
-                .eq(Objects.nonNull(parsingRecord.getState()), ParsingRecord::getState, parsingRecord.getState())
-                .ge(Objects.nonNull(parsingRecord.getCreateDate()), ParsingRecord::getCreateDate, parsingRecord.getCreateDate())
-                .le(Objects.nonNull(parsingRecord.getUpdateDate()), ParsingRecord::getUpdateDate, parsingRecord.getUpdateDate())
-                .page(new Page<ParsingRecord>(parsingRecord.getPage(), parsingRecord.getPageSize()));
-        List<ParsingRecord> resultList = page.getRecords().stream().map(item -> {
-            String serviceProviderName = ServiceProviderEnum.getNameByIndex(item.getServiceProvider());
-            String recordTypeName = RecordTypeEnum.getNameByIndex(item.getRecordType());
-            item.setServiceProviderName(serviceProviderName);
-            item.setRecordTypeName(recordTypeName);
-            return item;
-        }).collect(Collectors.toList());
-        page.setRecords(resultList);
-        return new PageUtils<ParsingRecord>(page);
-    }
-
-    @Override
     public String getIp(ParsingRecord parsingRecord) {
         //解析类型:1 AAAA 2 A
         Integer recordType = parsingRecord.getRecordType();
@@ -214,5 +193,28 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             return ipv4.trim();
         }
         return null;
+    }
+
+    @Override
+    public AmisPageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord) {
+        Page<ParsingRecord> pageList = lambdaQuery()
+                .eq(Objects.nonNull(parsingRecord.getServiceProvider()), ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
+                .eq(StringUtils.hasText(parsingRecord.getDomain()), ParsingRecord::getDomain, parsingRecord.getDomain())
+                .eq(Objects.nonNull(parsingRecord.getRecordType()), ParsingRecord::getRecordType, parsingRecord.getRecordType())
+                .eq(Objects.nonNull(parsingRecord.getState()), ParsingRecord::getState, parsingRecord.getState())
+                .ge(Objects.nonNull(parsingRecord.getCreateDate()), ParsingRecord::getCreateDate, parsingRecord.getCreateDate())
+                .le(Objects.nonNull(parsingRecord.getUpdateDate()), ParsingRecord::getUpdateDate, parsingRecord.getUpdateDate())
+                .page(new Page<ParsingRecord>(parsingRecord.getPage(), parsingRecord.getPerPage()));
+
+        List<ParsingRecord> resultList = pageList.getRecords().stream().map(item -> {
+            String serviceProviderName = ServiceProviderEnum.getNameByIndex(item.getServiceProvider());
+            String recordTypeName = RecordTypeEnum.getNameByIndex(item.getRecordType());
+            item.setServiceProviderName(serviceProviderName);
+            item.setRecordTypeName(recordTypeName);
+            return item;
+        }).collect(Collectors.toList());
+        pageList.setRecords(resultList);
+
+        return new AmisPageUtils<>(pageList);
     }
 }

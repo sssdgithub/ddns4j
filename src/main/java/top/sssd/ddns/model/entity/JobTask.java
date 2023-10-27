@@ -6,13 +6,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author sssd
  * @created 2023-05-02-11:01
  */
 @Data
 @TableName("job_task")
-public class JobTask {
+public class JobTask implements Serializable {
 
     @TableId(type = IdType.AUTO)
     private Integer id;

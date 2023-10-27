@@ -3,7 +3,6 @@ package top.sssd.ddns.controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.sssd.ddns.common.Result;
-import top.sssd.ddns.common.utils.PageUtils;
 import top.sssd.ddns.common.valid.ValidGroup;
 import top.sssd.ddns.model.entity.ParsingRecord;
 import top.sssd.ddns.model.response.NetWorkSelectResponse;
@@ -33,12 +32,6 @@ public class ParsingRecordController {
     @GetMapping("network/{recordType}")
     public Result<List<NetWorkSelectResponse>> network(@PathVariable Integer recordType) throws SocketException {
         return Result.ok(netWorkService.networks(recordType));
-    }
-
-    @PostMapping("page")
-    public Result<PageUtils<ParsingRecord>> queryPage(@RequestBody ParsingRecord parsingRecord) {
-        PageUtils<ParsingRecord> page = parsingRecordService.queryPage(parsingRecord);
-        return Result.ok(page);
     }
 
 
