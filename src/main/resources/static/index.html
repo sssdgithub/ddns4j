@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8"/>
+    <title>amis demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <link rel="stylesheet" href="./jssdk/sdk.css"/>
+    <link rel="stylesheet" href="./jssdk/helper.css"/>
+    <link rel="stylesheet" href="./jssdk/iconfont.css"/>
+    <!-- 这是默认主题所需的，如果是其他主题则不需要 -->
+    <!-- 从 1.1.0 开始 sdk.css 将不支持 IE 11，如果要支持 IE11 请引用这个 css，并把前面那个删了 -->
+    <!-- <link rel="stylesheet" href="sdk-ie11.css" /> -->
+    <!-- 不过 amis 开发团队几乎没测试过 IE 11 下的效果，所以可能有细节功能用不了，如果发现请报 issue -->
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="root" class="app-wrapper"></div>
+<script src="./jssdk/sdk.js"></script>
+<script type="text/javascript">
+    (function () {
+        let amis = amisRequire('amis/embed');
+        // 通过替换下面这个配置来生成不同页面
+        let amisJSON = {
+            "type": "page",
+            "asideResizor": false,
+            "regions": [
+                "header",
+                "toolbar",
+                "body"
+            ],
+            "body": [
+                {
+                    "id": "u:0d1136773f00",
+                    "type": "crud2",
+                    "mode": "table2",
+                    "dsType": "api",
+                    "syncLocation": true,
+                    "primaryField": "id",
+                    "loadType": "pagination",
+                    "api": {
+                        "url": "/amis/page",
+                        "method": "get",
+                        "requestAdaptor": "",
+                        "adaptor": "",
+                        "messages": {},
+                        "dataType": "json"
+                    },
+                    "filter": {
+                        "type": "form",
+                        "title": "条件查询",
+                        "mode": "normal",
+                        "columnCount": 2,
+                        "clearValueOnHidden": true,
+                        "behavior": [
+                            "SimpleQuery"
+                        ],
+                        "body": [
+                            {
+                                "type": "select",
+                                "label": "记录类型",
+                                "name": "recordType",
+                                "options": [
+                                    {
+                                        "label": "AAAA",
+                                        "value": 1
+                                    },
+                                    {
+                                        "label": "A",
+                                        "value": 2
+                                    }
+                                ],
+                                "id": "u:1b37e557be33",
+                                "multiple": false,
+                                "clearable": true,
+                                "searchable": false,
+                                "checkAll": false,
+                                "value": "",
+                                "remark": {
+                                    "icon": "fa fa-question-circle",
+                                    "trigger": [
+                                        "hover"
+                                    ],
+                                    "className": "Remark--warning",
+                                    "placement": "top",
+                                    "title": "",
+                                    "content": "ip类型,AAAA为ipv6地址,A为ipv4地址"
+                                }
+                            },
+                            {
+                                "type": "select",
+                                "label": "状态",
+                                "name": "state",
+                                "options": [
+                                    {
+                                        "label": "启用",
+                                        "value": 1
+                                    },
+                                    {
+                                        "label": "禁用",
+                                        "value": 2
+                                    }
+                                ],
+                                "id": "u:800d2949a0e0",
+                                "multiple": false,
+                                "clearable": true,
+                                "value": ""
+                            },
+                            {
+                                "type": "select",
+                                "label": "服务商",
+                                "name": "serviceProvider",
+                                "options": [
+                                    {
+                                        "label": "阿里云",
+                                        "value": 1
+                                    },
+                                    {
+                                        "label": "腾讯云",
+                                        "value": 2
+                                    },
+                                    {
+                                        "label": "Cloudflare",
+                                        "value": 3
+                                    }
+                                ],
+                                "id": "u:f6d8ebd734f6",
+                                "multiple": false,
+                                "clearable": true,
+                                "value": ""
+                            },
+                            {
+                                "type": "input-text",
+                                "label": "域名",
+                                "name": "domain",
+                                "id": "u:fc8fa78126c8",
+                                "validations": {
+                                    "maxLength": 30
+                                },
+                                "validationErrors": {
+                                    "maxLength": "域名不能超过30个字符"
+                                },
+                                "clearable": true
+                            }
+                        ],
+                        "actions": [
+                            {
+                                "type": "reset",
+                                "label": "重置",
+                                "id": "u:7d9ecfac528e"
+                            },
+                            {
+                                "type": "submit",
+                                "label": "查询",
+                                "level": "primary",
+                                "id": "u:c9de6bbc2116"
+                            }
+                        ],
+                        "id": "u:0230a74163d8",
+                        "autoFocus": false,
+                        "labelAlign": "left",
+                        "horizontal": {
+                            "left": 2,
+                            "right": 10
+                        },
+                        "canAccessSuperData": false,
+                        "affixFooter": true,
+                        "resetAfterSubmit": true,
+                        "loadingConfig": {
+                            "show": true,
+                            "root": "[role=page-body]"
+                        },
+                        "debug": false
+                    },
+                    "headerToolbar": [
+                        {
+                            "type": "flex",
+                            "direction": "row",
+                            "justify": "flex-start",
+                            "alignItems": "stretch",
+                            "style": {
+                                "position": "static"
+                            },
+                            "items": [
+                                {
+                                    "type": "container",
+                                    "align": "left",
+                                    "behavior": [
+                                        "Insert",
+                                        "BulkEdit",
+                                        "BulkDelete"
+                                    ],
+                                    "body": [
+                                        {
+                                            "type": "button",
+                                            "label": "新增",
+                                            "level": "primary",
+                                            "className": "m-r-xs",
+                                            "behavior": "Insert",
+                                            "onEvent": {
+                                                "click": {
+                                                    "actions": [
+                                                        {
+                                                            "actionType": "dialog",
+                                                            "dialog": {
+                                                                "body": [
+                                                                    {
+                                                                        "id": "u:828a303ec09f",
+                                                                        "type": "form",
+                                                                        "title": "新增数据",
+                                                                        "mode": "horizontal",
+                                                                        "dsType": "api",
+                                                                        "api": "/amis/add",
+                                                                        "feat": "Insert",
+                                                                        "body": [
+                                                                            {
+                                                                                "type": "select",
+                                                                                "label": "服务提供商",
+                                                                                "name": "serviceProvider",
+                                                                                "options": [
+                                                                                    {
+                                                                                        "label": "阿里云",
+                                                                                        "value": 1
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "腾讯云",
+                                                                                        "value": "2"
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "Cloudflare",
+                                                                                        "value": 3
+                                                                                    }
+                                                                                ],
+                                                                                "id": "u:9e6ea5dd4702",
+                                                                                "multiple": false,
+                                                                                "clearable": true,
+                                                                                "required": true,
+                                                                                "value": ""
+                                                                            },
+                                                                            {
+                                                                                "type": "input-text",
+                                                                                "label": "域名",
+                                                                                "name": "domain",
+                                                                                "id": "u:139c04b220c9",
+                                                                                "clearable": true,
+                                                                                "required": true,
+                                                                                "validations": {
+                                                                                    "maxLength": 30
+                                                                                },
+                                                                                "validationErrors": {
+                                                                                    "maxLength": "域名最大不能超过30个字符"
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "type": "input-text",
+                                                                                "label": "服务商ID",
+                                                                                "name": "serviceProviderId",
+                                                                                "id": "u:1c3afcbfe187",
+                                                                                "validations": {
+                                                                                    "maxLength": 50
+                                                                                },
+                                                                                "required": true,
+                                                                                "validationErrors": {
+                                                                                    "maxLength": "服务商ID不能大于0"
+                                                                                },
+                                                                                "validateOnChange": false,
+                                                                                "clearable": true
+                                                                            },
+                                                                            {
+                                                                                "type": "input-text",
+                                                                                "label": "服务商密钥",
+                                                                                "name": "serviceProviderSecret",
+                                                                                "id": "u:a169ab8ba0f7",
+                                                                                "required": true,
+                                                                                "validations": {
+                                                                                    "maxLength": 50
+                                                                                },
+                                                                                "validationErrors": {
+                                                                                    "maxLength": "服务商密钥最大不能超过50个字符"
+                                                                                },
+                                                                                "clearable": true,
+                                                                                "validateOnChange": false
+                                                                            },
+                                                                            {
+                                                                                "type": "divider",
+                                                                                "id": "u:afef25704845"
+                                                                            },
+                                                                            {
+                                                                                "type": "select",
+                                                                                "label": "解析类型",
+                                                                                "name": "recordType",
+                                                                                "options": [
+                                                                                    {
+                                                                                        "label": "AAAA",
+                                                                                        "value": 1
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "A",
+                                                                                        "value": 2
+                                                                                    }
+                                                                                ],
+                                                                                "id": "u:74140384fb3b",
+                                                                                "multiple": false,
+                                                                                "value": "",
+                                                                                "required": true,
+                                                                                "clearable": true
+                                                                            },
+                                                                            {
+                                                                                "type": "select",
+                                                                                "label": "状态",
+                                                                                "name": "state",
+                                                                                "options": [
+                                                                                    {
+                                                                                        "label": "启用",
+                                                                                        "value": 1
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "禁用",
+                                                                                        "value": 0
+                                                                                    }
+                                                                                ],
+                                                                                "id": "u:9ffad3b8ed5c",
+                                                                                "multiple": false,
+                                                                                "clearable": true,
+                                                                                "required": true,
+                                                                                "value": "",
+                                                                                "showInvalidMatch": false
+                                                                            },
+                                                                            {
+                                                                                "type": "select",
+                                                                                "label": "更新频率",
+                                                                                "name": "updateFrequency",
+                                                                                "options": [
+                                                                                    {
+                                                                                        "label": "1分钟",
+                                                                                        "value": 1
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "2分钟",
+                                                                                        "value": 2
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "5分钟",
+                                                                                        "value": 5
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "10分钟",
+                                                                                        "value": 10
+                                                                                    }
+                                                                                ],
+                                                                                "id": "u:17fe3f04de55",
+                                                                                "required": true,
+                                                                                "value": ""
+                                                                            },
+                                                                            {
+                                                                                "type": "select",
+                                                                                "label": "获取IP方式",
+                                                                                "name": "getIpMode",
+                                                                                "options": [
+                                                                                    {
+                                                                                        "label": "网络接口",
+                                                                                        "value": 1
+                                                                                    },
+                                                                                    {
+                                                                                        "label": "本地网卡获取",
+                                                                                        "value": 2
+                                                                                    }
+                                                                                ],
+                                                                                "id": "u:29327416bd4e",
+                                                                                "searchable": false,
+                                                                                "onlyLeaf": true,
+                                                                                "multiple": false,
+                                                                                "borderMode": "full",
+                                                                                "size": "full",
+                                                                                "mode": "horizontal",
+                                                                                "clearable": true,
+                                                                                "required": true
+                                                                            },
+                                                                            {
+                                                                                "type": "select",
+                                                                                "labelClassName": "text-muted",
+                                                                                "name": "getIpModeValue",
+                                                                                "source": "/amis/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                                "initFetchOn": "data.getIpMode",
+                                                                                "visibleOn": "data.recordType",
+                                                                                "clearable": true,
+                                                                                "searchable": false,
+                                                                                "onlyLeaf": true,
+                                                                                "multiple": false,
+                                                                            }
+                                                                        ],
+                                                                        "resetAfterSubmit": true,
+                                                                        "actions": [
+                                                                            {
+                                                                                "type": "button",
+                                                                                "actionType": "cancel",
+                                                                                "label": "取消",
+                                                                                "id": "u:8989d2d4ddd6"
+                                                                            },
+                                                                            {
+                                                                                "type": "button",
+                                                                                "actionType": "submit",
+                                                                                "label": "提交",
+                                                                                "level": "primary",
+                                                                                "id": "u:5d7ac540cca1"
+                                                                            }
+                                                                        ],
+                                                                        "onEvent": {
+                                                                            "submitSucc": {
+                                                                                "actions": [
+                                                                                    {
+                                                                                        "actionType": "search",
+                                                                                        "groupType": "component",
+                                                                                        "componentId": "u:0d1136773f00"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ],
+                                                                "title": "新增解析记录",
+                                                                "actions": [
+                                                                    {
+                                                                        "type": "button",
+                                                                        "actionType": "cancel",
+                                                                        "label": "取消",
+                                                                        "id": "u:4f15ec2fce44"
+                                                                    },
+                                                                    {
+                                                                        "type": "button",
+                                                                        "actionType": "submit",
+                                                                        "label": "提交",
+                                                                        "level": "primary",
+                                                                        "id": "u:649bdf55e5b9"
+                                                                    }
+                                                                ],
+                                                                "id": "u:db72b19dd36f",
+                                                                "showCloseButton": true,
+                                                                "closeOnOutside": false,
+                                                                "closeOnEsc": false,
+                                                                "showErrorMsg": true,
+                                                                "showLoading": true,
+                                                                "withDefaultData": false,
+                                                                "dataMapSwitch": false
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "id": "u:5a4f0b80acad"
+                                        },
+                                        {
+                                            "type": "button",
+                                            "label": "日志",
+                                            "behavior": "custom",
+                                            "className": "m-r-xs",
+                                            "actionType": "dialog",
+                                            "dialog": {
+                                                "title": "日志",
+                                                "closeOnEsc": true,
+                                                "body": {
+                                                    "type": "log",
+                                                    "height": 300,
+                                                    "source": "post:/amis/logs",
+                                                    "rowHeight": 30
+                                                }
+                                            },
+                                            "onEvent": {
+                                                "click": {
+                                                    "actions": []
+                                                }
+                                            },
+                                            "level": "light",
+                                            "id": "u:0759b710c332"
+                                        }
+                                    ],
+                                    "wrapperBody": false,
+                                    "style": {
+                                        "flexGrow": 1,
+                                        "flex": "1 1 auto",
+                                        "position": "static",
+                                        "display": "flex",
+                                        "flexBasis": "auto",
+                                        "flexDirection": "row",
+                                        "flexWrap": "nowrap",
+                                        "alignItems": "stretch",
+                                        "justifyContent": "flex-start"
+                                    },
+                                    "id": "u:a34c8310d3bd"
+                                },
+                                {
+                                    "type": "container",
+                                    "align": "right",
+                                    "behavior": [
+                                        "FuzzyQuery"
+                                    ],
+                                    "body": [],
+                                    "wrapperBody": false,
+                                    "style": {
+                                        "flexGrow": 1,
+                                        "flex": "1 1 auto",
+                                        "position": "static",
+                                        "display": "flex",
+                                        "flexBasis": "auto",
+                                        "flexDirection": "row",
+                                        "flexWrap": "nowrap",
+                                        "alignItems": "stretch",
+                                        "justifyContent": "flex-end"
+                                    },
+                                    "id": "u:1fd509ebb1ce"
+                                }
+                            ],
+                            "id": "u:3440b0836585"
+                        }
+                    ],
+                    "footerToolbar": [
+                        {
+                            "type": "flex",
+                            "direction": "row",
+                            "justify": "flex-start",
+                            "alignItems": "stretch",
+                            "style": {
+                                "position": "static"
+                            },
+                            "items": [
+                                {
+                                    "type": "container",
+                                    "align": "left",
+                                    "body": [],
+                                    "wrapperBody": false,
+                                    "style": {
+                                        "flexGrow": 1,
+                                        "flex": "1 1 auto",
+                                        "position": "static",
+                                        "display": "flex",
+                                        "flexBasis": "auto",
+                                        "flexDirection": "row",
+                                        "flexWrap": "nowrap",
+                                        "alignItems": "stretch",
+                                        "justifyContent": "flex-start"
+                                    },
+                                    "id": "u:c13802366165"
+                                },
+                                {
+                                    "type": "container",
+                                    "align": "right",
+                                    "body": [
+                                        {
+                                            "type": "pagination",
+                                            "behavior": "Pagination",
+                                            "layout": [
+                                                "total",
+                                                "perPage",
+                                                "pager"
+                                            ],
+                                            "perPage": 10,
+                                            "perPageAvailable": [
+                                                10,
+                                                20,
+                                                50,
+                                                100
+                                            ],
+                                            "align": "right",
+                                            "id": "u:5de235f0c789",
+                                            "mode": "normal"
+                                        }
+                                    ],
+                                    "wrapperBody": false,
+                                    "style": {
+                                        "flexGrow": 1,
+                                        "flex": "1 1 auto",
+                                        "position": "static",
+                                        "display": "flex",
+                                        "flexBasis": "auto",
+                                        "flexDirection": "row",
+                                        "flexWrap": "nowrap",
+                                        "alignItems": "stretch",
+                                        "justifyContent": "flex-end"
+                                    },
+                                    "id": "u:fd7fde36d5a9"
+                                }
+                            ],
+                            "id": "u:182da8c0dc51"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "type": "hidden",
+                            "name": "id"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "服务商",
+                            "name": "serviceProviderName",
+                            "id": "u:88a5082c3df6"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "解析类型",
+                            "name": "recordTypeName",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "公网IP",
+                            "name": "ip",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "域名",
+                            "name": "domain",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "更新频率 单位:分钟",
+                            "name": "updateFrequency",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "创建时间",
+                            "name": "createDate",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "tpl",
+                            "title": "更新时间",
+                            "name": "updateDate",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "operation",
+                            "title": "操作",
+                            "buttons": [
+                                {
+                                    "type": "button",
+                                    "label": "查看",
+                                    "level": "link",
+                                    "behavior": "View",
+                                    "onEvent": {
+                                        "click": {
+                                            "actions": [
+                                                {
+                                                    "actionType": "dialog",
+                                                    "dialog": {
+                                                        "body": {
+                                                            "id": "u:5e50a21d83ee",
+                                                            "type": "form",
+                                                            "title": "查看数据",
+                                                            "mode": "horizontal",
+                                                            "feat": "View",
+                                                            "body": [
+                                                                {
+                                                                    "type": "static",
+                                                                    "name": "serviceProviderName",
+                                                                    "label": "服务商"
+                                                                },
+                                                                {
+                                                                    "type": "static",
+                                                                    "name": "recordTypeName",
+                                                                    "label": "解析类型"
+                                                                },
+                                                                {
+                                                                    "type": "static",
+                                                                    "name": "ip",
+                                                                    "label": "公网IP"
+                                                                },
+                                                                {
+                                                                    "type": "static",
+                                                                    "name": "domain",
+                                                                    "label": "域名"
+                                                                },
+                                                                {
+                                                                    "type": "static",
+                                                                    "name": "updateFrequency",
+                                                                    "label": "更新频率"
+                                                                }
+                                                            ],
+                                                            "static": true,
+                                                            "actions": [
+                                                                {
+                                                                    "type": "button",
+                                                                    "actionType": "cancel",
+                                                                    "label": "关闭",
+                                                                    "id": "u:f769d348dd75"
+                                                                }
+                                                            ],
+                                                            "onEvent": {
+                                                                "submitSucc": {
+                                                                    "actions": [
+                                                                        {
+                                                                            "actionType": "search",
+                                                                            "groupType": "component",
+                                                                            "componentId": "u:0d1136773f00"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "title": "查看数据",
+                                                        "size": "md",
+                                                        "actions": [
+                                                            {
+                                                                "type": "button",
+                                                                "actionType": "cancel",
+                                                                "label": "关闭",
+                                                                "id": "u:06ce2f1badd3"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "id": "u:a3fec086bf31"
+                                },
+                                {
+                                    "type": "button",
+                                    "label": "编辑",
+                                    "level": "link",
+                                    "behavior": "Edit",
+                                    "onEvent": {
+                                        "click": {
+                                            "actions": [
+                                                {
+                                                    "actionType": "dialog",
+                                                    "dialog": {
+                                                        "body": {
+                                                            "id": "u:854fc706fceb",
+                                                            "type": "form",
+                                                            "title": "编辑数据",
+                                                            "mode": "horizontal",
+                                                            "dsType": "api",
+                                                            "api": "/amis/modify",
+                                                            "feat": "Edit",
+                                                            "body": [
+                                                                {
+                                                                    "type": "hidden",
+                                                                    "name": "id"
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "服务提供商",
+                                                                    "name": "serviceProvider",
+                                                                    "required": true,
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "阿里云",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "腾讯云",
+                                                                            "value": "2"
+                                                                        },
+                                                                        {
+                                                                            "label": "Cloudflare",
+                                                                            "value": 3
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "type": "input-text",
+                                                                    "label": "域名",
+                                                                    "name": "domain",
+                                                                    "id": "u:139c04b220c9",
+                                                                    "clearable": true,
+                                                                    "required": true,
+                                                                    "validations": {
+                                                                        "maxLength": 30
+                                                                    },
+                                                                    "validationErrors": {
+                                                                        "maxLength": "域名最大不能超过30个字符"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "input-text",
+                                                                    "label": "服务商ID",
+                                                                    "name": "serviceProviderId",
+                                                                    "id": "u:1c3afcbfe187",
+                                                                    "validations": {
+                                                                        "maxLength": 50
+                                                                    },
+                                                                    "required": true,
+                                                                    "validationErrors": {
+                                                                        "maxLength": "服务商ID不能大于0"
+                                                                    },
+                                                                    "validateOnChange": false,
+                                                                    "clearable": true
+                                                                },
+                                                                {
+                                                                    "type": "input-text",
+                                                                    "label": "服务商密钥",
+                                                                    "name": "serviceProviderSecret",
+                                                                    "id": "u:a169ab8ba0f7",
+                                                                    "required": true,
+                                                                    "validations": {
+                                                                        "maxLength": 50
+                                                                    },
+                                                                    "validationErrors": {
+                                                                        "maxLength": "服务商密钥最大不能超过50个字符"
+                                                                    },
+                                                                    "clearable": true,
+                                                                    "validateOnChange": false
+                                                                },
+                                                                {
+                                                                    "type": "divider",
+                                                                    "id": "u:afef25704845"
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "解析类型",
+                                                                    "name": "recordType",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "AAAA",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "A",
+                                                                            "value": 2
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:74140384fb3b",
+                                                                    "multiple": false,
+                                                                    "value": "",
+                                                                    "required": true,
+                                                                    "clearable": true
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "状态",
+                                                                    "name": "state",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "启用",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "禁用",
+                                                                            "value": 0
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:9ffad3b8ed5c",
+                                                                    "multiple": false,
+                                                                    "clearable": true,
+                                                                    "required": true,
+                                                                    "value": "",
+                                                                    "showInvalidMatch": false
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "更新频率",
+                                                                    "name": "updateFrequency",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "1分钟",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "2分钟",
+                                                                            "value": 2
+                                                                        },
+                                                                        {
+                                                                            "label": "5分钟",
+                                                                            "value": 5
+                                                                        },
+                                                                        {
+                                                                            "label": "10分钟",
+                                                                            "value": 10
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:17fe3f04de55",
+                                                                    "required": true,
+                                                                    "value": ""
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "获取IP方式",
+                                                                    "name": "getIpMode",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "网络接口",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "本地网卡获取",
+                                                                            "value": 2
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:29327416bd4e",
+                                                                    "searchable": false,
+                                                                    "onlyLeaf": true,
+                                                                    "multiple": false,
+                                                                    "borderMode": "full",
+                                                                    "size": "full",
+                                                                    "mode": "horizontal",
+                                                                    "clearable": true,
+                                                                    "required": true
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "labelClassName": "text-muted",
+                                                                    "name": "getIpModeValue",
+                                                                    "source": "/amis/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                    "initFetchOn": "data.getIpMode",
+                                                                    "visibleOn": "data.recordType",
+                                                                    "clearable": true,
+                                                                    "searchable": false,
+                                                                    "onlyLeaf": true,
+                                                                    "multiple": false,
+                                                                }
+                                                            ],
+                                                            "resetAfterSubmit": true,
+                                                            "actions": [
+                                                                {
+                                                                    "type": "button",
+                                                                    "actionType": "cancel",
+                                                                    "label": "取消",
+                                                                    "id": "u:b3c21361db28"
+                                                                },
+                                                                {
+                                                                    "type": "button",
+                                                                    "actionType": "submit",
+                                                                    "label": "提交",
+                                                                    "level": "primary",
+                                                                    "id": "u:8e827103b0ee"
+                                                                }
+                                                            ],
+                                                            "onEvent": {
+                                                                "submitSucc": {
+                                                                    "actions": [
+                                                                        {
+                                                                            "actionType": "search",
+                                                                            "groupType": "component",
+                                                                            "componentId": "u:0d1136773f00"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "title": "编辑数据",
+                                                        "size": "md",
+                                                        "actions": [
+                                                            {
+                                                                "type": "button",
+                                                                "actionType": "cancel",
+                                                                "label": "取消",
+                                                                "id": "u:ea18f3850561"
+                                                            },
+                                                            {
+                                                                "type": "button",
+                                                                "actionType": "submit",
+                                                                "label": "提交",
+                                                                "level": "primary",
+                                                                "id": "u:7302f64ed3c5"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "id": "u:6587f14a35d2"
+                                },
+                                {
+                                    "type": "button",
+                                    "label": "删除",
+                                    "behavior": "Delete",
+                                    "className": "m-r-xs text-danger",
+                                    "level": "link",
+                                    "confirmText": "确认要删除数据",
+                                    "onEvent": {
+                                        "click": {
+                                            "actions": [
+                                                {
+                                                    "actionType": "ajax",
+                                                    "api": "delete:/amis/delete/${id}"
+                                                },
+                                                {
+                                                    "actionType": "search",
+                                                    "groupType": "component",
+                                                    "componentId": "u:0d1136773f00"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "id": "u:54578b4cae1a"
+                                }
+                            ],
+                            "id": "u:db9472ee6ebf"
+                        }
+                    ],
+                    "placeholder": "暂无数据",
+                    "interval": 1000 * 60
+                }
+            ],
+            "id": "u:3d29656f76c9",
+            "pullRefresh": {
+                "disabled": true
+            },
+            "title": "DDNS4J",
+            "subTitle": "开源好用的域名解析工具",
+            "toolbar": [
+                {
+                    "type": "nav",
+                    "stacked": false,
+                    "links": [
+                        {
+                            "label": "ddns4j-spring-boot-starter",
+                            "to": "https://gitee.com/Xsssd/ddns4j-spring-boot-starter",
+                            "target": "_blank",
+                            "id": "0",
+                            "icon": "fa fa-slideshare",
+                            "badge": "",
+                            "children": []
+                        },
+                        {
+                            "label": "github",
+                            "to": "https://github.com/sssdgithub/ddns4j",
+                            "target": "_blank",
+                            "id": "1",
+                            "icon": "fa fa-stack-overflow",
+                            "children": []
+                        },
+                        {
+                            "label": "gitee",
+                            "to": "https://gitee.com/Xsssd/ddns4j",
+                            "icon": "fa fa-spotify",
+                            "target": "_blank",
+                            "children": [],
+                            "id": "2"
+                        }
+                    ],
+                    "id": "u:092b979bd8ff",
+                    "style": {
+                        "opacity": 1
+                    }
+                }
+            ]
+        };
+
+
+        let amisScoped = amis.embed('#root', amisJSON);
+    })();
+</script>
+</body>
+</html>
