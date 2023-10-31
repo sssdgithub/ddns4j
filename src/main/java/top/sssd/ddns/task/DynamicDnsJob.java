@@ -4,12 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import top.sssd.ddns.factory.DynamicDnsServiceFactory;
-import top.sssd.ddns.handler.LogWebSocketHandler;
+import top.sssd.ddns.model.entity.ChangedLog;
 import top.sssd.ddns.model.entity.ParsingRecord;
+import top.sssd.ddns.service.ChangedLogService;
 import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.service.IParsingRecordService;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 /**
  * @author sssd
@@ -23,7 +25,8 @@ public class DynamicDnsJob implements Job {
     private IParsingRecordService parsingRecordService;
 
     @Resource
-    private LogWebSocketHandler logWebSocketHandler;
+    private ChangedLogService changedLogService;
+
 
     @Override
     public void execute(JobExecutionContext context) {
@@ -41,7 +44,8 @@ public class DynamicDnsJob implements Job {
         String nowIp = parsingRecordService.getIp(parsingRecord);
         if(nowIp.equals(dnsIp)){
             log.info("域名为:{}的记录,域名服务商中的ip:{}与现在的ip:{},未发生改变",parsingRecord.getDomain(),dnsIp,nowIp);
-            logWebSocketHandler.sendToAllSessions(String.format("域名为:%s的记录,域名服务商中的ip:%s与现在的ip:%s,未发生改变",parsingRecord.getDomain(),dnsIp,nowIp));
+            String content = String.format("域名为:%s的记录,未发生改变", parsingRecord.getDomain(), dnsIp, nowIp);
+            insertLog(content);
             return;
         }
         try {
@@ -50,7 +54,16 @@ public class DynamicDnsJob implements Job {
             e.printStackTrace();
         }
         log.info("域名为:{}的记录,已将域名服务商中的ip:{},修改为现在的ip:{},更新成功",parsingRecord.getDomain(),dnsIp,nowIp);
-        logWebSocketHandler.sendToAllSessions(String.format("域名为:%s的记录,已将域名服务商中的ip:%s,修改为现在的ip:%s,更新成功",parsingRecord.getDomain(),dnsIp,nowIp));
+        String content = String.format("域名为:%s的记录,更新成功",parsingRecord.getDomain(),dnsIp,nowIp);
+        insertLog(content);
+    }
+
+
+    public void insertLog(String content){
+        ChangedLog changedLog = new ChangedLog();
+        changedLog.setContent(content);
+        changedLog.setInsertDate(LocalDateTime.now());
+        changedLogService.save(changedLog);
     }
 
 

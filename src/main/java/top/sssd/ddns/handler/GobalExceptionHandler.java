@@ -1,7 +1,6 @@
 package top.sssd.ddns.handler;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.AmisResult;
+import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.valid.ValidException;
 
 import javax.annotation.Resource;
@@ -61,14 +60,16 @@ public class GobalExceptionHandler {
     }
 
     @ExceptionHandler({BindException.class})
-    public AmisResult<Map<String,String>> bindExceptionHandler(BindException e) {
-        return AmisResult.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+    public AmisResult<Map<String,String>> bindExceptionHandler(BindException e) throws JsonProcessingException {
+        Map<String, String> map = e.getBindingResult().getFieldErrors().stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+        return AmisResult.fail(objectMapper.writeValueAsString(map));
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public AmisResult<List<FieldError>> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return AmisResult.fail(e.getBindingResult().getFieldErrors().stream().collect(Collectors.toList()));
+    public AmisResult<List<FieldError>> methodArgumentNotValidException(MethodArgumentNotValidException e) throws JsonProcessingException {
+        List<FieldError> list = e.getBindingResult().getFieldErrors().stream().collect(Collectors.toList());
+        return AmisResult.fail(objectMapper.writeValueAsString(list));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -110,28 +111,28 @@ public class GobalExceptionHandler {
     public AmisResult<Object> typeMismatchException(TypeMismatchException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("要求的类型:", e.getRequiredType()).put("传入的值:", e.getValue()).put("属性名称:", e.getPropertyName()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail().code(Integer.parseInt(e.getErrorCode())).message(e.getMessage());
+        return AmisResult.fail().code(Integer.parseInt(e.getErrorCode())).message(objectMapper.writeValueAsString(errorMap));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public AmisResult<String> httpMessageNotReadableException(HttpMessageNotReadableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("输入的消息流的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
     @ExceptionHandler(HttpMessageNotWritableException.class)
     public AmisResult<String> httpMessageNotWritableException(HttpMessageNotWritableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("输出的消息流的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
     public AmisResult<String> httpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("媒体类型不支持的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
 
@@ -139,7 +140,7 @@ public class GobalExceptionHandler {
     public AmisResult<String> servletRequestBindingException(ServletRequestBindingException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求绑定异常的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
 
@@ -147,7 +148,7 @@ public class GobalExceptionHandler {
     public AmisResult<String> conversionNotSupportedException(ConversionNotSupportedException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("不支持转换异常的属性名称:", e.getPropertyName()).put("不支持转换异常的所需的类型:", e.getRequiredType()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
 
@@ -155,7 +156,7 @@ public class GobalExceptionHandler {
     public AmisResult<String> missingServletRequestPartException(MissingServletRequestPartException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("请求附件的名称:", e.getRequestPartName()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
 
@@ -163,18 +164,18 @@ public class GobalExceptionHandler {
     public AmisResult<String> asyncRequestTimeoutException(AsyncRequestTimeoutException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put("异步请求超时异常的堆栈信息:", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
     @ExceptionHandler(BizException.class)
     public AmisResult<Object> bizException(BizException e) throws JsonProcessingException {
         Map<Object, Object> errorMap = MapUtil.builder().put(e.getMessage() + ":", e.getStackTrace()).map();
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(e.getMessage());
+        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
     }
 
     @ExceptionHandler(ValidException.class)
     public AmisResult<Object> validException(ValidException e) {
-        return AmisResult.fail(JSONUtil.toList(e.getMessage(), List.class));
+        return AmisResult.fail(e.getMessage());
     }
 }

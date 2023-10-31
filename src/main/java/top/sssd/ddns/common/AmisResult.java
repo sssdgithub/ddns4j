@@ -43,6 +43,13 @@ public class AmisResult<T> {
         return result;
     }
 
+    public static <T > AmisResult<T> build(ResultCodeEnum resultCodeEnum,String message) {
+        AmisResult<T> result = new AmisResult<>();
+        result.setStatus(resultCodeEnum.getCode());
+        result.setMsg(message);
+        return result;
+    }
+
     public static<T > AmisResult<T> ok(T data){
         return build(data, ResultCodeEnum.AMIS_SUCCESS);
     }
@@ -51,8 +58,9 @@ public class AmisResult<T> {
         return AmisResult.ok(null);
     }
 
-    public static<T > AmisResult<T> fail(T data){
-        return build(data, ResultCodeEnum.FAIL);
+
+    public static<T > AmisResult<T> fail(String message){
+        return build(ResultCodeEnum.FAIL, message);
     }
 
     public static<T > AmisResult<T> fail(){

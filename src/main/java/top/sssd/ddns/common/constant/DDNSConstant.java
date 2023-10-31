@@ -17,10 +17,9 @@ public class DDNSConstant {
     public static final String[] IPV4_INTERFACE_VALUES = {"https://ip.3322.net", "https://4.ipw.cn"};
     public static final String[] IPV6_INTERFACE_VALUES =
             {"https://v6.ip.zxinc.org/getip",
-                    "https://v6.ip.zxinc.org/getip",
                     "https://api6.ipify.org",
-                    "https://api.ip.sb/ip",
-                    "https://api.myip.la",
+//                    "https://api.ip.sb/ip",
+//                    "https://api.myip.la",
                     "https://speed.neu6.edu.cn/getIP.php",
                     "https://v6.ident.me",
                     "https://6.ipw.cn"};
