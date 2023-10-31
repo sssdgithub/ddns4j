@@ -114,13 +114,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         }
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
 
-        String ip = null;
-        Integer getIpMode = parsingRecord.getGetIpMode();
-        if (getIpMode.equals(IP_MODE_INTERFACE)) {
-            ip = getIp(parsingRecord);
-        }else if(getIpMode.equals(IP_MODE_NETWORK)){
-             ip = parsingRecord.getIp();
-        }
+        String ip = getIp(parsingRecord);
 
         dynamicDnsService.update(parsingRecord, ip, recordId);
         this.updateById(parsingRecord);
@@ -152,13 +146,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
             throw new BizException("该记录在域名服务商中不存在");
         }
-        String ip = null;
-        Integer getIpMode = parsingRecord.getGetIpMode();
-        if (getIpMode.equals(IP_MODE_INTERFACE)) {
-            ip = getIp(parsingRecord);
-        }else if(getIpMode.equals(IP_MODE_NETWORK)){
-            ip = parsingRecord.getIp();
-        }
+        String ip = getIp(parsingRecord);
         dynamicDnsService.remove(parsingRecord, ip);
         this.removeById(id);
         //  2023/5/2 删除定时任务

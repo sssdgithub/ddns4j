@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS changed_log (
+ id bigint NOT NULL AUTO_INCREMENT,
+ content varchar(255) NOT NULL,
+ insert_date datetime NOT NULL,
+ PRIMARY KEY (id)
+);
+
+
 CREATE TABLE IF NOT EXISTS job_task (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(255),

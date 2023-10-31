@@ -3,6 +3,13 @@ SET NAMES utf8mb4;
 CREATE DATABASE IF NOT EXISTS ddns4j CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE ddns4j;
 
+CREATE TABLE `changed_log` (
+`id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+`content` varchar(255) NOT NULL COMMENT '内容',
+`insert_date` datetime NOT NULL COMMENT '插入时间',
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `job_task`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '任务名称',
