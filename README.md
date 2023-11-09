@@ -2,7 +2,7 @@
 
 **这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
 
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.1</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.2</h1>
 <h4 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J -- 让动态域名解析变的更简单</h4>
 
 <p align="center">
@@ -14,12 +14,8 @@
 
 # DDNS4J 使用指南
 - 功能区介绍
-![ddns4j-功能区介绍](./doc/ddns4j-功能区介绍.png "ddns4j-功能区介绍")
-![效果图](./doc/效果图.png "效果图")
-- 新版本功能截图
-![新版本功能截图](./doc/ddns4j-network-view.png "新版本功能截图")
-
-
+![ddns4j-pc端-功能区介绍](./doc/ddns4j-web端-功能区介绍.png "ddns4j-web端-功能区介绍.png")
+![ddns4j-移动端-功能区介绍](./doc/ddns4j-移动端-功能区介绍.png "ddns4j-移动端-功能区介绍.png")
 
 ## 新手使用步骤
 1. 购买域名
@@ -27,7 +23,7 @@
  - [腾讯云域名](https://dnspod.cloud.tencent.com/)
  - [cloudflare](https://www.cloudflare.com/zh-cn/products/registrar/)
 2. 申请密钥
-  - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak?spm=5176.12818093.nav-right.dak.488716d0mHaMgg)
+  - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak)
   - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
 3. 使用ddns4j
@@ -36,13 +32,13 @@
       - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases)
       - 启动jar包
      ```
-     java -jar ddns-v1.6.1-RELEASE.jar
+     java -jar ddns-v1.6.2-RELEASE.jar
      ```
    - docker方式
      ```
-     docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.1
+     docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.2
      ```
-   - 浏览器输入 http://ip:10000/ddns4j.html 进入使用
+   - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
    ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
 5. 恭喜您!已成功接入互联网
@@ -110,8 +106,8 @@ DDNS 即动态 DNS，是一种可以自动更新域名解析记录的 DNS 服务
 ## 技术栈
 DDNS4J 使用了以下技术栈：
 
-### 后端：SpringBoot、MyBatisPlus、Quartz、WebSocket
-### 前端：Vue2、ElementUI、Axios
+### 后端：SpringBoot、MyBatisPlus、Quartz
+### 前端：amis
 ### 数据库 支持mysql、h2
 
 ## 交流群
