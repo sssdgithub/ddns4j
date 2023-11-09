@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8"/>
-    <title>amis demo</title>
+    <title>DDNS4J</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta
             name="viewport"
@@ -264,6 +264,16 @@
                                                                                 },
                                                                                 "validationErrors": {
                                                                                     "maxLength": "域名最大不能超过30个字符"
+                                                                                },
+                                                                                "remark": {
+                                                                                    "icon": "fa fa-question-circle",
+                                                                                    "trigger": [
+                                                                                        "hover"
+                                                                                    ],
+                                                                                    "className": "Remark--warning",
+                                                                                    "placement": "top",
+                                                                                    "title": "",
+                                                                                    "content": "域名注册入口:<p><a href='https://wanwang.aliyun.com/domain'>阿里云域名</a></p><p><a href='https://dnspod.cloud.tencent.com/'>腾讯云域名</a></p><p><a href='https://www.cloudflare.com/zh-cn/products/registrar/'>Cloudflare域名</a></p>"
                                                                                 }
                                                                             },
                                                                             {
@@ -279,7 +289,17 @@
                                                                                     "maxLength": "服务商ID不能大于0"
                                                                                 },
                                                                                 "validateOnChange": false,
-                                                                                "clearable": true
+                                                                                "clearable": true,
+                                                                                "remark": {
+                                                                                    "icon": "fa fa-question-circle",
+                                                                                    "trigger": [
+                                                                                        "hover"
+                                                                                    ],
+                                                                                    "className": "Remark--warning",
+                                                                                    "placement": "top",
+                                                                                    "title": "",
+                                                                                    "content": "申请ID及密钥入口:<p><a href='https://ram.console.aliyun.com/manage/ak'>阿里云密钥</a></p><p><a href='https://console.dnspod.cn/account/token/apikey'>腾讯云密钥</a></p><p><a href='https://dash.cloudflare.com/profile/api-tokens'>腾讯云密钥</a></p>"
+                                                                                }
                                                                             },
                                                                             {
                                                                                 "type": "input-text",
@@ -318,7 +338,17 @@
                                                                                 "multiple": false,
                                                                                 "value": "",
                                                                                 "required": true,
-                                                                                "clearable": true
+                                                                                "clearable": true,
+                                                                                "remark": {
+                                                                                    "icon": "fa fa-question-circle",
+                                                                                    "trigger": [
+                                                                                        "hover"
+                                                                                    ],
+                                                                                    "className": "Remark--warning",
+                                                                                    "placement": "top",
+                                                                                    "title": "",
+                                                                                    "content": "解析类型,AAAA为ipv6地址,A为ipv4地址"
+                                                                                }
                                                                             },
                                                                             {
                                                                                 "type": "select",
@@ -365,7 +395,17 @@
                                                                                 ],
                                                                                 "id": "u:17fe3f04de55",
                                                                                 "required": true,
-                                                                                "value": ""
+                                                                                "value": "",
+                                                                                "remark": {
+                                                                                    "icon": "fa fa-question-circle",
+                                                                                    "trigger": [
+                                                                                        "hover"
+                                                                                    ],
+                                                                                    "className": "Remark--warning",
+                                                                                    "placement": "top",
+                                                                                    "title": "",
+                                                                                    "content": "此更新频率只跟ddns4j的检查频率有关,和dns服务商的ttl时间无关"
+                                                                                }
                                                                             },
                                                                             {
                                                                                 "type": "select",
@@ -787,7 +827,18 @@
                                                                     },
                                                                     "validationErrors": {
                                                                         "maxLength": "域名最大不能超过30个字符"
+                                                                    },
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "域名注册入口:<p><a href='https://wanwang.aliyun.com/domain'>阿里云域名</a></p><p><a href='https://dnspod.cloud.tencent.com/'>腾讯云域名</a></p><p><a href='https://www.cloudflare.com/zh-cn/products/registrar/'>Cloudflare域名</a></p>"
                                                                     }
+
                                                                 },
                                                                 {
                                                                     "type": "input-text",
@@ -802,7 +853,17 @@
                                                                         "maxLength": "服务商ID不能大于0"
                                                                     },
                                                                     "validateOnChange": false,
-                                                                    "clearable": true
+                                                                    "clearable": true,
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "申请ID及密钥入口:<p><a href='https://ram.console.aliyun.com/manage/ak'>阿里云密钥</a></p><p><a href='https://console.dnspod.cn/account/token/apikey'>腾讯云密钥</a></p><p><a href='https://dash.cloudflare.com/profile/api-tokens'>腾讯云密钥</a></p>"
+                                                                    }
                                                                 },
                                                                 {
                                                                     "type": "input-text",
@@ -841,7 +902,17 @@
                                                                     "multiple": false,
                                                                     "value": "",
                                                                     "required": true,
-                                                                    "clearable": true
+                                                                    "clearable": true,
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "解析类型,AAAA为ipv6地址,A为ipv4地址"
+                                                                    }
                                                                 },
                                                                 {
                                                                     "type": "select",
@@ -888,7 +959,17 @@
                                                                     ],
                                                                     "id": "u:17fe3f04de55",
                                                                     "required": true,
-                                                                    "value": ""
+                                                                    "value": "",
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "此更新频率只跟ddns4j的检查频率有关,和dns服务商的ttl时间无关"
+                                                                    }
                                                                 },
                                                                 {
                                                                     "type": "select",
