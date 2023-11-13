@@ -35,6 +35,6 @@ public class JobTask implements Serializable {
     private Integer status;
 
     @TableField(exist = false)
-    private Object executeParams;
+    private transient Object executeParams;
 }
 

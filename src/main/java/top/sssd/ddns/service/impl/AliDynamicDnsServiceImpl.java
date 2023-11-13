@@ -100,8 +100,8 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
 
         String recordTypeName = RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType());
 
-        String recordId = AliDnsUtils.getDomainRecordId(client, subDoMain, recordTypeName, ip);;
-        if (StringUtils.isEmpty(recordId)) {
+        String recordId = AliDnsUtils.getDomainRecordId(client, subDoMain, recordTypeName, ip);
+        if (!StringUtils.hasText(recordId)) {
             throw new BizException("没有该域名对应的解析记录");
         }
         return recordId;
