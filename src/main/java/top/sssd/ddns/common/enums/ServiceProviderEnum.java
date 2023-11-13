@@ -8,7 +8,8 @@ package top.sssd.ddns.common.enums;
 public enum ServiceProviderEnum {
     ALI_YUN(1,"阿里云"),
     TENCENT(2,"腾讯云"),
-    CLOUD_FLARE(3,"cloudflare");
+    CLOUD_FLARE(3,"cloudflare"),
+    HUAWEI_YUN(4,"华为云");
 
     private Integer index;
     private String name;
