@@ -10,3 +10,4 @@ spring:
 logging:
   file:
     path: ./
+    name: ddns4j.log
