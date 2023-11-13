@@ -50,11 +50,13 @@ public class CloudflareUtils {
 
     private static RestTemplate restTemplate = new RestTemplate();
 
-    private static final String baseUrl = "https://api.cloudflare.com/client/v4/zones/";
+    private static final String BASE_URL = "https://api.cloudflare.com/client/v4/zones/";
 
-    private static final String authHeader = "Authorization";
+    private static final String AUTH_HEADER = "Authorization";
 
-    private static final String bearer = "Bearer";
+    private static final String BEARER = "bearer";
+    
+    private static final String ROUTE_PATH = "/dns_records";
 
 
     /**
@@ -69,11 +71,11 @@ public class CloudflareUtils {
     public static CloudflareQueryResponse getSubDomainParseList(String zoneId, String accessKeySecret, String subDomain, String recordType) {
         // 设置请求头，包括Authorization和Content-Type
         HttpHeaders headers = new HttpHeaders();
-        headers.set(authHeader, bearer + " " + accessKeySecret);
+        headers.set(AUTH_HEADER, BEARER + " " + accessKeySecret);
         headers.setContentType(MediaType.APPLICATION_JSON);
         // 构建URI参数
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl)
-                .path(zoneId + "/dns_records")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL)
+                .path(zoneId + ROUTE_PATH)
                 .queryParam("type", recordType)
                 .queryParam("name", subDomain);
         // 构建RequestEntity
@@ -86,11 +88,11 @@ public class CloudflareUtils {
     public static CloudflareQueryResponse getSubDomainParseList(String zoneId, String accessKeySecret, String subDomain, String recordType, String ip) {
         // 设置请求头，包括Authorization和Content-Type
         HttpHeaders headers = new HttpHeaders();
-        headers.set(authHeader, bearer + " " + accessKeySecret);
+        headers.set(AUTH_HEADER, BEARER + " " + accessKeySecret);
         headers.setContentType(MediaType.APPLICATION_JSON);
         // 构建URI参数
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl)
-                .path(zoneId + "/dns_records")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL)
+                .path(zoneId + ROUTE_PATH)
                 .queryParam("type", recordType)
                 .queryParam("name", subDomain)
                 .queryParam("content", ip);
@@ -114,10 +116,10 @@ public class CloudflareUtils {
     public static CloudflareResponse add(String zoneId, String accessKeySecret, String domain, String recordType, String ip) throws JsonProcessingException {
         // 设置请求头，包括Authorization和Content-Type
         HttpHeaders headers = new HttpHeaders();
-        headers.set(authHeader, bearer + " " + accessKeySecret);
+        headers.set(AUTH_HEADER, BEARER + " " + accessKeySecret);
         headers.setContentType(MediaType.APPLICATION_JSON);
         // 构建URI参数
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl).path(zoneId + "/dns_records");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL).path(zoneId + ROUTE_PATH);
 
         SimpleContent simpleContent = new SimpleContent().setType(recordType).setName(domain).setContent(ip);
         // 构建RequestEntity
@@ -166,11 +168,11 @@ public class CloudflareUtils {
     public static CloudflareResponse delete(String zoneId, String accessKeySecret, String domain, String recordType,String ip) {
         // 设置请求头，包括Authorization和Content-Type
         HttpHeaders headers = new HttpHeaders();
-        headers.set(authHeader, bearer + " " + accessKeySecret);
+        headers.set(AUTH_HEADER, BEARER + " " + accessKeySecret);
         headers.setContentType(MediaType.APPLICATION_JSON);
         // 构建URI参数
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl)
-                .path(zoneId + "/dns_records")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL)
+                .path(zoneId + ROUTE_PATH)
                 .path("/" + getId(zoneId, accessKeySecret, domain, recordType,ip));
 
         // 构建RequestEntity
@@ -194,11 +196,11 @@ public class CloudflareUtils {
     public static CloudflareResponse update(String zoneId, String accessKeySecret, String domain, String recordType, String ip,String recordId) {
         // 设置请求头，包括Authorization和Content-Type
         HttpHeaders headers = new HttpHeaders();
-        headers.set(authHeader, bearer + " " + accessKeySecret);
+        headers.set(AUTH_HEADER, BEARER + " " + accessKeySecret);
         headers.setContentType(MediaType.APPLICATION_JSON);
         // 构建URI参数
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl)
-                .path(zoneId + "/dns_records")
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL)
+                .path(zoneId + ROUTE_PATH)
                 .path("/" + recordId);
 
         SimpleContent simpleContent = new SimpleContent().setType(recordType).setName(domain).setContent(ip);

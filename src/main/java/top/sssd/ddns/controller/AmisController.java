@@ -84,7 +84,7 @@ public class AmisController {
 
 
     @GetMapping("getIpModeValue")
-    public AmisResult<List> getModeValue(@RequestParam Integer getIpMode,@RequestParam Integer recordType) throws Exception {
+    public AmisResult<List<NetWorkSelectResponse>> getModeValue(@RequestParam Integer getIpMode,@RequestParam Integer recordType) throws Exception {
         List<NetWorkSelectResponse> list = parsingRecordService.getModeIpValue(getIpMode,recordType);
         return AmisResult.ok(list);
     }
