@@ -3,6 +3,7 @@ package top.sssd.ddns.factory;
 import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.service.impl.AliDynamicDnsServiceImpl;
 import top.sssd.ddns.service.impl.CloudflareDynamicDnsServiceImpl;
+import top.sssd.ddns.service.impl.HuaweiDynamicDnsServiceImpl;
 import top.sssd.ddns.service.impl.TencentDynamicDnsServiceImpl;
 
 /**
@@ -24,6 +25,9 @@ public class DynamicDnsServiceFactory {
                 break;
             case 3:
                 service = new CloudflareDynamicDnsServiceImpl();
+                break;
+            case 4:
+                service = new HuaweiDynamicDnsServiceImpl();
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported service provider: " + serviceProvider);
