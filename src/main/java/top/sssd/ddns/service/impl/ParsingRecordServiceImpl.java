@@ -150,7 +150,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         dynamicDnsService.remove(parsingRecord, ip);
         this.removeById(id);
         //  2023/5/2 删除定时任务
-        JobTask one = jobTaskService.lambdaQuery().eq(JobTask::getName, parsingRecord.getId()).one();
+        JobTask one = jobTaskService.lambdaQuery().eq(JobTask::getName, parsingRecord.getId().toString()).one();
         if (Objects.nonNull(one)) {
             jobTaskService.deleteJobTask(one.getId());
         }
