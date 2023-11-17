@@ -2,7 +2,7 @@
 
 **这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
 
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.2</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.3</h1>
 <h4 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J -- 让动态域名解析变的更简单</h4>
 
 <p align="center">
@@ -22,21 +22,23 @@
  - [阿里云域名](https://wanwang.aliyun.com/domain)
  - [腾讯云域名](https://dnspod.cloud.tencent.com/)
  - [cloudflare](https://www.cloudflare.com/zh-cn/products/registrar/)
+ - [华为云域名](https://www.huaweicloud.com/product/domain.html)
 2. 申请密钥
   - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak)
   - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
+  - [华为云密钥入口](https://console.huaweicloud.com/iam/)
 3. 使用ddns4j
    - jar包方式
       - 需要安装jdk或者jre环境(后续版本会出整合包,不用安装jdk环境)
       - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases)
       - 启动jar包
      ```
-     java -jar ddns-v1.6.2-RELEASE.jar
+     java -jar ddns-v1.6.3-RELEASE.jar
      ```
    - docker方式
      ```
-     docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.2
+     docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.3
      ```
    - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
@@ -49,7 +51,7 @@ DDNS4j基本介绍:
 
 目前已支持阿里云,腾讯云,Cloudflare,并默认开启Cloudflare代理.
 
-DDNS4J 是一个基于 SpringBoot 和 Vue2 开发的完全免费开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。
+DDNS4J 是一个基于 SpringBoot 和 Amis 开发的完全免费开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。
 
 ## 项目演示地址
 
