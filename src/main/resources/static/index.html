@@ -534,24 +534,35 @@
                                             "id": "u:0759b710c332"
                                         },
                                         {
-                                            "name": "publicAccessDisabled",
-                                            "type": "switch",
-                                            "onText": "禁用公共访问",
-                                            "offText": "开启公网访问",
-                                            "value": false,
-                                            "onEvent":{
-                                                "change":{
-                                                    "actions":[
-                                                        {
-                                                            "actionType": "ajax",
-                                                            "api": {
-                                                                "method": "get",
-                                                                "url": "/amis/publicAccessDisabled?switch=${value}"
-                                                            }
+                                            "type": "form",
+                                            "title": "",
+                                            "initApi": "/amis/publicAccessDisabled",
+                                            "body": [
+                                                {
+                                                    "name": "publicAccessDisabled",
+                                                    "type": "switch",
+                                                    "onText": "禁用公网访问",
+                                                    "offText": "开启公网访问",
+                                                    "value": false,
+                                                    "onEvent": {
+                                                        "change": {
+                                                            "actions": [
+                                                                {
+                                                                    "actionType": "ajax",
+                                                                    "api": {
+                                                                        "method": "post",
+                                                                        "url": "/amis/publicAccessDisabled",
+                                                                        "data": {
+                                                                            "value":"${value}"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
                                                         }
-                                                    ]
+                                                    }
                                                 }
-                                            }
+                                            ],
+                                            "actions": []
                                         }
                                     ],
                                     "wrapperBody": false,
@@ -708,6 +719,12 @@
                             "type": "tpl",
                             "title": "更新时间",
                             "name": "updateDate",
+                            "id": "u:6be7ffd4b055"
+                        },
+                        {
+                            "type": "status",
+                            "title": "状态",
+                            "name": "state",
                             "id": "u:6be7ffd4b055"
                         },
                         {
