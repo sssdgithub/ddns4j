@@ -15,6 +15,7 @@ import top.sssd.ddns.service.IParsingRecordService;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,8 +32,16 @@ public class AmisController {
     
     @Resource
     private ChangedLogService changedLogService;
+    
 
-
+    @GetMapping("publicAccessDisabled")
+    public AmisResult publicAccessDisabled(@RequestParam("switch") Boolean publicAccessDisabled){
+        // TODO: 2023/11/17
+        HashMap<String, Boolean> resultMap = new HashMap<>();
+        resultMap.put("name",publicAccessDisabled);
+        return AmisResult.ok(resultMap);
+    }
+    
     @GetMapping("page")
     public AmisResult<AmisPageUtils<ParsingRecord>> queryPage(ParsingRecord parsingRecord){
         AmisPageUtils<ParsingRecord> pageResult = parsingRecordService.queryPage(parsingRecord);
