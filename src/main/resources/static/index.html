@@ -110,7 +110,7 @@
                                     },
                                     {
                                         "label": "禁用",
-                                        "value": 2
+                                        "value": 0
                                     }
                                 ],
                                 "id": "u:800d2949a0e0",
@@ -532,6 +532,26 @@
                                             },
                                             "level": "light",
                                             "id": "u:0759b710c332"
+                                        },
+                                        {
+                                            "name": "publicAccessDisabled",
+                                            "type": "switch",
+                                            "onText": "禁用公共访问",
+                                            "offText": "开启公网访问",
+                                            "value": false,
+                                            "onEvent":{
+                                                "change":{
+                                                    "actions":[
+                                                        {
+                                                            "actionType": "ajax",
+                                                            "api": {
+                                                                "method": "get",
+                                                                "url": "/amis/publicAccessDisabled?switch=${value}"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
                                         }
                                     ],
                                     "wrapperBody": false,
