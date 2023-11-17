@@ -35,6 +35,7 @@ public class DDNSConstant {
     public static HashMap<String,Boolean> publicAccessDisabledMap = new HashMap();
 
     static {
-        publicAccessDisabledMap.put(publicAccessDisabledKey,true);
+        //默认可以公网访问
+        publicAccessDisabledMap.put(publicAccessDisabledKey,false);
     }
 }
