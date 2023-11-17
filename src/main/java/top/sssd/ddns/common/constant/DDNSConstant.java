@@ -1,5 +1,7 @@
 package top.sssd.ddns.common.constant;
 
+import java.util.HashMap;
+
 /**
  * DDNS常量类
  *
@@ -27,4 +29,12 @@ public class DDNSConstant {
 
     public static final Integer IP_MODE_INTERFACE = 1;
     public static final Integer IP_MODE_NETWORK = 2;
+
+    public static final String publicAccessDisabledKey = "ddns4j.publicAccessDisabled";
+
+    public static HashMap<String,Boolean> publicAccessDisabledMap = new HashMap();
+
+    static {
+        publicAccessDisabledMap.put(publicAccessDisabledKey,true);
+    }
 }

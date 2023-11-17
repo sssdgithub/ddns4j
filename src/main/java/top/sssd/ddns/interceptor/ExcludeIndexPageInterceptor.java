@@ -1,16 +1,16 @@
 package top.sssd.ddns.interceptor;
 
 import cn.hutool.core.net.NetUtil;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.HandlerInterceptor;
 import sun.net.util.IPAddressUtil;
-import top.sssd.ddns.config.ApplicationContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledKey;
+import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledMap;
 
 /**
  * @author sssd
@@ -18,14 +18,9 @@ import java.net.UnknownHostException;
  */
 public class ExcludeIndexPageInterceptor implements HandlerInterceptor{
 
-
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        ApplicationContext applicationContext = ApplicationContextHolder.getApplicationContext();
-        Environment environment = applicationContext.getEnvironment();
-        String property = environment.getProperty("ddns4j.publicAccessDisabled");
-        boolean publicAccessDisabled = Boolean.parseBoolean(property);
+        Boolean publicAccessDisabled = publicAccessDisabledMap.get(publicAccessDisabledKey);
         if (publicAccessDisabled) {
             String remoteAddr = request.getRemoteAddr();
             String requestURI = request.getRequestURI();

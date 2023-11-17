@@ -1,5 +1,6 @@
 package top.sssd.ddns.controller;
 
+import lombok.Data;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledKey;
+import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledMap;
+
 /**
  * @author sssd
  * @careate 2023-10-25-15:01
@@ -32,13 +36,24 @@ public class AmisController {
     
     @Resource
     private ChangedLogService changedLogService;
+
+    @Data
+    static class PublicAccessDisabled{
+        private Boolean value;
+    }
+
+    @PostMapping("publicAccessDisabled")
+    public AmisResult UpdatePublicAccessDisabled(@RequestBody PublicAccessDisabled publicAccessDisabled){
+        publicAccessDisabledMap.put(publicAccessDisabledKey,publicAccessDisabled.getValue());
+        return AmisResult.ok();
+    }
     
 
     @GetMapping("publicAccessDisabled")
-    public AmisResult publicAccessDisabled(@RequestParam("switch") Boolean publicAccessDisabled){
-        // TODO: 2023/11/17
+    public AmisResult publicAccessDisabled(){
+        Boolean publicAccessDisabled = publicAccessDisabledMap.get(publicAccessDisabledKey);
         HashMap<String, Boolean> resultMap = new HashMap<>();
-        resultMap.put("name",publicAccessDisabled);
+        resultMap.put("publicAccessDisabled",publicAccessDisabled);
         return AmisResult.ok(resultMap);
     }
     

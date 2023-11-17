@@ -6,8 +6,6 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-ddns4j:
-  publicAccessDisabled: true
 #日志目录
 logging:
   file:
