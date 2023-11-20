@@ -44,7 +44,7 @@ public class DynamicDnsJob implements Job {
         String nowIp = parsingRecordService.getIp(parsingRecord);
         if(nowIp.equals(dnsIp)){
             log.info("域名为:{}的记录,域名服务商中的ip:{}与现在的ip:{},未发生改变",parsingRecord.getDomain(),dnsIp,nowIp);
-            String content = String.format("域名为:%s的记录,未发生改变", parsingRecord.getDomain(), dnsIp, nowIp);
+            String content = String.format("域名为:%s的记录,未发生改变", parsingRecord.getDomain());
             insertLog(content);
             return;
         }
@@ -54,7 +54,7 @@ public class DynamicDnsJob implements Job {
             e.printStackTrace();
         }
         log.info("域名为:{}的记录,已将域名服务商中的ip:{},修改为现在的ip:{},更新成功",parsingRecord.getDomain(),dnsIp,nowIp);
-        String content = String.format("域名为:%s的记录,更新成功",parsingRecord.getDomain(),dnsIp,nowIp);
+        String content = String.format("域名为:%s的记录,更新成功",parsingRecord.getDomain());
         insertLog(content);
     }
 
