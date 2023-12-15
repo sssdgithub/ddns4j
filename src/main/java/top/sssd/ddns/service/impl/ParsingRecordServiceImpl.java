@@ -1,12 +1,12 @@
 package top.sssd.ddns.service.impl;
 
-import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.common.enums.ServiceProviderEnum;
@@ -156,27 +156,30 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         }
     }
 
+    @Resource
+    private RestTemplate restTemplate;
+
     @Override
     public String getIp(ParsingRecord parsingRecord) {
         //解析类型:1 AAAA 2 A
         Integer recordType = parsingRecord.getRecordType();
         if (recordType.equals(RECORD_TYPE_AAAA)) {
             //ipv6
-            if(parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)){
-                String ipv6 = HttpUtil.get(parsingRecord.getGetIpModeValue().trim());
+            if (parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)) {
+                String ipv6 = restTemplate.getForObject(parsingRecord.getGetIpModeValue().trim(), String.class);
                 parsingRecord.setIp(ipv6);
                 return ipv6.trim();
-            }else if(parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)){
+            } else if (parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)) {
                 parsingRecord.setIp(parsingRecord.getGetIpModeValue());
                 return parsingRecord.getGetIpModeValue().trim();
             }
         } else if (recordType.equals(RECORD_TYPE_A)) {
             //ipv4
-            if(parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)){
-                String ipv4 = HttpUtil.get(parsingRecord.getGetIpModeValue().trim());
+            if (parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)) {
+                String ipv4 = restTemplate.getForObject(parsingRecord.getGetIpModeValue().trim(), String.class);
                 parsingRecord.setIp(ipv4);
                 return ipv4.trim();
-            }else if(parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)){
+            } else if (parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)) {
                 parsingRecord.setIp(parsingRecord.getGetIpModeValue());
                 return parsingRecord.getGetIpModeValue().trim();
             }
@@ -188,24 +191,24 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     private NetWorkService netWorkService;
 
     @Override
-    public List<NetWorkSelectResponse> getModeIpValue(Integer getIpMode,Integer recordType) throws SocketException {
-        if(IP_MODE_INTERFACE.equals(getIpMode)){
+    public List<NetWorkSelectResponse> getModeIpValue(Integer getIpMode, Integer recordType) throws SocketException {
+        if (IP_MODE_INTERFACE.equals(getIpMode)) {
             if (RECORD_TYPE_AAAA.equals(recordType)) {
-                return Arrays.stream(IPV6_INTERFACE_VALUES).map(item->{
+                return Arrays.stream(IPV6_INTERFACE_VALUES).map(item -> {
                     NetWorkSelectResponse netWorkSelectResponse = new NetWorkSelectResponse();
                     netWorkSelectResponse.setLabel(item);
                     netWorkSelectResponse.setValue(item);
                     return netWorkSelectResponse;
                 }).collect(Collectors.toList());
-            }else if(RECORD_TYPE_A.equals(recordType)){
-                return Arrays.stream(IPV4_INTERFACE_VALUES).map(item->{
+            } else if (RECORD_TYPE_A.equals(recordType)) {
+                return Arrays.stream(IPV4_INTERFACE_VALUES).map(item -> {
                     NetWorkSelectResponse netWorkSelectResponse = new NetWorkSelectResponse();
                     netWorkSelectResponse.setLabel(item);
                     netWorkSelectResponse.setValue(item);
                     return netWorkSelectResponse;
                 }).collect(Collectors.toList());
             }
-        }else if(IP_MODE_NETWORK.equals(getIpMode)){
+        } else if (IP_MODE_NETWORK.equals(getIpMode)) {
             return netWorkService.networks(recordType);
         }
         return null;
