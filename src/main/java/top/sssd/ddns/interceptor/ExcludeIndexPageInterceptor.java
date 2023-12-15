@@ -1,6 +1,5 @@
 package top.sssd.ddns.interceptor;
 
-import cn.hutool.core.net.NetUtil;
 import org.springframework.web.servlet.HandlerInterceptor;
 import sun.net.util.IPAddressUtil;
 
@@ -31,7 +30,7 @@ public class ExcludeIndexPageInterceptor implements HandlerInterceptor{
                     return false;
                 }
             }else{
-                boolean innerIP = NetUtil.isInnerIP(remoteAddr);
+                boolean innerIP = isInternalIP(remoteAddr);
                 if (!innerIP && requestURI.equals("/index.html")) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     return false;
@@ -47,6 +46,16 @@ public class ExcludeIndexPageInterceptor implements HandlerInterceptor{
             return inetAddress.isSiteLocalAddress() || inetAddress.isLinkLocalAddress() || inetAddress.isLoopbackAddress();
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean isInternalIP(String ipAddress) {
+        try {
+            InetAddress inetAddress = InetAddress.getByName(ipAddress);
+            return inetAddress.isAnyLocalAddress() || inetAddress.isLoopbackAddress() || inetAddress.isLinkLocalAddress() || inetAddress.isSiteLocalAddress();
+        } catch (UnknownHostException e) {
+            System.out.println("无法解析 IP 地址: " + ipAddress);
             return false;
         }
     }
