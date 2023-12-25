@@ -1,15 +1,15 @@
 package top.sssd.ddns.service.impl;
 
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
-import com.tencentcloudapi.dnspod.v20210323.models.RecordListItem;
+
 import org.springframework.stereotype.Service;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
-import top.sssd.ddns.common.utils.DoMainUtil;
 import top.sssd.ddns.model.entity.ParsingRecord;
 import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.utils.TencentDnsUtils;
 
 import java.util.Objects;
+
+import static top.sssd.ddns.common.utils.DoMainUtil.spiltDomain;
 
 /**
  * @author sssd
@@ -18,91 +18,46 @@ import java.util.Objects;
 @Service
 public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
 
-
     @Override
-    public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) throws TencentCloudSDKException {
-        String resultDomain = "";
-        String subDoMain = "";
-        if (DoMainUtil.firstLevel(domain)) {
-            subDoMain = "@";
-        } else {
-            resultDomain = domain.substring(domain.indexOf('.') + 1);
-            subDoMain = domain.substring(0, domain.indexOf('.'));
-        }
-        RecordListItem[] recordArray = TencentDnsUtils.getRecordList(resultDomain, subDoMain, recordType, serviceProviderId, serviceProviderSecret);
-        return Objects.nonNull(recordArray) && recordArray.length > 0;
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) throws Exception {
+        String[] domains = spiltDomain(domain);
+        TencentDnsUtils.ListRecordResponse recordList = TencentDnsUtils.getRecordList(domains[0], domains[1], recordType, serviceProviderId, serviceProviderSecret);
+        return Objects.nonNull(recordList) && recordList.getResponse().getRecordList().size() > 0;
     }
 
     @Override
-    public void add(ParsingRecord parsingRecord, String ip) throws TencentCloudSDKException {
+    public void add(ParsingRecord parsingRecord, String ip) throws Exception {
         String domain = parsingRecord.getDomain();
-        String resultDomain = "";
-        String subDoMain = "";
-        if (DoMainUtil.firstLevel(domain)) {
-            subDoMain = "@";
-        } else {
-            resultDomain = domain.substring(domain.indexOf('.') + 1);
-            subDoMain = domain.substring(0, domain.indexOf('.'));
-        }
-        TencentDnsUtils.createRecord(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), ip);
+        String[] domains = spiltDomain(domain);
+        TencentDnsUtils.createRecord(domains[0], domains[1], RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), ip);
     }
 
     @Override
-    public void update(ParsingRecord parsingRecord, String ip, String recordId) {
+    public void update(ParsingRecord parsingRecord, String ip, String recordId) throws Exception {
         String domain = parsingRecord.getDomain();
-        String resultDomain = "";
-        String subDoMain = "";
-        if (DoMainUtil.firstLevel(domain)) {
-            subDoMain = "@";
-        } else {
-            resultDomain = domain.substring(domain.indexOf('.') + 1);
-            subDoMain = domain.substring(0, domain.indexOf('.'));
-        }
-        try {
-            TencentDnsUtils.updateRecord(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), ip, Long.parseLong(recordId));
-        } catch (TencentCloudSDKException e) {
-            e.printStackTrace();
-        }
+        String[] domains = spiltDomain(domain);
+        TencentDnsUtils.updateRecord(domains[0], domains[1], RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), ip, Integer.parseInt(recordId));
     }
 
     @Override
-    public String getRecordId(ParsingRecord parsingRecord, String ip) throws TencentCloudSDKException {
+    public String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception {
         String domain = parsingRecord.getDomain();
-        String resultDomain = "";
-        String subDoMain = "";
-        if (DoMainUtil.firstLevel(domain)) {
-            subDoMain = "@";
-        } else {
-            resultDomain = domain.substring(domain.indexOf('.') + 1);
-            subDoMain = domain.substring(0, domain.indexOf('.'));
-        }
-        Long recordId = TencentDnsUtils.getRecordId(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
-        return recordId.toString();
+        String[] domains = spiltDomain(domain);
+        return  TencentDnsUtils.getRecordId(domains[0], domains[1], RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
     }
 
     @Override
-    public void remove(ParsingRecord parsingRecord, String ip) throws TencentCloudSDKException {
+    public void remove(ParsingRecord parsingRecord, String ip) throws Exception {
         String domain = parsingRecord.getDomain();
         String resultDomain = domain.substring(domain.indexOf('.') + 1);
         String recordId = getRecordId(parsingRecord, ip);
-        try {
-            TencentDnsUtils.deleteRecord(resultDomain, parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), Long.parseLong(recordId));
-        } catch (TencentCloudSDKException e) {
-            e.printStackTrace();
-        }
+        TencentDnsUtils.deleteRecord(resultDomain, parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret(), Integer.parseInt(recordId));
     }
 
     @Override
-    public String getIpBySubDomainWithType(ParsingRecord parsingRecord) throws TencentCloudSDKException {
+    public String getIpBySubDomainWithType(ParsingRecord parsingRecord) throws Exception {
         String domain = parsingRecord.getDomain();
-        String resultDomain = "";
-        String subDoMain = "";
-        if (DoMainUtil.firstLevel(domain)) {
-            subDoMain = "@";
-        } else {
-            resultDomain = domain.substring(domain.indexOf('.') + 1);
-            subDoMain = domain.substring(0, domain.indexOf('.'));
-        }
-        return TencentDnsUtils.getIpBySubDomainWithType(resultDomain, subDoMain, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
+        String[] domains = spiltDomain(domain);
+        return TencentDnsUtils.getIpBySubDomainWithType(domains[0], domains[1], RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), parsingRecord.getServiceProviderId(), parsingRecord.getServiceProviderSecret());
     }
 }
