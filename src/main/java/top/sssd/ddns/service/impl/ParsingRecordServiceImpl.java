@@ -2,7 +2,6 @@ package top.sssd.ddns.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -107,11 +106,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         }
 
         String dnsIp = null;
-        try {
-            dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
-        } catch (TencentCloudSDKException e) {
-            e.printStackTrace();
-        }
+        dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
 
         String ip = getIp(parsingRecord);
