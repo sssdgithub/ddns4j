@@ -1,28 +1,203 @@
 package top.sssd.ddns.utils;
 
-import com.tencentcloudapi.common.Credential;
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
-import com.tencentcloudapi.common.profile.ClientProfile;
-import com.tencentcloudapi.common.profile.HttpProfile;
-import com.tencentcloudapi.dnspod.v20210323.DnspodClient;
-import com.tencentcloudapi.dnspod.v20210323.models.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Objects;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+
+import static top.sssd.ddns.utils.TencentCloudAPITC3Singer.HOST;
+
 
 /**
  * @author sssd
  * @created 2023-05-06-16:13
  */
 @Slf4j
+@Component
 public class TencentDnsUtils {
 
     private TencentDnsUtils() {
     }
 
-    public static final String ENDPOINT = "dnspod.tencentcloudapi.com";
+    private static final String CREATE_RECORD_ACTION = "CreateRecord";
+    private static final String MODIFY_RECORD_ACTION = "ModifyRecord";
+    private static final String DELETE_RECORD_ACTION = "DeleteRecord";
+    private static final String DESCRIBE_RECORD_LIST_ACTION = "DescribeRecordList";
 
-    public static final String RECORDLINE = "默认";
+    private static RestTemplate staticRestTemplate;
+
+
+    private static ObjectMapper staticObjectMapper;
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Resource
+    private ObjectMapper objectMapper;
+
+    @PostConstruct
+    public void init(){
+        staticRestTemplate = restTemplate;
+        staticObjectMapper = objectMapper;
+    }
+
+
+    /*public static void main(String[] args) throws Exception {
+        String domain = "sssd.site";
+        String suDomain = "smy";
+        String recordType = "AAAA";
+        String secretId = "AKIDiGYbNt8tRikV0FDuKTMyJNAhwvd5GL9g";
+        String secretKey = "JL6aokPnukJbcNr52i7F6h14pJWS6TaQ";
+        String recordId = TencentDnsUtils.getRecordId(domain, suDomain, recordType, secretId, secretKey);
+        UpdateRecordResponse updateRecordResponse = TencentDnsUtils.updateRecord(domain, suDomain, recordType, secretId, secretKey, "2409:8a70:1617:2922::c32", Integer.parseInt(recordId));
+        System.out.println(updateRecordResponse);
+    }*/
+
+    /**
+     * 创建记录实体
+     * @ https://cloud.tencent.com/document/product/1427/56180
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class CreateRecordRequest {
+        @JsonProperty("Domain")
+        private String domain;
+        @JsonProperty("SubDomain")
+        private String subDomain;
+        @JsonProperty("RecordType")
+        private String recordType;
+        @JsonProperty("Value")
+        private String value;
+        @JsonProperty("RecordLine")
+        private String recordLine = "默认";
+    }
+
+    @Data
+    public static class CreateRecordResponse {
+        @JsonProperty("Response")
+        private CreateResponse response;
+    }
+
+    @Data
+    private static class CreateResponse{
+        @JsonProperty("RecordId")
+        private String recordId;
+        @JsonProperty("RequestId")
+        private String requestId;
+    }
+
+    /**
+     * 删除记录实体
+     * @ https://cloud.tencent.com/document/product/1427/56176
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class DeleteRecordRequest {
+        @JsonProperty("Domain")
+        private String domain;
+        @JsonProperty("RecordId")
+        private Integer recordId;
+    }
+
+    @Data
+    public static class DeleteRecordResponse {
+        @JsonProperty("Response")
+        private DeleteResponse response;
+    }
+
+    @Data
+    public static class DeleteResponse{
+        @JsonProperty("RequestId")
+        private String requestId;
+    }
+
+    /**
+     * 获取列表实体
+     * @ https://cloud.tencent.com/document/product/1427/56166
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class ListRecordRequest {
+        @JsonProperty("Domain")
+        private String domain;
+        @JsonProperty("Subdomain")
+        private String subDomain;
+        @JsonProperty("RecordType")
+        private String recordType;
+        @JsonProperty("RecordLine")
+        private String recordLine = "默认";
+    }
+
+    @Data
+    public static class ListRecordResponse {
+        @JsonProperty("Response")
+        private ListResponse response;
+    }
+
+    @Data
+    public static class ListResponse {
+        @JsonProperty("RequestId")
+        private String requestId;
+        @JsonProperty("RecordList")
+        private List<RecordListItem> recordList = new ArrayList<>();
+    }
+
+    @Data
+    public static class RecordListItem {
+        @JsonProperty("RecordId")
+        private String recordId;
+        @JsonProperty("Value")
+        private String value;
+    }
+
+    /**
+     * 更新记录实体对象
+     * @ https://cloud.tencent.com/document/product/1427/56157
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class UpdateRecordRequest {
+        @JsonProperty("Domain")
+        private String domain;
+        @JsonProperty("SubDomain")
+        private String subDomain;
+        @JsonProperty("RecordType")
+        private String recordType;
+        @JsonProperty("RecordId")
+        private Integer recordId;
+        @JsonProperty("Value")
+        private String value;
+        @JsonProperty("RecordLine")
+        private String recordLine = "默认";
+    }
+
+    @Data
+    public static class UpdateRecordResponse {
+        @JsonProperty("Response")
+        private CreateResponse response;
+    }
+
+    @Data
+    private static class UpdateResponse{
+        @JsonProperty("RecordId")
+        private Integer recordId;
+        @JsonProperty("RequestId")
+        private String requestId;
+    }
 
     /**
      * 获取解析记录ID
@@ -33,16 +208,11 @@ public class TencentDnsUtils {
      * @param secretId
      * @param secretKey
      * @return
-     * @throws TencentCloudSDKException
      */
-    public static Long getRecordId(String domain, String subDomain, String recordType,
-                                   String secretId, String secretKey) throws TencentCloudSDKException {
-        RecordListItem[] recordList = getRecordList(domain, subDomain, recordType, secretId, secretKey);
-        if (Objects.isNull(recordList)) {
-            return null;
-        }
-        RecordListItem recordListItem = recordList[0];
-        return recordListItem.getRecordId();
+    public static String getRecordId(String domain, String subDomain, String recordType,
+                                   String secretId, String secretKey) throws Exception {
+        ListRecordResponse recordList = getRecordList(domain, subDomain, recordType, secretId, secretKey);
+        return recordList.getResponse().getRecordList().get(0).getRecordId();
     }
 
     /**
@@ -54,46 +224,29 @@ public class TencentDnsUtils {
      * @param secretId
      * @param secretKey
      * @return
-     * @throws TencentCloudSDKException
      */
     public static String getIpBySubDomainWithType(String domain, String subDomain, String recordType,
-                                                  String secretId, String secretKey) throws TencentCloudSDKException {
-        RecordListItem[] recordList = getRecordList(domain, subDomain, recordType, secretId, secretKey);
-        if (Objects.isNull(recordList)) {
-            return null;
-        }
-        RecordListItem recordListItem = recordList[0];
-        return recordListItem.getValue();
+                                                  String secretId, String secretKey) throws Exception {
+        ListRecordResponse recordList = getRecordList(domain, subDomain, recordType, secretId, secretKey);
+        return recordList.getResponse().getRecordList().get(0).getValue();
     }
 
-    public static RecordListItem[] getRecordList(String domain, String subDomain, String recordType,
-                                                 String secretId, String secretKey) throws TencentCloudSDKException {
-        try {
-            // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
-            Credential cred = new Credential(secretId, secretKey);
-            // 实例化一个http选项，可选的，没有特殊需求可以跳过
-            HttpProfile httpProfile = new HttpProfile();
-            httpProfile.setEndpoint(ENDPOINT);
-            // 实例化一个client选项，可选的，没有特殊需求可以跳过
-            ClientProfile clientProfile = new ClientProfile();
-            clientProfile.setHttpProfile(httpProfile);
-            // 实例化要请求产品的client对象,clientProfile是可选的
-            DnspodClient client = new DnspodClient(cred, "", clientProfile);
-            // 实例化一个请求对象,每个接口都会对应一个request对象
-            DescribeRecordListRequest req = new DescribeRecordListRequest();
-            req.setDomain(domain);
-            req.setSubdomain(subDomain);
-            req.setRecordType(recordType);
-            // 返回的resp是一个DescribeRecordListResponse的实例，与请求对象对应
-            DescribeRecordListResponse resp = client.DescribeRecordList(req);
-            return resp.getRecordList();
-        } catch (TencentCloudSDKException e) {
-            if (e.getMessage().contains("记录列表为空")) {
-                return new RecordListItem[]{};
-            }
-            e.printStackTrace();
-        }
-        return new RecordListItem[]{};
+    public static ListRecordResponse getRecordList(String domain, String subDomain, String recordType,
+                                                 String secretId, String secretKey) throws Exception {
+        ListRecordRequest listRecordRequest = new ListRecordRequest().setDomain(domain).setSubDomain(subDomain).setRecordType(recordType);
+        String jsonBody = staticObjectMapper.writeValueAsString(listRecordRequest);
+
+        TreeMap<String, String> headerMap = TencentCloudAPITC3Singer.buildSignRequestHeaderWithBody(secretId, secretKey, DESCRIBE_RECORD_LIST_ACTION, jsonBody);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAll(headerMap);
+
+        // 构建URI参数
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("https://" + HOST);
+        // 构建RequestEntity
+        RequestEntity<String> requestEntity = new RequestEntity<String>(jsonBody, headers, HttpMethod.POST, builder.build().toUri());
+        //发送请求
+        ResponseEntity<ListRecordResponse> response = staticRestTemplate.exchange(requestEntity, ListRecordResponse.class);
+        return response.getBody();
     }
 
     /**
@@ -104,31 +257,23 @@ public class TencentDnsUtils {
      * @param recordType
      * @param ip
      * @return
-     * @throws TencentCloudSDKException
+     * @throws Exception
      */
     public static CreateRecordResponse createRecord(String domain, String subDomain, String recordType,
-                                                    String secretId, String secretKey, String ip) throws TencentCloudSDKException {
-        // 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
-        // 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305
-        // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
-        Credential cred = new Credential(secretId, secretKey);
-        // 实例化一个http选项，可选的，没有特殊需求可以跳过
-        HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(ENDPOINT);
-        // 实例化一个client选项，可选的，没有特殊需求可以跳过
-        ClientProfile clientProfile = new ClientProfile();
-        clientProfile.setHttpProfile(httpProfile);
-        // 实例化要请求产品的client对象,clientProfile是可选的
-        DnspodClient client = new DnspodClient(cred, "", clientProfile);
-        // 实例化一个请求对象,每个接口都会对应一个request对象
-        CreateRecordRequest req = new CreateRecordRequest();
-        req.setDomain(domain);
-        req.setSubDomain(subDomain);
-        req.setRecordType(recordType);
-        req.setRecordLine(RECORDLINE);
-        req.setValue(ip);
-        // 返回的resp是一个CreateRecordResponse的实例，与请求对象对应
-        return client.CreateRecord(req);
+                                                    String secretId, String secretKey, String ip) throws Exception {
+        CreateRecordRequest createRecordRequest = new CreateRecordRequest().setDomain(domain).setSubDomain(subDomain).setRecordType(recordType).setValue(ip);
+        String jsonBody = staticObjectMapper.writeValueAsString(createRecordRequest);
+
+        TreeMap<String, String> headerMap = TencentCloudAPITC3Singer.buildSignRequestHeaderWithBody(secretId, secretKey, CREATE_RECORD_ACTION, jsonBody);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAll(headerMap);
+        // 构建URI参数
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("https://" + HOST);
+        // 构建RequestEntity
+        RequestEntity<String> requestEntity = new RequestEntity<String>(jsonBody, headers, HttpMethod.POST, builder.build().toUri());
+        //发送请求
+        ResponseEntity<CreateRecordResponse> response = staticRestTemplate.exchange(requestEntity, CreateRecordResponse.class);
+        return response.getBody();
     }
 
     /**
@@ -142,29 +287,22 @@ public class TencentDnsUtils {
      * @param ip
      * @param recordId
      * @return
-     * @throws TencentCloudSDKException
      */
-    public static ModifyRecordResponse updateRecord(String domain, String subDomain, String recordType,
-                                                    String secretId, String secretKey, String ip, Long recordId) throws TencentCloudSDKException {
-        Credential cred = new Credential(secretId, secretKey);
-        // 实例化一个http选项，可选的，没有特殊需求可以跳过
-        HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(ENDPOINT);
-        // 实例化一个client选项，可选的，没有特殊需求可以跳过
-        ClientProfile clientProfile = new ClientProfile();
-        clientProfile.setHttpProfile(httpProfile);
-        // 实例化要请求产品的client对象,clientProfile是可选的
-        DnspodClient client = new DnspodClient(cred, "", clientProfile);
-        // 实例化一个请求对象,每个接口都会对应一个request对象
-        ModifyRecordRequest req = new ModifyRecordRequest();
-        req.setDomain(domain);
-        req.setSubDomain(subDomain);
-        req.setRecordType(recordType);
-        req.setRecordLine(RECORDLINE);
-        req.setValue(ip);
-        req.setRecordId(recordId);
-        // 返回的resp是一个ModifyRecordResponse的实例，与请求对象对应
-        return client.ModifyRecord(req);
+    public static UpdateRecordResponse updateRecord(String domain, String subDomain, String recordType,
+                                                    String secretId, String secretKey, String ip, Integer recordId) throws Exception {
+        UpdateRecordRequest updateRecordRequest = new UpdateRecordRequest().setDomain(domain).setValue(ip).setSubDomain(subDomain).setRecordType(recordType).setRecordId(recordId);
+        String jsonBody = staticObjectMapper.writeValueAsString(updateRecordRequest);
+
+        TreeMap<String, String> headerMap = TencentCloudAPITC3Singer.buildSignRequestHeaderWithBody(secretId, secretKey, MODIFY_RECORD_ACTION, jsonBody);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAll(headerMap);
+        // 构建URI参数
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("https://" + HOST);
+        // 构建RequestEntity
+        RequestEntity<String> requestEntity = new RequestEntity<String>(jsonBody, headers, HttpMethod.POST, builder.build().toUri());
+        //发送请求
+        ResponseEntity<UpdateRecordResponse> response = staticRestTemplate.exchange(requestEntity, UpdateRecordResponse.class);
+        return response.getBody();
     }
 
     /**
@@ -174,24 +312,20 @@ public class TencentDnsUtils {
      * @param secretId
      * @param secretKey
      * @param recordId
-     * @throws TencentCloudSDKException
      */
-    public static DeleteRecordResponse deleteRecord(String domain, String secretId, String secretKey, Long recordId) throws TencentCloudSDKException {
-        // 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
-        Credential cred = new Credential(secretId, secretKey);
-        // 实例化一个http选项，可选的，没有特殊需求可以跳过
-        HttpProfile httpProfile = new HttpProfile();
-        httpProfile.setEndpoint(ENDPOINT);
-        // 实例化一个client选项，可选的，没有特殊需求可以跳过
-        ClientProfile clientProfile = new ClientProfile();
-        clientProfile.setHttpProfile(httpProfile);
-        // 实例化要请求产品的client对象,clientProfile是可选的
-        DnspodClient client = new DnspodClient(cred, "", clientProfile);
-        // 实例化一个请求对象,每个接口都会对应一个request对象
-        DeleteRecordRequest req = new DeleteRecordRequest();
-        req.setDomain(domain);
-        req.setRecordId(recordId);
-        // 返回的resp是一个DeleteRecordResponse的实例，与请求对象对应
-        return client.DeleteRecord(req);
+    public static DeleteRecordResponse deleteRecord(String domain, String secretId, String secretKey, Integer recordId) throws Exception {
+        DeleteRecordRequest deleteRecordRequest = new DeleteRecordRequest().setDomain(domain).setRecordId(recordId);
+        String jsonBody = staticObjectMapper.writeValueAsString(deleteRecordRequest);
+
+        TreeMap<String, String> headerMap = TencentCloudAPITC3Singer.buildSignRequestHeaderWithBody(secretId, secretKey, DELETE_RECORD_ACTION, jsonBody);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAll(headerMap);
+        // 构建URI参数
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("https://" + HOST);
+        // 构建RequestEntity
+        RequestEntity<String> requestEntity = new RequestEntity<String>(jsonBody, headers, HttpMethod.POST, builder.build().toUri());
+        //发送请求
+        ResponseEntity<DeleteRecordResponse> response = staticRestTemplate.exchange(requestEntity, DeleteRecordResponse.class);
+        return response.getBody();
     }
 }
