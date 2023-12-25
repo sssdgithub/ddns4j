@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
-import top.sssd.ddns.common.utils.DoMainUtil;
 import top.sssd.ddns.model.entity.ParsingRecord;
 import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.utils.AliDnsUtils;
+
+import static top.sssd.ddns.common.utils.DoMainUtil.findNthOccurrence;
+import static top.sssd.ddns.common.utils.DoMainUtil.firstLevel;
 
 /**
  * @author sssd
@@ -45,7 +47,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
         String subDoMain = parsingRecord.getDomain();
         String domain = null;
         String rr = null;
-        if (DoMainUtil.firstLevel(subDoMain)) {
+        if (firstLevel(subDoMain)) {
             domain = subDoMain;
             rr = "@";
         } else {
@@ -53,23 +55,6 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
             rr = subDoMain.substring(0, findNthOccurrence(subDoMain, ".", 1));
         }
         AliDnsUtils.add(client, domain, rr, RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()), ip);
-    }
-
-
-    public static  int findNthOccurrence(String str, String subStr, int n) {
-        // 记录出现次数
-        int count = 0;
-        // 从后往前查找最后一次出现的位置
-        int index = str.lastIndexOf(subStr);
-        // 如果找到了并且出现次数小于n
-        while (index != -1 && count < n) {
-            // 继续往前查找下一次出现的位置
-            index = str.lastIndexOf(subStr, index - 1);
-            // 更新出现次数
-            count++;
-        }
-        // 返回最后一次出现的位置的索引
-        return index;
     }
 
 
@@ -81,7 +66,7 @@ public class AliDynamicDnsServiceImpl implements DynamicDnsService {
         String subDoMain = parsingRecord.getDomain();
 
         String rr = null;
-        if (DoMainUtil.firstLevel(subDoMain)) {
+        if (firstLevel(subDoMain)) {
             rr = "@";
         } else {
             rr = subDoMain.substring(0, findNthOccurrence(subDoMain, ".", 1));
