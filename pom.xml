@@ -98,11 +98,11 @@
             <artifactId>alidns20150109</artifactId>
             <version>3.0.1</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>com.tencentcloudapi</groupId>
             <artifactId>tencentcloud-sdk-java-dnspod</artifactId>
             <version>3.1.749</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.huaweicloud.sdk</groupId>
             <artifactId>huaweicloud-sdk-dns</artifactId>
