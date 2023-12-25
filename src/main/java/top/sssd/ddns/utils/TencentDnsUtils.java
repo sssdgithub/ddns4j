@@ -55,18 +55,6 @@ public class TencentDnsUtils {
         staticObjectMapper = objectMapper;
     }
 
-
-    /*public static void main(String[] args) throws Exception {
-        String domain = "sssd.site";
-        String suDomain = "smy";
-        String recordType = "AAAA";
-        String secretId = "AKIDiGYbNt8tRikV0FDuKTMyJNAhwvd5GL9g";
-        String secretKey = "JL6aokPnukJbcNr52i7F6h14pJWS6TaQ";
-        String recordId = TencentDnsUtils.getRecordId(domain, suDomain, recordType, secretId, secretKey);
-        UpdateRecordResponse updateRecordResponse = TencentDnsUtils.updateRecord(domain, suDomain, recordType, secretId, secretKey, "2409:8a70:1617:2922::c32", Integer.parseInt(recordId));
-        System.out.println(updateRecordResponse);
-    }*/
-
     /**
      * 创建记录实体
      * @ https://cloud.tencent.com/document/product/1427/56180
