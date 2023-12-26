@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class CloudflareUtils {
         private List<Map> errors;
         private List<Map> messages;
         private Boolean success;
-        private List<SimpleContent> result;
+        private List<SimpleContent> result = new ArrayList<>();
     }
 
     @Data

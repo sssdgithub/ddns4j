@@ -8,8 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledKey;
-import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledMap;
+import static top.sssd.ddns.common.constant.DDNSConstant.*;
 
 /**
  * @author sssd
@@ -19,7 +18,7 @@ public class ExcludeIndexPageInterceptor implements HandlerInterceptor{
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Boolean publicAccessDisabled = publicAccessDisabledMap.get(publicAccessDisabledKey);
+        Boolean publicAccessDisabled = publicAccessDisabledMap.get(PUBLIC_ACCESS_DISABLED_KEY);
         if (publicAccessDisabled) {
             String remoteAddr = request.getRemoteAddr();
             String requestURI = request.getRequestURI();

@@ -44,8 +44,17 @@ public class GobalExceptionHandler {
     private ObjectMapper objectMapper;
 
     @ExceptionHandler({Exception.class})
-    public AmisResult<String> teaExceptionHandler(Exception exception) throws JsonProcessingException {
-        log.error("teaException info:{}", exception.getMessage());
+    public AmisResult<String> exceptionHandler(Exception exception) throws JsonProcessingException {
+        log.error("Exception info:{}", exception.getMessage());
+        if (exception.getMessage().contains(RECORD_EXISTS)) {
+            return AmisResult.fail("DNS记录已存在");
+        }
+        return AmisResult.fail(exception.getMessage());
+    }
+
+    @ExceptionHandler({BizException.class})
+    public AmisResult<String> teaExceptionHandler(BizException exception) throws JsonProcessingException {
+        log.error("BizException info:{}", exception.getMessage());
         if (exception.getMessage().contains(RECORD_EXISTS)) {
             return AmisResult.fail("DNS记录已存在");
         }
