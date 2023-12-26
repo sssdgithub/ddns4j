@@ -30,12 +30,12 @@ public class DDNSConstant {
     public static final Integer IP_MODE_INTERFACE = 1;
     public static final Integer IP_MODE_NETWORK = 2;
 
-    public static final String publicAccessDisabledKey = "ddns4j.publicAccessDisabled";
+    public static final String PUBLIC_ACCESS_DISABLED_KEY = "ddns4j.publicAccessDisabled";
 
     public static HashMap<String,Boolean> publicAccessDisabledMap = new HashMap();
 
     static {
         //默认可以公网访问
-        publicAccessDisabledMap.put(publicAccessDisabledKey,false);
+        publicAccessDisabledMap.put(PUBLIC_ACCESS_DISABLED_KEY,false);
     }
 }
