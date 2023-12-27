@@ -25,6 +25,7 @@ import top.sssd.ddns.task.DynamicDnsJob;
 import javax.annotation.Resource;
 import java.net.SocketException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -62,6 +63,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         if (Objects.nonNull(checkParsingRecord)) {
             throw new BizException("同一服务商,同一解析类型,同一ip,不能重复添加");
         }
+        // TODO: 2023/12/26 添加错误
         if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),
@@ -156,30 +158,54 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
 
     @Override
     public String getIp(ParsingRecord parsingRecord) {
-        //解析类型:1 AAAA 2 A
         Integer recordType = parsingRecord.getRecordType();
+        Integer getIpMode = parsingRecord.getGetIpMode();
+        String getIpModeValue = parsingRecord.getGetIpModeValue().trim();
+
         if (recordType.equals(RECORD_TYPE_AAAA)) {
-            //ipv6
-            if (parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)) {
-                String ipv6 = restTemplate.getForObject(parsingRecord.getGetIpModeValue().trim(), String.class);
-                parsingRecord.setIp(ipv6);
-                return ipv6.trim();
-            } else if (parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)) {
-                parsingRecord.setIp(parsingRecord.getGetIpModeValue());
-                return parsingRecord.getGetIpModeValue().trim();
-            }
+            // AAAA record type (ipv6)
+            return handleIpv6(getIpMode, getIpModeValue, parsingRecord);
         } else if (recordType.equals(RECORD_TYPE_A)) {
-            //ipv4
-            if (parsingRecord.getGetIpMode().equals(IP_MODE_INTERFACE)) {
-                String ipv4 = restTemplate.getForObject(parsingRecord.getGetIpModeValue().trim(), String.class);
-                parsingRecord.setIp(ipv4);
-                return ipv4.trim();
-            } else if (parsingRecord.getGetIpMode().equals(IP_MODE_NETWORK)) {
-                parsingRecord.setIp(parsingRecord.getGetIpModeValue());
-                return parsingRecord.getGetIpModeValue().trim();
-            }
+            // A record type (ipv4)
+            return handleIpv4(getIpMode, getIpModeValue, parsingRecord);
+        }else{
+            throw new BizException("参数错误-recordType:"+recordType);
         }
-        return null;
+    }
+
+    private String handleIpv6(Integer getIpMode, String getIpModeValue, ParsingRecord parsingRecord) {
+        if (IP_MODE_INTERFACE.equals(getIpMode)) {
+            String ipv6 = restTemplate.getForObject(getIpModeValue, String.class);
+            if (!StringUtils.hasText(ipv6)) {
+                throw new BizException("通过网络接口获取ipv6地址失败，请检查网卡是否分配ipv6地址");
+            }
+            parsingRecord.setIp(ipv6);
+            return ipv6.trim();
+        } else if (IP_MODE_NETWORK.equals(getIpMode)) {
+            if (!StringUtils.hasText(getIpModeValue)) {
+                throw new BizException("通过本地网卡获取ipv6地址失败，请检查网卡是否分配ipv6地址");
+            }
+            parsingRecord.setIp(getIpModeValue);
+            return getIpModeValue;
+        }else{
+            throw new BizException("参数错误-getIpMode:"+getIpMode);
+        }
+    }
+
+    private String handleIpv4(Integer getIpMode, String getIpModeValue, ParsingRecord parsingRecord) {
+        if (IP_MODE_INTERFACE.equals(getIpMode)) {
+            String ipv4 = restTemplate.getForObject(getIpModeValue, String.class);
+            if (!StringUtils.hasText(ipv4)) {
+                throw new BizException("通过网络接口获取ipv4地址失败，请检查网卡是否分配ipv4地址");
+            }
+            parsingRecord.setIp(ipv4);
+            return ipv4.trim();
+        } else if (IP_MODE_NETWORK.equals(getIpMode)) {
+            parsingRecord.setIp(getIpModeValue);
+            return getIpModeValue;
+        }else{
+            throw new BizException("参数错误-getIpMode:"+getIpMode);
+        }
     }
 
     @Resource
@@ -206,7 +232,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         } else if (IP_MODE_NETWORK.equals(getIpMode)) {
             return netWorkService.networks(recordType);
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

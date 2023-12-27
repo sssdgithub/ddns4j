@@ -38,13 +38,13 @@ import static top.sssd.ddns.common.constant.ExceptionConstant.RECORD_EXISTS;
  */
 @RestControllerAdvice
 @Slf4j
-public class GobalExceptionHandler {
+public class GlobalExceptionHandler {
 
     @Resource
     private ObjectMapper objectMapper;
 
     @ExceptionHandler({Exception.class})
-    public AmisResult<String> exceptionHandler(Exception exception) throws JsonProcessingException {
+    public AmisResult<String> exceptionHandler(Exception exception) {
         log.error("Exception info:{}", exception.getMessage());
         if (exception.getMessage().contains(RECORD_EXISTS)) {
             return AmisResult.fail("DNS记录已存在");
@@ -52,17 +52,8 @@ public class GobalExceptionHandler {
         return AmisResult.fail(exception.getMessage());
     }
 
-    @ExceptionHandler({BizException.class})
-    public AmisResult<String> teaExceptionHandler(BizException exception) throws JsonProcessingException {
-        log.error("BizException info:{}", exception.getMessage());
-        if (exception.getMessage().contains(RECORD_EXISTS)) {
-            return AmisResult.fail("DNS记录已存在");
-        }
-        return AmisResult.fail(exception.getMessage());
-    }
-
     @ExceptionHandler({ConstraintViolationException.class})
-    public AmisResult<String> constraintViolationExceptionHandler(ConstraintViolationException violationException) throws JsonProcessingException {
+    public AmisResult<String> constraintViolationExceptionHandler(ConstraintViolationException violationException) {
         log.error("valid exception info:{}", violationException.getMessage());
         return AmisResult.fail(violationException.getMessage());
     }

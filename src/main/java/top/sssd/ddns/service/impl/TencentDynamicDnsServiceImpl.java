@@ -31,10 +31,6 @@ public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
         if(Objects.isNull(listResponse)){
             throw new BizException("TencentCloud 查询列表记录失败 腾讯云的列表记录响应对象为空");
         }
-        TencentDnsUtils.Error error = listResponse.getError();
-        if(Objects.nonNull(error)){
-            throw new BizException("TencentCloud 查询列表记录失败"+error.getMessage());
-        }
         return !(listResponse.getRecordList().isEmpty());
     }
 
