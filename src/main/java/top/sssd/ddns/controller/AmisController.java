@@ -20,7 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static top.sssd.ddns.common.constant.DDNSConstant.*;
+import static top.sssd.ddns.common.constant.DDNSConstant.PUBLIC_ACCESS_DISABLED_KEY;
+import static top.sssd.ddns.common.constant.DDNSConstant.publicAccessDisabledMap;
 
 /**
  * @author sssd
@@ -42,14 +43,14 @@ public class AmisController {
     }
 
     @PostMapping("publicAccessDisabled")
-    public AmisResult UpdatePublicAccessDisabled(@RequestBody PublicAccessDisabled publicAccessDisabled){
+    public AmisResult<String> UpdatePublicAccessDisabled(@RequestBody PublicAccessDisabled publicAccessDisabled){
         publicAccessDisabledMap.put(PUBLIC_ACCESS_DISABLED_KEY,publicAccessDisabled.getValue());
         return AmisResult.ok();
     }
     
 
     @GetMapping("publicAccessDisabled")
-    public AmisResult publicAccessDisabled(){
+    public AmisResult<HashMap<String, Boolean>> publicAccessDisabled(){
         Boolean publicAccessDisabled = publicAccessDisabledMap.get(PUBLIC_ACCESS_DISABLED_KEY);
         HashMap<String, Boolean> resultMap = new HashMap<>();
         resultMap.put("publicAccessDisabled",publicAccessDisabled);
