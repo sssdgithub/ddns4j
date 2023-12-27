@@ -43,7 +43,7 @@ public class TencentCloudAPITC3Singer {
     public static TreeMap<String,String> buildSignRequestHeaderWithBody(String secretId, String secretKey, String action, String jsonBody) throws Exception {
         String timestamp = String.valueOf(Instant.now().getEpochSecond());
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        log.info("************* TencentCloud: 步骤 1：拼接规范请求串 *************");
+//        log.info("************* TencentCloud: 步骤 1：拼接规范请求串 *************");
         String httpRequestMethod = "POST";
         String canonicalUri = "/";
         String canonicalQueryString = "";
@@ -53,19 +53,19 @@ public class TencentCloudAPITC3Singer {
         String hashedRequestPayload = sha256Hex(jsonBody);
         String canonicalRequest = httpRequestMethod + "\n" + canonicalUri + "\n" + canonicalQueryString + "\n"
                 + canonicalHeaders + "\n" + signedHeaders + "\n" + hashedRequestPayload;
-        log.info("************* TencentCloud: 步骤 2：拼接待签名字符串 *************");
+//        log.info("************* TencentCloud: 步骤 2：拼接待签名字符串 *************");
         String credentialScope = date + "/" + SERVICE + "/" + "tc3_request";
         String hashedCanonicalRequest = sha256Hex(canonicalRequest);
         String stringToSign = ALGORITHM + "\n" + timestamp + "\n" + credentialScope + "\n" + hashedCanonicalRequest;
-        log.info("************* TencentCloud: 步骤 3：计算签名 *************");
+//        log.info("************* TencentCloud: 步骤 3：计算签名 *************");
         byte[] secretDate = hmac256(("TC3" + secretKey).getBytes(UTF8), date);
         byte[] secretService = hmac256(secretDate, SERVICE);
         byte[] secretSigning = hmac256(secretService, "tc3_request");
         String signature = DatatypeConverter.printHexBinary(hmac256(secretSigning, stringToSign)).toLowerCase();
-        log.info("************* TencentCloud: 步骤 4：拼接 Authorization *************");
+//        log.info("************* TencentCloud: 步骤 4：拼接 Authorization *************");
         String authorization = ALGORITHM + " " + "Credential=" + secretId + "/" + credentialScope + ", "
                 + "SignedHeaders=" + signedHeaders + ", " + "Signature=" + signature;
-        log.info("************* TencentCloud: 步骤 5：拼接 请求头 *************");
+//        log.info("************* TencentCloud: 步骤 5：拼接 请求头 *************");
         TreeMap<String, String> headers = new TreeMap<>();
         headers.put("Authorization", authorization);
         headers.put("Content-Type", CT_JSON);
