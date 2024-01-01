@@ -9,9 +9,9 @@
             content="width=device-width, initial-scale=1, maximum-scale=1"
     />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-    <link rel="stylesheet" href="./jssdk/sdk.css"/>
-    <link rel="stylesheet" href="./jssdk/helper.css"/>
-    <link rel="stylesheet" href="./jssdk/iconfont.css"/>
+    <link rel="stylesheet" href="https://blog-sssd.oss-cn-chengdu.aliyuncs.com/amis/3.4.3/jssdk/sdk.css"/>
+    <link rel="stylesheet" href="https://blog-sssd.oss-cn-chengdu.aliyuncs.com/amis/3.4.3/jssdk/helper.css"/>
+    <link rel="stylesheet" href="https://blog-sssd.oss-cn-chengdu.aliyuncs.com/amis/3.4.3/jssdk/iconfont.css"/>
     <!-- 这是默认主题所需的，如果是其他主题则不需要 -->
     <style>
         html,
@@ -24,13 +24,10 @@
             padding: 0;
         }
     </style>
-    <!--统计代码-->
-    <!--<script charset="UTF-8" id="LA_COLLECT" src="https://sdk.51.la/js-sdk-pro.min.js"></script>
-    <script>LA.init({id:"3F763KyXoxU8bRBH",ck:"3F763KyXoxU8bRBH"})</script>-->
 </head>
 <body>
 <div id="root" class="app-wrapper"></div>
-<script src="./jssdk/sdk.js"></script>
+<script src="https://blog-sssd.oss-cn-chengdu.aliyuncs.com/amis/3.4.3/jssdk/sdk.js"></script>
 <script type="text/javascript">
     (function () {
         let amis = amisRequire('amis/embed');
@@ -53,7 +50,7 @@
                     "primaryField": "id",
                     "loadType": "pagination",
                     "api": {
-                        "url": "/amis/page",
+                        "url": "/parsingRecord/page",
                         "syncLocation": false,
                         "method": "get",
                         "requestAdaptor": "",
@@ -101,25 +98,6 @@
                                     "title": "",
                                     "content": "ip类型,AAAA为ipv6地址,A为ipv4地址"
                                 }
-                            },
-                            {
-                                "type": "select",
-                                "label": "状态",
-                                "name": "state",
-                                "options": [
-                                    {
-                                        "label": "启用",
-                                        "value": 1
-                                    },
-                                    {
-                                        "label": "禁用",
-                                        "value": 0
-                                    }
-                                ],
-                                "id": "u:800d2949a0e0",
-                                "multiple": false,
-                                "clearable": true,
-                                "value": ""
                             },
                             {
                                 "type": "select",
@@ -229,7 +207,7 @@
                                                                         "title": "新增数据",
                                                                         "mode": "horizontal",
                                                                         "dsType": "api",
-                                                                        "api": "/amis/add",
+                                                                        "api": "/parsingRecord/add",
                                                                         "feat": "Insert",
                                                                         "body": [
                                                                             {
@@ -285,7 +263,7 @@
                                                                                 }
                                                                             },
                                                                             {
-                                                                                "type": "input-text",
+                                                                                "type": "input-password",
                                                                                 "label": "服务商ID",
                                                                                 "name": "serviceProviderId",
                                                                                 "id": "u:1c3afcbfe187",
@@ -310,7 +288,7 @@
                                                                                 }
                                                                             },
                                                                             {
-                                                                                "type": "input-text",
+                                                                                "type": "input-password",
                                                                                 "label": "服务商密钥",
                                                                                 "name": "serviceProviderSecret",
                                                                                 "id": "u:a169ab8ba0f7",
@@ -357,27 +335,6 @@
                                                                                     "title": "",
                                                                                     "content": "解析类型,AAAA为ipv6地址,A为ipv4地址"
                                                                                 }
-                                                                            },
-                                                                            {
-                                                                                "type": "select",
-                                                                                "label": "状态",
-                                                                                "name": "state",
-                                                                                "options": [
-                                                                                    {
-                                                                                        "label": "启用",
-                                                                                        "value": 1
-                                                                                    },
-                                                                                    {
-                                                                                        "label": "禁用",
-                                                                                        "value": 0
-                                                                                    }
-                                                                                ],
-                                                                                "id": "u:9ffad3b8ed5c",
-                                                                                "multiple": false,
-                                                                                "clearable": true,
-                                                                                "required": true,
-                                                                                "value": "",
-                                                                                "showInvalidMatch": false
                                                                             },
                                                                             {
                                                                                 "type": "select",
@@ -443,7 +400,7 @@
                                                                                 "type": "select",
                                                                                 "labelClassName": "text-muted",
                                                                                 "name": "getIpModeValue",
-                                                                                "source": "/amis/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                                "source": "/parsingRecord/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
                                                                                 "initFetchOn": "data.getIpMode",
                                                                                 "visibleOn": "data.recordType",
                                                                                 "clearable": true,
@@ -524,7 +481,7 @@
                                                 "body": {
                                                     "type": "log",
                                                     "height": 300,
-                                                    "source": "post:/amis/logs",
+                                                    "source": "post:/changedLog/logs",
                                                     "rowHeight": 30
                                                 }
                                             },
@@ -539,7 +496,7 @@
                                         {
                                             "type": "form",
                                             "title": "",
-                                            "initApi": "/amis/publicAccessDisabled",
+                                            "initApi": "/publicAccess/publicAccessDisabled",
                                             "body": [
                                                 {
                                                     "name": "publicAccessDisabled",
@@ -554,7 +511,7 @@
                                                                     "actionType": "ajax",
                                                                     "api": {
                                                                         "method": "post",
-                                                                        "url": "/amis/publicAccessDisabled",
+                                                                        "url": "/publicAccess/publicAccessDisabled",
                                                                         "data": {
                                                                             "value":"${value}"
                                                                         }
@@ -725,12 +682,6 @@
                             "id": "u:6be7ffd4b055"
                         },
                         {
-                            "type": "status",
-                            "title": "状态",
-                            "name": "state",
-                            "id": "u:6be7ffd4b055"
-                        },
-                        {
                             "type": "operation",
                             "title": "操作",
                             "buttons": [
@@ -833,7 +784,7 @@
                                                             "title": "编辑数据",
                                                             "mode": "horizontal",
                                                             "dsType": "api",
-                                                            "api": "/amis/modify",
+                                                            "api": "/parsingRecord/modify",
                                                             "feat": "Edit",
                                                             "body": [
                                                                 {
@@ -890,7 +841,7 @@
 
                                                                 },
                                                                 {
-                                                                    "type": "input-text",
+                                                                    "type": "input-password",
                                                                     "label": "服务商ID",
                                                                     "name": "serviceProviderId",
                                                                     "id": "u:1c3afcbfe187",
@@ -915,7 +866,7 @@
                                                                     }
                                                                 },
                                                                 {
-                                                                    "type": "input-text",
+                                                                    "type": "input-password",
                                                                     "label": "服务商密钥",
                                                                     "name": "serviceProviderSecret",
                                                                     "id": "u:a169ab8ba0f7",
@@ -962,27 +913,6 @@
                                                                         "title": "",
                                                                         "content": "解析类型,AAAA为ipv6地址,A为ipv4地址"
                                                                     }
-                                                                },
-                                                                {
-                                                                    "type": "select",
-                                                                    "label": "状态",
-                                                                    "name": "state",
-                                                                    "options": [
-                                                                        {
-                                                                            "label": "启用",
-                                                                            "value": 1
-                                                                        },
-                                                                        {
-                                                                            "label": "禁用",
-                                                                            "value": 0
-                                                                        }
-                                                                    ],
-                                                                    "id": "u:9ffad3b8ed5c",
-                                                                    "multiple": false,
-                                                                    "clearable": true,
-                                                                    "required": true,
-                                                                    "value": "",
-                                                                    "showInvalidMatch": false
                                                                 },
                                                                 {
                                                                     "type": "select",
@@ -1048,7 +978,7 @@
                                                                     "type": "select",
                                                                     "labelClassName": "text-muted",
                                                                     "name": "getIpModeValue",
-                                                                    "source": "/amis/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                    "source": "/parsingRecord/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
                                                                     "initFetchOn": "data.getIpMode",
                                                                     "visibleOn": "data.recordType",
                                                                     "clearable": true,
@@ -1121,7 +1051,7 @@
                                             "actions": [
                                                 {
                                                     "actionType": "ajax",
-                                                    "api": "delete:/amis/delete/${id}"
+                                                    "api": "delete:/parsingRecord/delete/${id}"
                                                 },
                                                 {
                                                     "actionType": "search",

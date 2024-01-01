@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS `parsing_record`  (
   `get_ip_mode_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '当为interface时 https://myip4.ipip.net, https://ddns.oray.com/checkip, https://ip.3322.net, https://4.ipw.cn\r\n当为network时 是网卡信息\r\n当为cmd时 是bash或shell命令\r\n',
   `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '真实的公网ip',
   `domain` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '域名',
-  `state` int(11) NOT NULL COMMENT '1 启用 0 禁用',
   `update_frequency` int(11) NOT NULL COMMENT '单位:分钟 1分钟 2分钟 5分钟 10分钟',
   `create_date` datetime NULL DEFAULT NULL COMMENT '创建时间',
   `update_date` datetime NULL DEFAULT NULL COMMENT '更新时间',
