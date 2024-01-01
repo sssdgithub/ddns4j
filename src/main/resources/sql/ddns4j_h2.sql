@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS parsing_record (
     get_ip_mode_value VARCHAR(255) NOT NULL,
     ip VARCHAR(255) NOT NULL,
     domain VARCHAR(100) NOT NULL,
-    state INT NOT NULL,
     update_frequency INT NOT NULL,
     create_date DATETIME,
     update_date DATETIME,
