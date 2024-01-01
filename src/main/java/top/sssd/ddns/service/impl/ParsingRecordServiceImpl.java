@@ -61,9 +61,8 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 .eq(ParsingRecord::getIp, parsingRecord.getIp())
                 .last("limit 1").one();
         if (Objects.nonNull(checkParsingRecord)) {
-            throw new BizException("同一服务商,同一解析类型,同一ip,不能重复添加");
+            throw new BizException("同一域名,同一解析类型,同一ip,不能重复添加");
         }
-        // TODO: 2023/12/26 添加错误
         if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),
@@ -93,26 +92,34 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 .ne(ParsingRecord::getId, parsingRecord.getId())
                 .last("limit 1").one();
         if (Objects.nonNull(checkParsingRecord)) {
-            throw new BizException("同一服务商,同一解析类型,同一ip,不允许重复更新");
+            throw new BizException("同一域名,同一解析类型,同一ip,不允许重复更新");
         }
 
+        String dnsIp = null;
+        dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
+        String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
+        String ip = getIp(parsingRecord);
+        //是否修改了服务商相关信息
+        if(updatedServiceProvider(dbParsingRecord,parsingRecord)){
+            dynamicDnsService.update(parsingRecord, ip, recordId);
+        }
+        this.updateById(parsingRecord);
         // 删除之前的定时任务
         JobTask one = jobTaskService.lambdaQuery().eq(JobTask::getName, dbParsingRecord.getId().toString()).one();
         if (Objects.nonNull(one)) {
             jobTaskService.deleteJobTask(one.getId());
         }
-
-
-        String dnsIp = null;
-        dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
-        String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
-
-        String ip = getIp(parsingRecord);
-
-        dynamicDnsService.update(parsingRecord, ip, recordId);
-        this.updateById(parsingRecord);
         // 添加并启动一个定时任务
         addWithStartTask(parsingRecord);
+    }
+
+    //是否修改了服务商相关信息
+    public boolean updatedServiceProvider(ParsingRecord dbParsingRecord, ParsingRecord parsingRecord) {
+        return !dbParsingRecord.getServiceProvider().equals(parsingRecord.getServiceProvider()) ||
+                !dbParsingRecord.getServiceProviderId().equals(parsingRecord.getServiceProviderId()) ||
+                !dbParsingRecord.getServiceProviderSecret().equals(parsingRecord.getServiceProviderSecret()) ||
+                !dbParsingRecord.getRecordType().equals(parsingRecord.getRecordType()) ||
+                !dbParsingRecord.getDomain().equals(parsingRecord.getDomain());
     }
 
     private void addWithStartTask(ParsingRecord parsingRecord) {
