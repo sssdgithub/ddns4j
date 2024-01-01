@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import top.sssd.ddns.config.ApplicationContextProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,9 @@ public class CloudflareUtils {
         private List<String> tags;
     }
 
-    private static RestTemplate restTemplate = new RestTemplate();
+    public static RestTemplate getRestTemplate(){
+        return ApplicationContextProvider.getContext().getBean(RestTemplate.class);
+    }
 
     private static final String BASE_URL = "https://api.cloudflare.com/client/v4/zones/";
 
@@ -82,7 +85,7 @@ public class CloudflareUtils {
         // 构建RequestEntity
         RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, builder.build().toUri());
         //发送请求
-        ResponseEntity<CloudflareQueryResponse> response = restTemplate.exchange(requestEntity, CloudflareQueryResponse.class);
+        ResponseEntity<CloudflareQueryResponse> response = getRestTemplate().exchange(requestEntity, CloudflareQueryResponse.class);
         return response.getBody();
     }
 
@@ -100,7 +103,7 @@ public class CloudflareUtils {
         // 构建RequestEntity
         RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, builder.build().toUri());
         //发送请求
-        ResponseEntity<CloudflareQueryResponse> response = restTemplate.exchange(requestEntity, CloudflareQueryResponse.class);
+        ResponseEntity<CloudflareQueryResponse> response = getRestTemplate().exchange(requestEntity, CloudflareQueryResponse.class);
         return response.getBody();
     }
 
@@ -126,7 +129,7 @@ public class CloudflareUtils {
         // 构建RequestEntity
         RequestEntity<SimpleContent> requestEntity = new RequestEntity<>(simpleContent, headers, HttpMethod.POST, builder.build().toUri());
         //发送请求
-        ResponseEntity<CloudflareResponse> response = restTemplate.exchange(requestEntity, CloudflareResponse.class);
+        ResponseEntity<CloudflareResponse> response = getRestTemplate().exchange(requestEntity, CloudflareResponse.class);
         return response.getBody();
     }
 
@@ -179,7 +182,7 @@ public class CloudflareUtils {
         // 构建RequestEntity
         RequestEntity<?> requestEntity = new RequestEntity<>(headers, HttpMethod.DELETE, builder.build().toUri());
         //发送请求
-        ResponseEntity<CloudflareResponse> response = restTemplate.exchange(requestEntity, CloudflareResponse.class);
+        ResponseEntity<CloudflareResponse> response = getRestTemplate().exchange(requestEntity, CloudflareResponse.class);
         return response.getBody();
     }
 
@@ -208,7 +211,7 @@ public class CloudflareUtils {
         // 构建RequestEntity
         RequestEntity<SimpleContent> requestEntity = new RequestEntity<>(simpleContent, headers, HttpMethod.PUT, builder.build().toUri());
         //发送请求
-        ResponseEntity<CloudflareResponse> response = restTemplate.exchange(requestEntity, CloudflareResponse.class);
+        ResponseEntity<CloudflareResponse> response = getRestTemplate().exchange(requestEntity, CloudflareResponse.class);
         return response.getBody();
     }
 }
