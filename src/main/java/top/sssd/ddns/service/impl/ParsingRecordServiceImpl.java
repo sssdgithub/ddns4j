@@ -102,10 +102,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
             jobTaskService.deleteJobTask(one.getId());
         }
 
-        if (parsingRecord.getState().equals(0)) {
-            this.updateById(parsingRecord);
-            return;
-        }
 
         String dnsIp = null;
         dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
@@ -241,7 +237,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 .eq(Objects.nonNull(parsingRecord.getServiceProvider()), ParsingRecord::getServiceProvider, parsingRecord.getServiceProvider())
                 .eq(StringUtils.hasText(parsingRecord.getDomain()), ParsingRecord::getDomain, parsingRecord.getDomain())
                 .eq(Objects.nonNull(parsingRecord.getRecordType()), ParsingRecord::getRecordType, parsingRecord.getRecordType())
-                .eq(Objects.nonNull(parsingRecord.getState()), ParsingRecord::getState, parsingRecord.getState())
                 .ge(Objects.nonNull(parsingRecord.getCreateDate()), ParsingRecord::getCreateDate, parsingRecord.getCreateDate())
                 .le(Objects.nonNull(parsingRecord.getUpdateDate()), ParsingRecord::getUpdateDate, parsingRecord.getUpdateDate())
                 .page(new Page<ParsingRecord>(parsingRecord.getPage(), parsingRecord.getPerPage()));

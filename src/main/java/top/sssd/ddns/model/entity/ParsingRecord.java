@@ -59,9 +59,6 @@ public class ParsingRecord extends AmisPageEntity implements Serializable {
     @NotBlank(groups = {ValidGroup.SaveGroup.class, ValidGroup.UpdateGroup.class}, message = "域名不能为空")
     private String domain;
 
-    @NotNull(groups = {ValidGroup.SaveGroup.class, ValidGroup.UpdateGroup.class}, message = "状态不能为空")
-    private Integer state;
-
     @NotNull(groups = {ValidGroup.SaveGroup.class, ValidGroup.UpdateGroup.class}, message = "更新频率不能为空")
     private Integer updateFrequency;
 
