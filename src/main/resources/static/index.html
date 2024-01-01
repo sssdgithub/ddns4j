@@ -50,7 +50,7 @@
                     "primaryField": "id",
                     "loadType": "pagination",
                     "api": {
-                        "url": "/amis/page",
+                        "url": "/parsingRecord/page",
                         "syncLocation": false,
                         "method": "get",
                         "requestAdaptor": "",
@@ -226,7 +226,7 @@
                                                                         "title": "新增数据",
                                                                         "mode": "horizontal",
                                                                         "dsType": "api",
-                                                                        "api": "/amis/add",
+                                                                        "api": "/parsingRecord/add",
                                                                         "feat": "Insert",
                                                                         "body": [
                                                                             {
@@ -440,7 +440,7 @@
                                                                                 "type": "select",
                                                                                 "labelClassName": "text-muted",
                                                                                 "name": "getIpModeValue",
-                                                                                "source": "/amis/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                                "source": "/parsingRecord/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
                                                                                 "initFetchOn": "data.getIpMode",
                                                                                 "visibleOn": "data.recordType",
                                                                                 "clearable": true,
@@ -521,7 +521,7 @@
                                                 "body": {
                                                     "type": "log",
                                                     "height": 300,
-                                                    "source": "post:/amis/logs",
+                                                    "source": "post:/changedLog/logs",
                                                     "rowHeight": 30
                                                 }
                                             },
@@ -536,7 +536,7 @@
                                         {
                                             "type": "form",
                                             "title": "",
-                                            "initApi": "/amis/publicAccessDisabled",
+                                            "initApi": "/publicAccess/publicAccessDisabled",
                                             "body": [
                                                 {
                                                     "name": "publicAccessDisabled",
@@ -551,7 +551,7 @@
                                                                     "actionType": "ajax",
                                                                     "api": {
                                                                         "method": "post",
-                                                                        "url": "/amis/publicAccessDisabled",
+                                                                        "url": "/publicAccess/publicAccessDisabled",
                                                                         "data": {
                                                                             "value":"${value}"
                                                                         }
@@ -830,7 +830,7 @@
                                                             "title": "编辑数据",
                                                             "mode": "horizontal",
                                                             "dsType": "api",
-                                                            "api": "/amis/modify",
+                                                            "api": "/parsingRecord/modify",
                                                             "feat": "Edit",
                                                             "body": [
                                                                 {
@@ -1045,7 +1045,7 @@
                                                                     "type": "select",
                                                                     "labelClassName": "text-muted",
                                                                     "name": "getIpModeValue",
-                                                                    "source": "/amis/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                    "source": "/parsingRecord/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
                                                                     "initFetchOn": "data.getIpMode",
                                                                     "visibleOn": "data.recordType",
                                                                     "clearable": true,
@@ -1118,7 +1118,7 @@
                                             "actions": [
                                                 {
                                                     "actionType": "ajax",
-                                                    "api": "delete:/amis/delete/${id}"
+                                                    "api": "delete:/parsingRecord/delete/${id}"
                                                 },
                                                 {
                                                     "actionType": "search",
