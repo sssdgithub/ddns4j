@@ -47,6 +47,12 @@
     ```
    - docker方式
     ```
+    #国内镜像
+    docker run -itd --name=ddns4j --restart=always --network=host  registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.3
+    ```
+   或者
+    ```
+    #docker hub 镜像
     docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.3
     ```
   - 浏览器输入 http://ip:10000 进入使用
