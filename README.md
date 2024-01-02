@@ -17,30 +17,39 @@
 ![ddns4j-pc端-功能区介绍](./doc/ddns4j-web端-功能区介绍.png "ddns4j-web端-功能区介绍.png")
 ![ddns4j-移动端-功能区介绍](./doc/ddns4j-移动端-功能区介绍.png "ddns4j-移动端-功能区介绍.png")
 
-## 新手使用步骤
-1. 购买域名
+## 使用步骤
+1. 购买域名(选一项即可)
  - [阿里云域名](https://wanwang.aliyun.com/domain)
  - [腾讯云域名](https://dnspod.cloud.tencent.com/)
  - [cloudflare](https://www.cloudflare.com/zh-cn/products/registrar/)
  - [华为云域名](https://www.huaweicloud.com/product/domain.html)
-2. 申请密钥
+2. 申请密钥(选一项即可)
   - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak)
   - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
   - [华为云密钥入口](https://console.huaweicloud.com/iam/)
 3. 使用ddns4j
-   - jar包方式
-      - 需要安装jdk或者jre环境(后续版本会出整合包,不用安装jdk环境)
-      - [下载最新版jar包](https://gitee.com/Xsssd/ddns4j/releases)
-      - 启动jar包
-     ```
-     java -jar ddns-v1.6.3-RELEASE.jar
-     ```
+   - window平台使用
+      - [下载ddns4j_setup.exe安装包](https://gitee.com/Xsssd/ddns4j/releases)
+      - 双击安装下一步启动
+   - linux平台使用
+      - [下载ddns4j-linux.tar.gz安装包](https://gitee.com/Xsssd/ddns4j/releases)
+    ```
+    #解压安装包并授权执行
+    tar -zxvf ddns4j-linux.tar.gz && cd ddns4j && chmod +x ddns4j.sh
+    ```
+    ```
+    #安装并启动ddns4j
+    ./ddns4j.sh install
+    
+    #卸载并关闭ddns4j
+    ./ddns4j.sh uninstall
+    ```
    - docker方式
-     ```
-     docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.3
-     ```
-   - 浏览器输入 http://ip:10000 进入使用
+    ```
+    docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.3
+    ```
+  - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
    ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
 5. 恭喜您!已成功接入互联网
