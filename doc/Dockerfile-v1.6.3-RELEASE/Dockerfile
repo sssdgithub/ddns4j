@@ -19,6 +19,8 @@ WORKDIR /usr/local/
 # 将您的Web JAR文件复制到容器中的指定位置
 COPY ddns-v1.6.3-RELEASE.jar /usr/local/ddns-v1.6.3-RELEASE.jar
 
-# 设置入口点
-CMD ["java", "-jar", "ddns-v1.6.3-RELEASE.jar"]
+# 设置上海时区
+RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
 
+# 设置入口点
+CMD ["java", "-Xmx500m", "-Xms500m", "-jar", "ddns-v1.6.3-RELEASE.jar"]
