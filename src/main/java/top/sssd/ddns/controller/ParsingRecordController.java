@@ -36,6 +36,13 @@ public class ParsingRecordController {
         return AmisResult.ok();
     }
 
+    @PostMapping("copy")
+    public AmisResult<String> copy(@RequestBody
+                                  @Validated(ValidGroup.CopyGroup.class) ParsingRecord parsingRecord) throws Exception {
+        parsingRecordService.copy(parsingRecord);
+        return AmisResult.ok();
+    }
+
     @PostMapping("modify")
     public AmisResult<String> modify(@RequestBody
                                  @Validated(ValidGroup.UpdateGroup.class) ParsingRecord parsingRecord) throws Exception {

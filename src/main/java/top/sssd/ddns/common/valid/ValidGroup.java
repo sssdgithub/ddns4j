@@ -9,4 +9,5 @@ public class ValidGroup {
     public interface SaveGroup extends Default{}
     public interface UpdateGroup extends Default{}
     public interface ImportGroup extends Default{}
+    public interface CopyGroup extends Default{}
 }
