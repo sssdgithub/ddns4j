@@ -23,4 +23,4 @@ COPY ddns-v1.6.4-RELEASE.jar /usr/local/ddns-v1.6.4-RELEASE.jar
 RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
 
 # 设置入口点
-CMD ["java", "-Xmx500m", "-Xms500m", "-jar", "ddns-v1.6.4-RELEASE.jar"]
+CMD ["java", "-Xmx256m", "-Xms256m", "-jar", "ddns-v1.6.4-RELEASE.jar"]

@@ -2,7 +2,7 @@
 
 **这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
 
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.3</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.4</h1>
 <h4 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J -- 让动态域名解析变的更简单</h4>
 
 <p align="center">

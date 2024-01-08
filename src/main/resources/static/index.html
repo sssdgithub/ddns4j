@@ -1062,6 +1062,281 @@
                                         }
                                     },
                                     "id": "u:54578b4cae1a"
+                                },
+                                {
+                                    "type": "button",
+                                    "label": "快速添加",
+                                    "level": "link",
+                                    "tooltip": "同一域名添加子域名时,可以快速添加不用再填写密钥和key",
+                                    "tooltipPlacement": "top",
+                                    "tooltipTrigger": "hover",
+                                    "behavior": "Edit",
+                                    "onEvent": {
+                                        "click": {
+                                            "actions": [
+                                                {
+                                                    "actionType": "dialog",
+                                                    "dialog": {
+                                                        "body": {
+                                                            "id": "u:854fc706fceb",
+                                                            "type": "form",
+                                                            "title": "快速添加",
+                                                            "mode": "horizontal",
+                                                            "dsType": "api",
+                                                            "api": "/parsingRecord/copy",
+                                                            "feat": "Edit",
+                                                            "body": [
+                                                                {
+                                                                    "type": "hidden",
+                                                                    "name": "id"
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "服务提供商",
+                                                                    "name": "serviceProvider",
+                                                                    "required": true,
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "阿里云",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "腾讯云",
+                                                                            "value": "2"
+                                                                        },
+                                                                        {
+                                                                            "label": "Cloudflare",
+                                                                            "value": 3
+                                                                        },
+                                                                        {
+                                                                            "label": "华为云",
+                                                                            "value": 4
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "type": "input-text",
+                                                                    "label": "域名",
+                                                                    "name": "domain",
+                                                                    "id": "u:139c04b220c9",
+                                                                    "clearable": true,
+                                                                    "required": true,
+                                                                    "validations": {
+                                                                        "maxLength": 30
+                                                                    },
+                                                                    "validationErrors": {
+                                                                        "maxLength": "域名最大不能超过30个字符"
+                                                                    },
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "域名注册入口:<p><a href='https://wanwang.aliyun.com/domain'>阿里云域名</a></p><p><a href='https://dnspod.cloud.tencent.com/'>腾讯云域名</a></p><p><a href='https://www.cloudflare.com/zh-cn/products/registrar/'>Cloudflare域名</a></p><p><a href='https://www.huaweicloud.com/product/domain.html'>华为云域名</a></p>"
+                                                                    }
+
+                                                                },
+                                                                {
+                                                                    "type": "input-password",
+                                                                    "label": "服务商ID",
+                                                                    "name": "serviceProviderId",
+                                                                    "id": "u:1c3afcbfe187",
+                                                                    "validations": {
+                                                                        "maxLength": 50
+                                                                    },
+                                                                    "required": true,
+                                                                    "validationErrors": {
+                                                                        "maxLength": "服务商ID不能大于0"
+                                                                    },
+                                                                    "validateOnChange": false,
+                                                                    "clearable": true,
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "申请ID及密钥入口:<p><a href='https://ram.console.aliyun.com/manage/ak'>阿里云密钥</a></p><p><a href='https://console.dnspod.cn/account/token/apikey'>腾讯云密钥</a></p><p><a href='https://dash.cloudflare.com/profile/api-tokens'>Cloudflare密钥</a></p><p><a href='https://console.huaweicloud.com/iam/'>华为云密钥</a></p>"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "input-password",
+                                                                    "label": "服务商密钥",
+                                                                    "name": "serviceProviderSecret",
+                                                                    "id": "u:a169ab8ba0f7",
+                                                                    "required": true,
+                                                                    "validations": {
+                                                                        "maxLength": 50
+                                                                    },
+                                                                    "validationErrors": {
+                                                                        "maxLength": "服务商密钥最大不能超过50个字符"
+                                                                    },
+                                                                    "clearable": true,
+                                                                    "validateOnChange": false
+                                                                },
+                                                                {
+                                                                    "type": "divider",
+                                                                    "id": "u:afef25704845"
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "解析类型",
+                                                                    "name": "recordType",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "AAAA",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "A",
+                                                                            "value": 2
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:74140384fb3b",
+                                                                    "multiple": false,
+                                                                    "value": "",
+                                                                    "required": true,
+                                                                    "clearable": true,
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "解析类型,AAAA为ipv6地址,A为ipv4地址"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "更新频率",
+                                                                    "name": "updateFrequency",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "1分钟",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "2分钟",
+                                                                            "value": 2
+                                                                        },
+                                                                        {
+                                                                            "label": "5分钟",
+                                                                            "value": 5
+                                                                        },
+                                                                        {
+                                                                            "label": "10分钟",
+                                                                            "value": 10
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:17fe3f04de55",
+                                                                    "required": true,
+                                                                    "value": "",
+                                                                    "remark": {
+                                                                        "icon": "fa fa-question-circle",
+                                                                        "trigger": [
+                                                                            "hover"
+                                                                        ],
+                                                                        "className": "Remark--warning",
+                                                                        "placement": "top",
+                                                                        "title": "",
+                                                                        "content": "此更新频率只跟ddns4j的检查频率有关,和dns服务商的ttl时间无关"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "label": "获取IP方式",
+                                                                    "name": "getIpMode",
+                                                                    "options": [
+                                                                        {
+                                                                            "label": "网络接口",
+                                                                            "value": 1
+                                                                        },
+                                                                        {
+                                                                            "label": "本地网卡获取",
+                                                                            "value": 2
+                                                                        }
+                                                                    ],
+                                                                    "id": "u:29327416bd4e",
+                                                                    "searchable": false,
+                                                                    "onlyLeaf": true,
+                                                                    "multiple": false,
+                                                                    "borderMode": "full",
+                                                                    "size": "full",
+                                                                    "mode": "horizontal",
+                                                                    "clearable": true,
+                                                                    "required": true
+                                                                },
+                                                                {
+                                                                    "type": "select",
+                                                                    "labelClassName": "text-muted",
+                                                                    "name": "getIpModeValue",
+                                                                    "source": "/parsingRecord/getIpModeValue?getIpMode=${getIpMode}&recordType=${recordType}",
+                                                                    "initFetchOn": "data.getIpMode",
+                                                                    "visibleOn": "data.recordType",
+                                                                    "clearable": true,
+                                                                    "searchable": false,
+                                                                    "onlyLeaf": true,
+                                                                    "multiple": false,
+                                                                }
+                                                            ],
+                                                            "resetAfterSubmit": true,
+                                                            "actions": [
+                                                                {
+                                                                    "type": "button",
+                                                                    "actionType": "cancel",
+                                                                    "label": "取消",
+                                                                    "id": "u:b3c21361db28"
+                                                                },
+                                                                {
+                                                                    "type": "button",
+                                                                    "actionType": "submit",
+                                                                    "label": "提交",
+                                                                    "level": "primary",
+                                                                    "id": "u:8e827103b0ee"
+                                                                }
+                                                            ],
+                                                            "onEvent": {
+                                                                "submitSucc": {
+                                                                    "actions": [
+                                                                        {
+                                                                            "actionType": "search",
+                                                                            "groupType": "component",
+                                                                            "componentId": "u:0d1136773f00"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        },
+                                                        "title": "快速添加",
+                                                        "size": "md",
+                                                        "actions": [
+                                                            {
+                                                                "type": "button",
+                                                                "actionType": "cancel",
+                                                                "label": "取消",
+                                                                "id": "u:ea18f3850561"
+                                                            },
+                                                            {
+                                                                "type": "button",
+                                                                "actionType": "submit",
+                                                                "label": "提交",
+                                                                "level": "primary",
+                                                                "id": "u:7302f64ed3c5"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "id": "u:6587f14a35d2"
                                 }
                             ],
                             "id": "u:db9472ee6ebf"

@@ -209,7 +209,7 @@ public class GlobalExceptionHandler {
         errorMap.put(e.getMessage() + ":", e.getStackTrace());
 
         log.error(objectMapper.writeValueAsString(errorMap));
-        return AmisResult.fail(objectMapper.writeValueAsString(errorMap));
+        return AmisResult.fail(e.getMessage());
     }
 
 }

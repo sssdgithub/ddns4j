@@ -28,12 +28,12 @@ public interface IParsingRecordService extends IService<ParsingRecord> {
 
     void delete(Long id) throws Exception;
 
-//    PageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord);
-
     AmisPageUtils<ParsingRecord> queryPage(ParsingRecord parsingRecord);
 
     String getIp(ParsingRecord parsingRecord);
 
 
     List<NetWorkSelectResponse> getModeIpValue(Integer getIpMode,Integer recordType) throws SocketException;
+
+    void copy(ParsingRecord parsingRecord) throws Exception;
 }

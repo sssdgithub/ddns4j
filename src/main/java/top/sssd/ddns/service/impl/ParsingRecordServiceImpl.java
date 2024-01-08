@@ -1,5 +1,6 @@
 package top.sssd.ddns.service.impl;
 
+import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,9 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     @Resource
     private IJobTaskService jobTaskService;
 
+    @Resource
+    private DefaultIdentifierGenerator defaultIdentifierGenerator;
+
     @Override
     public void add(ParsingRecord parsingRecord) throws Exception {
         DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
@@ -69,10 +73,17 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
                 RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()))) {
             throw new BizException("该记录已在域名服务商中存在");
         }
-        dynamicDnsService.add(parsingRecord, ip);
         this.save(parsingRecord);
+        dynamicDnsService.add(parsingRecord, ip);
         //添加并启动一个定时任务
         addWithStartTask(parsingRecord);
+    }
+
+    @Override
+    public void copy(ParsingRecord parsingRecord) throws Exception {
+        long newId = defaultIdentifierGenerator.nextId(parsingRecord).longValue();
+        parsingRecord.setId(newId);
+        add(parsingRecord);
     }
 
     @Override
