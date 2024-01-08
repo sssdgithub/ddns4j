@@ -29,11 +29,11 @@
   - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
   - [华为云密钥入口](https://console.huaweicloud.com/iam/)
 3. 使用ddns4j
-   - window平台使用
+   ### window平台使用
       - [下载ddns4j_setup.exe安装包](https://gitee.com/Xsssd/ddns4j/releases)
       - 双击安装下一步启动
-   - linux平台使用
-      - [下载ddns4j-linux.tar.gz安装包](https://gitee.com/Xsssd/ddns4j/releases)
+   ### linux平台使用
+         - [下载ddns4j-linux.tar.gz安装包](https://gitee.com/Xsssd/ddns4j/releases)
     ```
     #解压安装包并授权执行
     tar -zxvf ddns4j-linux.tar.gz && cd ddns4j && chmod +x ddns4j.sh
@@ -45,7 +45,7 @@
     #卸载并关闭ddns4j
     ./ddns4j.sh uninstall
     ```
-   - docker方式
+   ### docker方式
     ```
     #国内镜像
     docker run -itd --name=ddns4j --restart=always --network=host  registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.3
