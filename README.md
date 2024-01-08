@@ -33,7 +33,7 @@
       - [下载ddns4j_setup.exe安装包](https://gitee.com/Xsssd/ddns4j/releases)
       - 双击安装下一步启动
    ### linux平台使用
-         - [下载ddns4j-linux.tar.gz安装包](https://gitee.com/Xsssd/ddns4j/releases)
+      - [下载ddns4j-linux.tar.gz安装包](https://gitee.com/Xsssd/ddns4j/releases)
     ```
     #解压安装包并授权执行
     tar -zxvf ddns4j-linux.tar.gz && cd ddns4j && chmod +x ddns4j.sh
