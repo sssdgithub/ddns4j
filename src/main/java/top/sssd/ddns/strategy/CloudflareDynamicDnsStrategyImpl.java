@@ -1,4 +1,4 @@
-package top.sssd.ddns.service.impl;
+package top.sssd.ddns.strategy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.model.entity.ParsingRecord;
-import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.utils.CloudflareUtils;
 
 /**
@@ -15,12 +14,12 @@ import top.sssd.ddns.utils.CloudflareUtils;
  */
 @Service
 @Slf4j
-public class CloudflareDynamicDnsServiceImpl implements DynamicDnsService {
+public class CloudflareDynamicDnsStrategyImpl implements DynamicDnsStrategy {
 
     @Override
     public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) {
         CloudflareUtils.CloudflareQueryResponse cloudflareResponse = CloudflareUtils.getSubDomainParseList(serviceProviderId, serviceProviderSecret, subDomain, recordType);
-        return cloudflareResponse.getResult().size() > 0;
+        return !cloudflareResponse.getResult().isEmpty();
     }
 
     @Override

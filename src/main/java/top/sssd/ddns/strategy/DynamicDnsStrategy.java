@@ -1,4 +1,4 @@
-package top.sssd.ddns.service;
+package top.sssd.ddns.strategy;
 
 import top.sssd.ddns.model.entity.ParsingRecord;
 
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
  * @author sssd
  * @created 2023-03-19-21:43
  */
-public interface DynamicDnsService {
+public interface DynamicDnsStrategy {
 
     /**
      * 通过域名及密钥判断是否存在

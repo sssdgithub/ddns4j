@@ -3,11 +3,11 @@ package top.sssd.ddns.task;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import top.sssd.ddns.factory.DynamicDnsServiceFactory;
+import top.sssd.ddns.strategy.DynamicDnsServiceFactory;
 import top.sssd.ddns.model.entity.ChangedLog;
 import top.sssd.ddns.model.entity.ParsingRecord;
 import top.sssd.ddns.service.ChangedLogService;
-import top.sssd.ddns.service.DynamicDnsService;
+import top.sssd.ddns.strategy.DynamicDnsStrategy;
 import top.sssd.ddns.service.IParsingRecordService;
 
 import javax.annotation.Resource;
@@ -27,13 +27,16 @@ public class DynamicDnsJob implements Job {
     @Resource
     private ChangedLogService changedLogService;
 
+    @Resource
+    private DynamicDnsServiceFactory dnsServiceFactory;
+
 
     @Override
     public void execute(JobExecutionContext context) {
         Object executeParams = context.getJobDetail().getJobDataMap().get("executeParams");
         ParsingRecord parsingRecord = (ParsingRecord) executeParams;
 
-        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
         String dnsIp   = null;
         try {
             dnsIp = dynamicDnsService.getIpBySubDomainWithType(parsingRecord);

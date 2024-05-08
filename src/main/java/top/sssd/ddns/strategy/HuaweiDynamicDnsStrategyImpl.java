@@ -1,4 +1,4 @@
-package top.sssd.ddns.service.impl;
+package top.sssd.ddns.strategy;
 
 import com.huaweicloud.sdk.dns.v2.DnsClient;
 import com.huaweicloud.sdk.dns.v2.model.ListRecordSetsResponse;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.model.entity.ParsingRecord;
-import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.utils.HuaweiDnsUtils;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class HuaweiDynamicDnsServiceImpl implements DynamicDnsService {
+public class HuaweiDynamicDnsStrategyImpl implements DynamicDnsStrategy {
     @Override
     public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) throws Exception {
         DnsClient client = HuaweiDnsUtils.createClient(serviceProviderId, serviceProviderSecret);
