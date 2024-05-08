@@ -1,4 +1,4 @@
-package top.sssd.ddns.service.impl;
+package top.sssd.ddns.strategy;
 
 import com.aliyun.alidns20150109.Client;
 import com.aliyun.alidns20150109.models.DescribeSubDomainRecordsResponse;
@@ -10,7 +10,6 @@ import org.springframework.util.StringUtils;
 import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.model.entity.ParsingRecord;
-import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.utils.AliDnsUtils;
 
 import static top.sssd.ddns.common.utils.DoMainUtil.findNthOccurrence;
@@ -22,7 +21,7 @@ import static top.sssd.ddns.common.utils.DoMainUtil.firstLevel;
  */
 @Service
 @Slf4j
-public class AliDynamicDnsServiceImpl implements DynamicDnsService {
+public class AliDynamicDnsStrategyImpl implements DynamicDnsStrategy {
     @Override
     public boolean exist(String serviceProviderId, String serviceProviderSecret, String subDomain, String recordType) throws Exception {
         Client client = AliDnsUtils.createClient(serviceProviderId, serviceProviderSecret);

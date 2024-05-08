@@ -12,15 +12,15 @@ import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.common.enums.ServiceProviderEnum;
 import top.sssd.ddns.common.enums.UpdateFrequencyEnum;
 import top.sssd.ddns.common.utils.AmisPageUtils;
-import top.sssd.ddns.factory.DynamicDnsServiceFactory;
 import top.sssd.ddns.mapper.ParsingRecordMapper;
 import top.sssd.ddns.model.entity.JobTask;
 import top.sssd.ddns.model.entity.ParsingRecord;
 import top.sssd.ddns.model.response.NetWorkSelectResponse;
-import top.sssd.ddns.service.DynamicDnsService;
+import top.sssd.ddns.strategy.DynamicDnsStrategy;
 import top.sssd.ddns.service.IJobTaskService;
 import top.sssd.ddns.service.IParsingRecordService;
 import top.sssd.ddns.service.NetWorkService;
+import top.sssd.ddns.strategy.DynamicDnsServiceFactory;
 import top.sssd.ddns.task.DynamicDnsJob;
 
 import javax.annotation.Resource;
@@ -51,9 +51,12 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
     @Resource
     private DefaultIdentifierGenerator defaultIdentifierGenerator;
 
+    @Resource
+    private DynamicDnsServiceFactory dnsServiceFactory;
+
     @Override
     public void add(ParsingRecord parsingRecord) throws Exception {
-        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         String ip = getIp(parsingRecord);
 
@@ -88,7 +91,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
 
     @Override
     public void modify(ParsingRecord parsingRecord) throws Exception {
-        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
         if (Objects.isNull(dbParsingRecord)) {
@@ -149,7 +152,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         if (Objects.isNull(parsingRecord)) {
             throw new BizException("该记录不存在");
         }
-        DynamicDnsService dynamicDnsService = DynamicDnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
+        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
 
         if (!dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),

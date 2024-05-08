@@ -1,11 +1,10 @@
-package top.sssd.ddns.service.impl;
+package top.sssd.ddns.strategy;
 
 
 import org.springframework.stereotype.Service;
 import top.sssd.ddns.common.BizException;
 import top.sssd.ddns.common.enums.RecordTypeEnum;
 import top.sssd.ddns.model.entity.ParsingRecord;
-import top.sssd.ddns.service.DynamicDnsService;
 import top.sssd.ddns.utils.TencentDnsUtils;
 
 import java.util.Objects;
@@ -17,7 +16,7 @@ import static top.sssd.ddns.common.utils.DoMainUtil.spiltDomain;
  * @created 2023-05-06-17:11
  */
 @Service
-public class TencentDynamicDnsServiceImpl implements DynamicDnsService {
+public class TencentDynamicDnsStrategyImpl implements DynamicDnsStrategy {
 
     @Override
     public boolean exist(String serviceProviderId, String serviceProviderSecret, String domain, String recordType) throws Exception {

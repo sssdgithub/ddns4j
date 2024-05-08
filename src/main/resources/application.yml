@@ -11,3 +11,12 @@ logging:
   file:
     path: ./
     name: ddns4j.log
+
+dns:
+  serviceTypes:
+    1: aliDynamicDnsStrategyImpl
+    2: tencentDynamicDnsStrategyImpl
+    3: cloudflareDynamicDnsStrategyImpl
+    4: huaweiDynamicDnsStrategyImpl
+
+
