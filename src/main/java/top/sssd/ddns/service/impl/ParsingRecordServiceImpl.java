@@ -114,7 +114,7 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
         String ip = getIp(parsingRecord);
         //是否修改了服务商相关信息
-        if(updatedServiceProvider(dbParsingRecord,parsingRecord)){
+        if(updatedServiceProvider(dbParsingRecord,parsingRecord)||!ip.equals(dnsIp)){
             dynamicDnsService.update(parsingRecord, ip, recordId);
         }
         this.updateById(parsingRecord);
