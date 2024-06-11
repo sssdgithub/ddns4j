@@ -2,7 +2,7 @@
 
 **这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
 
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.4</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.5</h1>
 <h4 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J -- 让动态域名解析变的更简单</h4>
 
 <p align="center">
@@ -48,12 +48,12 @@
    ### docker方式
     ```
     #国内镜像
-    docker run -itd --name=ddns4j --restart=always --network=host  registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.4
+    docker run -itd --name=ddns4j --restart=always --network=host  registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.5
     ```
    或者
     ```
     #docker hub 镜像
-    docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.4
+    docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.5
     ```
   - 浏览器输入 http://ip:10000 进入使用
 4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
