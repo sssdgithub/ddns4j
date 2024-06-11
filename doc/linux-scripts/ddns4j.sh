@@ -1,6 +1,6 @@
 #!/bin/bash
 
-JAR_VERSION="ddns-v1.6.4-RELEASE.jar"
+JAR_VERSION="ddns-v1.6.5-RELEASE.jar"
 
 if [ -f /etc/os-release ]; then
     source /etc/os-release
