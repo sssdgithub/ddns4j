@@ -33,13 +33,13 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis-plus.version}</version>
+                <version>3.5.1</version>
             </dependency>
             <!--mysql-->
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
+                <version>8.0.23</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>alidns20150109</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.8</version>
         </dependency>
         <dependency>
             <groupId>com.huaweicloud.sdk</groupId>
