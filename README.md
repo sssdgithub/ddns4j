@@ -1,9 +1,6 @@
-**旨在帮助用户动态更新域名解析记录**
+# DDNS4J v1.6.5
 
-**这个工具适用于需要搭建互联网服务但没有固定公网IP的人，可以替代部分花生壳等动态域名服务。**
-
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J v1.6.5</h1>
-<h4 align="center" style="margin: 30px 0 30px; font-weight: bold;">DDNS4J -- 让动态域名解析变的更简单</h4>
+**DDNS4J -- 让动态域名解析变的更简单**
 
 <p align="center">
 <a href='https://gitee.com/Xsssd/ddns4j/stargazers'><img src='https://gitee.com/Xsssd/ddns4j/badge/star.svg?theme=dark' alt='star'></img></a>
@@ -11,130 +8,124 @@
 <a href='https://img.shields.io/badge/license-apache-blue'><img src='https://img.shields.io/badge/license-apache-blue'></img></a>
 </p>
 
+---
 
-# DDNS4J 使用指南
-- 功能区介绍
-![ddns4j-pc端-功能区介绍](./doc/ddns4j-web端-功能区介绍.png "ddns4j-web端-功能区介绍.png")
-![ddns4j-移动端-功能区介绍](./doc/ddns4j-移动端-功能区介绍.png "ddns4j-移动端-功能区介绍.png")
-
-## 使用步骤
-1. 购买域名(选一项即可)
- - [阿里云域名](https://wanwang.aliyun.com/domain)
- - [腾讯云域名](https://dnspod.cloud.tencent.com/)
- - [cloudflare](https://www.cloudflare.com/zh-cn/products/registrar/)
- - [华为云域名](https://www.huaweicloud.com/product/domain.html)
-2. 申请密钥(选一项即可)
-  - [阿里云密钥入口](https://ram.console.aliyun.com/manage/ak)
-  - [腾讯云密钥入口](https://console.dnspod.cn/account/token/apikey)
-  - [cloudflare密钥入口](https://dash.cloudflare.com/profile/api-tokens)
-  - [华为云密钥入口](https://console.huaweicloud.com/iam/)
-3. 使用ddns4j
-   ### window平台使用
-      - [下载ddns4j_setup.exe安装包](https://gitee.com/Xsssd/ddns4j/releases)
-      - 双击安装下一步启动
-   ### linux平台使用
-      - [下载ddns4j-linux.tar.gz安装包](https://gitee.com/Xsssd/ddns4j/releases)
-    ```
-    #解压安装包并授权执行
-    tar -zxvf ddns4j-linux.tar.gz && cd ddns4j && chmod +x ddns4j.sh
-    ```
-    ```
-    #安装并启动ddns4j
-    ./ddns4j.sh install
-    
-    #卸载并关闭ddns4j
-    ./ddns4j.sh uninstall
-    ```
-   ### docker方式
-    ```
-    #国内镜像
-    docker run -itd --name=ddns4j --restart=always --network=host  registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.5
-    ```
-   或者
-    ```
-    #docker hub 镜像
-    docker run -itd --name=ddns4j --restart=always --network=host  topsssd/ddns4j:v1.6.5
-    ```
-  - 浏览器输入 http://ip:10000 进入使用
-4. 填入密钥及域名更新频率等信息,ddns4j会使用您所选择的多种方式自动识别你的ipv4或者ipv6公网地址,进行记录解析,从而达到接入互联网的目的
-   ![ddns4j详细参数说明](./doc/ddns4j-详细参数说明.png "ddns4j详细参数说明")
-5. 恭喜您!已成功接入互联网
-
-****
-
-DDNS4j基本介绍:
-
-目前已支持阿里云,腾讯云,Cloudflare,并默认开启Cloudflare代理.
+## 项目简介
 
 DDNS4J 是一个基于 SpringBoot 和 Amis 开发的完全免费开源 DDNS 服务，支持 IPv4 和 IPv6，能够帮助用户动态更新域名解析记录，从而方便地将个人服务器或家庭网络对外提供服务。
 
-## 项目演示地址
+### 核心功能
+- 支持阿里云、腾讯云、Cloudflare 和华为云等主流 DNS 服务商
+- 提供 IPv4 和 IPv6 双栈支持
+- 自动识别公网 IP 地址并更新解析记录
+- 提供可视化 Web 管理界面
+- 支持定时任务自动更新
+- 提供日志记录与管理功能
 
-https://demo.sssd.top
+---
 
-## 项目官方地址
+## 使用指南
 
-https://ddns4j.sssd.top
+### 支持平台
+- Windows
+- Linux
+- Docker
 
-演示地址中的数据均为演示数据,非真实数据,如要使用,请在发布版下载jar包或使用构建工具自己打包部署,部署步骤可参照下面部署章节
+### 安装步骤
 
-## 项目目录结构
-```
-├─doc mysql脚本,项目效果展示相关
-└─src 源码总目录
-    └─main  核心源码总目录
-        ├─java  
-        │  └─top
-        │      └─sssd
-        │          └─ddns
-        │              ├─common  通用项目代码
-        │              │  ├─constant 项目中使用的常量
-        │              │  ├─enums    项目中使用的枚举
-        │              │  ├─utils    项目使用的工具类
-        │              │  └─valid    项目使用的校验相关工具类
-        │              ├─config      项目配置相关类
-        │              ├─controller   处理前端路由的控制器处理器
-        │              ├─factory      项目中使用的工厂类
-        │              ├─handler      项目中使用的处理器,全局异常处理器,日志处理处理器,元数据处理器
-        │              ├─mapper       持久层数据访问接口
-        │              ├─model        项目中使用的实体类及业务相关类
-        │              │  ├─entity     实体类
-        │              │  ├─request    接收到请求的类
-        │              │  └─response   需要返回响应的类
-        │              ├─service       项目中使用到的服务类接口
-        │              │  └─impl       服务类接口实现
-        │              ├─task          定时任务类
-        │              └─utils         封装好的ddns相关厂商的工具类 
-        └─resources
-            ├─mapper            持久层接口与实体类的映射文件
-            └─static
-                ├─css           前端相关css文件
-                │  └─fonts      前端相关字体
-                └─js            前端相关js
-                └─index.html    前端操作页面
+#### Windows 平台
+1. 从 [Releases](https://gitee.com/Xsssd/ddns4j/releases) 下载 `ddns4j_setup.exe` 安装包
+2. 双击安装并按照提示完成安装
+
+#### Linux 平台
+1. 从 [Releases](https://gitee.com/Xsssd/ddns4j/releases) 下载 `ddns4j-linux.tar.gz`
+2. 解压并授权执行：
+   ```bash
+   tar -zxvf ddns4j-linux.tar.gz && cd ddns4j && chmod +x ddns4j.sh
+   ```
+3. 安装并启动：
+   ```bash
+   ./ddns4j.sh install
+   ```
+4. 卸载：
+   ```bash
+   ./ddns4j.sh uninstall
+   ```
+
+#### Docker 部署
+**方式一：使用阿里云镜像**
+```bash
+docker run -itd --name=ddns4j --restart=always --network=host registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.5
 ```
 
-## DDNS 的发展
-DDNS 即动态 DNS，是一种可以自动更新域名解析记录的 DNS 服务。传统 DNS 服务需要手动维护域名解析记录，这对于动态 IP 地址来说非常不方便。因此，DDNS 应运而生，能够实现自动更新域名解析记录，让用户更加方便地访问网络资源。DDNS（Dynamic Domain Name System，动态域名系统）是一种通过将域名与动态 IP 地址进行绑定，使得能够通过一个不变的域名来访问处于动态 IP 环境下的主机的技术。在 IPv4 时代，DDNS 技术已经成为了广泛应用的网络技术，它为个人用户提供了一种简单易用的方式来管理自己的网络设备。而在 IPv6 时代，由于 IPv6 地址的数量庞大，DDNS 将变得更加重要，因为动态 IPv6 地址变化的频率更高，使用 DDNS 可以方便地将域名与新的 IP 地址进行绑定。
+**方式二：使用 Docker Hub 镜像**
+```bash
+docker run -itd --name=ddns4j --restart=always --network=host topsssd/ddns4j:v1.6.5
+```
 
-随着 IPv6 的逐渐普及，越来越多的用户拥有了多个 IPv6 地址。而 DDNS4J 就是一款支持 IPv6 的 DDNS 客户端，为用户提供更加便捷的 DDNS 服务。
+访问 `http://ip:10000` 进入管理界面
 
-## DDNS4J 的作用及好处
-使用 DDNS4J，用户可以方便地将个人服务器或家庭网络对外提供服务。比如，用户可以使用 DDNS4J 将自己家里的摄像头、文件共享服务等对外提供服务，而不必担心 IP 地址变化导致服务无法访问。DDNS 技术使得拥有动态 IP 地址的用户可以轻松地维护自己的网络设备。它可以方便地让你的路由器和网络摄像头等设备保持与互联网的连接。同时，使用 DDNS 还可以帮助你避免一些网络攻击，例如 DNS 劫持和 DDoS 攻击。此外，如果你拥有多个域名，使用 DDNS 可以帮助你将多个域名映射到同一个 IP 地址上，方便管理和维护。
+---
 
-此外，DDNS4J 还支持多种 DDNS 服务商，用户可以根据自己的需要选择不同的服务商。同时，DDNS4J 还提供了可视化的界面，用户可以方便地管理自己的域名解析记录。
+## 功能说明
+
+- **域名管理**：支持添加、修改、复制、删除域名解析记录
+- **IP 自动识别**：支持通过网卡或网络接口自动获取公网 IP
+- **定时更新**：可设置更新频率（每分钟、每小时、每天）
+- **日志查看**：记录所有解析更新操作日志
+- **多服务支持**：支持阿里云、腾讯云、Cloudflare、华为云等平台
+- **代理支持**：Cloudflare 默认开启代理模式
+
+---
 
 ## 技术栈
-DDNS4J 使用了以下技术栈：
 
-### 后端：SpringBoot、MyBatisPlus、Quartz
-### 前端：amis
-### 数据库 支持mysql、h2
+### 后端
+- SpringBoot
+- MyBatisPlus
+- Quartz 定时任务
+- RestTemplate 网络请求
+- MySQL / H2 数据库
 
-## 交流群
-![群二维码](./doc/ddns4j交流群(一)群二维码.png "QQ群二维码")
+### 前端
+- Amis 可视化框架
+- HTML / CSS / JavaScript
 
-## 推荐阅读
-如果想要深入了解 DDNS 和 DDNS4J，可以访问我的博客 https://blog.sssd.top
+---
 
-该博客站点就是使用ddn4j搭建而成,响应较慢请大家海涵!了解更多有关网络和开发的知识。
+## 项目结构
+
+```
+├── doc/                # 文档与图片资源
+├── src/                # 源码目录
+│   ├── main/
+│   │   ├── java/       # Java 源代码
+│   │   └── resources/  # 配置文件与静态资源
+│   └── test/           # 测试代码
+└── pom.xml             # Maven 项目配置
+```
+
+---
+
+## 开源许可
+
+本项目使用 Apache-2.0 协议，详情请查看 [LICENSE](LICENSE) 文件。
+
+---
+
+## 联系方式
+
+加入交流群获取更多帮助：
+![QQ群二维码](doc/ddns4j交流群(一)群二维码.png)
+
+---
+
+## 更多信息
+
+- 项目演示地址：[https://demo.sssd.top](https://demo.sssd.top)
+- 项目官方地址：[https://ddns4j.sssd.top](https://ddns4j.sssd.top)
+- 作者博客：[https://blog.sssd.top](https://blog.sssd.top)
+
+---
+
+> DDNS4J 是一个免费开源项目，欢迎参与贡献！
