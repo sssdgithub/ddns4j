@@ -1,0 +1,1128 @@
+# DDNS4J 项目技术文档
+
+## 1. 项目概述
+
+### 1.1 项目简介
+
+DDNS4J（Dynamic Domain Name System for Java）是一个基于 Spring Boot 和 Amis 开发的完全免费开源的动态域名解析（DDNS）服务。该项目旨在帮助用户动态更新域名解析记录，使得个人服务器或家庭网络能够方便地对外提供服务，即使公网 IP 地址发生变化也能保持域名的可访问性。
+
+**版本**: v1.6.5-RELEASE  
+**许可证**: Apache-2.0  
+**官方网站**: https://ddns4j.sssd.top
+
+### 1.2 核心功能
+
+- **多服务商支持**: 支持阿里云、腾讯云、Cloudflare、华为云等主流 DNS 服务商
+- **双栈协议支持**: 同时支持 IPv4（A 记录）和 IPv6（AAAA 记录）
+- **智能 IP 获取**: 自动识别公网 IP 地址，支持从网卡或公共接口获取
+- **可视化 Web 管理界面**: 基于 Amis 低代码框架构建的管理后台
+- **定时任务调度**: 支持自定义更新频率（每分钟、每小时、每天）
+- **日志管理**: 完整的操作日志记录与查询功能
+- **数据持久化**: 支持 H2（嵌入式）和 MySQL 两种数据库
+
+### 1.3 支持的服务商
+
+| 服务商 | 枚举值 | Bean 名称 |
+|--------|--------|-----------|
+| 阿里云 | 1 | aliDynamicDnsStrategyImpl |
+| 腾讯云 | 2 | tencentDynamicDnsStrategyImpl |
+| Cloudflare | 3 | cloudflareDynamicDnsStrategyImpl |
+| 华为云 | 4 | huaweiDynamicDnsStrategyImpl |
+
+---
+
+## 2. 技术栈详解
+
+### 2.1 后端技术栈
+
+#### 核心框架
+
+- **Spring Boot 2.7.16**
+  - 作为项目的核心框架，提供依赖注入、自动配置、RESTful API 支持等功能
+  - 简化了 Spring 应用的初始搭建和开发过程
+
+- **MyBatis-Plus 3.5.1**
+  - 增强的 MyBatis 框架，提供 CRUD 操作的简化实现
+  - 支持 Lambda 表达式查询、分页插件、自动填充等功能
+  - 用于数据持久层，操作 ParsingRecord、ChangedLog、JobTask 等实体
+
+- **Quartz**
+  - 强大的任务调度框架
+  - 用于实现动态域名解析的定时更新任务
+  - 每个解析记录对应一个独立的定时任务，支持动态启停
+
+#### 数据库
+
+- **H2 Database**
+  - 嵌入式内存数据库，适用于单机部署场景
+  - 无需额外安装数据库服务，开箱即用
+  - 通过 `application-h2.yml` 配置
+
+- **MySQL 8.0.23**
+  - 关系型数据库，适用于生产环境
+  - 支持数据持久化和多实例部署
+  - 通过 `application-mysql.yml` 配置
+
+#### 网络通信
+
+- **RestTemplate**
+  - Spring 提供的 HTTP 客户端工具
+  - 用于调用各云厂商的 DNS API 接口
+  - 支持 GET/POST 请求，处理 JSON 响应
+
+- **阿里云 SDK (alidns20150109 v3.0.1)**
+  - 官方提供的 Java SDK
+  - 封装了阿里云 DNS 的所有 API 调用
+
+- **华为云 SDK (huaweicloud-sdk-dns v3.1.65)**
+  - 官方提供的 Java SDK
+  - 封装了华为云 DNS 的所有 API 调用
+
+#### 其他工具
+
+- **Lombok**
+  - 简化 Java 代码的工具库
+  - 自动生成 getter/setter、构造函数、日志对象等
+
+- **Jackson**
+  - JSON 序列化/反序列化工具
+  - 处理 REST API 的请求和响应数据
+
+- **Hibernate Validator**
+  - JSR-303 规范实现
+  - 提供参数校验功能（@NotNull, @NotBlank 等）
+
+### 2.2 前端技术栈
+
+#### Amis 低代码框架
+
+- **Amis** 是百度开源的前端低代码框架，通过 JSON 配置即可生成各种页面
+- 项目前端页面完全由 `src/main/resources/static/index.html` 中的 JSON 配置驱动
+- 无需编写复杂的 HTML/CSS/JavaScript 代码
+- 支持表单、表格、图表等多种组件
+
+**特点**:
+- 声明式 UI：通过 JSON 描述页面结构
+- 组件丰富：内置 100+ 常用组件
+- 易于维护：配置即代码，修改简单
+
+### 2.3 构建与部署
+
+#### 构建工具
+
+- **Maven**
+  - 项目管理和构建工具
+  - 管理依赖、编译、打包、测试等流程
+  - 通过 `pom.xml` 配置项目依赖和构建参数
+
+**关键配置**:
+```xml
+<properties>
+    <java.version>1.8</java.version>
+    <spring-boot.version>2.7.16</spring-boot.version>
+    <mybatis-plus.version>3.5.1</mybatis-plus.version>
+    <mysql.version>8.0.23</mysql.version>
+</properties>
+```
+
+#### 部署方式
+
+1. **Docker 容器化部署**
+   - 基于 OpenJDK 11 镜像
+   - 通过 Dockerfile 构建镜像
+   - 支持阿里云镜像仓库和 Docker Hub
+
+2. **Linux systemd 服务**
+   - 通过 shell 脚本自动安装和配置
+   - 支持 CentOS、Ubuntu、OpenCloudOS 等系统
+   - 开机自启、自动重启
+
+3. **Windows 安装包**
+   - 提供 exe 安装程序
+   - 图形化安装向导
+
+---
+
+## 3. 项目结构说明
+
+### 3.1 目录结构概览
+
+```
+ddns4j/
+├── src/main/java/top/sssd/ddns/
+│   ├── common/              # 通用模块
+│   │   ├── constant/        # 常量定义
+│   │   ├── enums/           # 枚举类
+│   │   ├── utils/           # 工具类
+│   │   └── valid/           # 校验分组
+│   ├── config/              # 配置类
+│   ├── controller/          # 控制器层
+│   ├── handler/             # 处理器（异常处理、SQL注入器等）
+│   ├── interceptor/         # 拦截器
+│   ├── mapper/              # MyBatis Mapper 接口
+│   ├── model/               # 数据模型
+│   │   ├── entity/          # 实体类
+│   │   └── response/        # 响应对象
+│   ├── service/             # 服务层
+│   │   └── impl/            # 服务实现类
+│   ├── strategy/            # 策略模式实现
+│   ├── task/                # 定时任务
+│   └── utils/               # 工具类（DNS API 调用）
+├── src/main/resources/
+│   ├── mapper/              # MyBatis XML 映射文件
+│   ├── sql/                 # 数据库初始化脚本
+│   ├── static/              # 静态资源（前端页面）
+│   └── application*.yml     # 配置文件
+└── doc/                     # 文档和脚本
+```
+
+### 3.2 核心包详解
+
+#### strategy 包：策略模式与工厂模式
+
+**设计模式应用**:
+
+1. **策略模式 (Strategy Pattern)**
+   
+   `DynamicDnsStrategy` 接口定义了统一的 DNS 操作规范：
+   
+   ```java
+   public interface DynamicDnsStrategy {
+       boolean exist(String serviceProviderId, String serviceProviderSecret, 
+                    String subDomain, String recordType) throws Exception;
+       void add(ParsingRecord parsingRecord, String ip) throws Exception;
+       void update(ParsingRecord parsingRecord, String ip, String recordId) throws Exception;
+       String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception;
+       void remove(ParsingRecord parsingRecord, String ip) throws Exception;
+       String getIpBySubDomainWithType(ParsingRecord parsingRecord) throws Exception;
+   }
+   ```
+
+   **具体实现类**:
+   - `AliDynamicDnsStrategyImpl`: 阿里云 DNS 策略
+   - `TencentDynamicDnsStrategyImpl`: 腾讯云 DNS 策略
+   - `CloudflareDynamicDnsStrategyImpl`: Cloudflare DNS 策略
+   - `HuaweiDynamicDnsStrategyImpl`: 华为云 DNS 策略
+
+   每个实现类封装了对应云厂商的 API 调用逻辑，对外提供统一的操作接口。
+
+2. **工厂模式 (Factory Pattern)**
+
+   `DynamicDnsServiceFactory` 负责根据服务商类型创建对应的策略实例：
+
+   ```java
+   @Component
+   public class DynamicDnsServiceFactory implements ApplicationContextAware {
+       private static Map<Integer, DynamicDnsStrategy> dnsStrategyMap = new ConcurrentHashMap<>();
+
+       @Resource
+       private DnsServiceTypeConfig dnsServiceTypeConfig;
+
+       public DynamicDnsStrategy getServiceInstance(Integer serviceProvider) {
+           return dnsStrategyMap.get(serviceProvider);
+       }
+
+       @Override
+       public void setApplicationContext(ApplicationContext applicationContext) {
+           dnsServiceTypeConfig.getServiceTypes().forEach((k, v) -> 
+               dnsStrategyMap.put(k, (DynamicDnsStrategy) applicationContext.getBean(v))
+           );
+       }
+   }
+   ```
+
+   **工作流程**:
+   1. 应用启动时，通过 `setApplicationContext` 方法从 Spring 容器中获取所有策略 Bean
+   2. 根据 `application.yml` 中的配置映射关系，将服务商 ID 与策略实例存入 Map
+   3. 业务代码通过 `getServiceInstance(serviceProvider)` 获取对应的策略实例
+
+   **优势**:
+   - **解耦**: 业务代码无需关心具体使用哪个服务商
+   - **扩展性**: 新增服务商只需添加新的策略实现类并配置映射关系
+   - **统一管理**: 所有策略实例由工厂集中管理
+
+#### task 包：定时任务实现
+
+**DynamicDnsJob** 是 Quartz 定时任务的核心实现：
+
+```java
+@Slf4j
+public class DynamicDnsJob implements Job {
+    @Resource
+    private IParsingRecordService parsingRecordService;
+    
+    @Resource
+    private ChangedLogService changedLogService;
+    
+    @Resource
+    private DynamicDnsServiceFactory dnsServiceFactory;
+
+    @Override
+    public void execute(JobExecutionContext context) {
+        // 1. 获取任务参数（解析记录对象）
+        Object executeParams = context.getJobDetail().getJobDataMap().get("executeParams");
+        ParsingRecord parsingRecord = (ParsingRecord) executeParams;
+
+        // 2. 获取对应的 DNS 策略实例
+        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(
+            parsingRecord.getServiceProvider()
+        );
+
+        // 3. 查询云端当前解析的 IP
+        String dnsIp = dynamicDnsService.getIpBySubDomainWithType(parsingRecord);
+
+        // 4. 获取本地当前 IP
+        String nowIp = parsingRecordService.getIp(parsingRecord);
+
+        // 5. 比较 IP 是否变化
+        if (nowIp.equals(dnsIp)) {
+            log.info("IP 未发生改变");
+            insertLog("域名为:" + parsingRecord.getDomain() + "的记录,未发生改变");
+            return;
+        }
+
+        // 6. IP 发生变化，执行更新
+        parsingRecordService.modify(parsingRecord);
+        log.info("IP 更新成功: {} -> {}", dnsIp, nowIp);
+        insertLog("域名为:" + parsingRecord.getDomain() + "的记录,更新成功");
+    }
+}
+```
+
+**任务调度机制**:
+
+1. **任务创建**: 当添加或修改解析记录时，`ParsingRecordServiceImpl.addWithStartTask()` 会创建对应的定时任务
+2. **Cron 表达式**: 根据用户设置的更新频率（每分钟/每小时/每天）生成对应的 Cron 表达式
+3. **任务参数**: 将 `ParsingRecord` 对象作为参数传递给任务
+4. **任务执行**: Quartz 按照设定的时间间隔触发任务，检查 IP 变化并更新
+
+**UpdateFrequencyEnum** 定义了支持的更新频率：
+
+```java
+public enum UpdateFrequencyEnum {
+    EVERY_MINUTE(1, "每分钟", "0 * * * * ?"),
+    EVERY_HOUR(2, "每小时", "0 0 * * * ?"),
+    EVERY_DAY(3, "每天", "0 0 0 * * ?");
+}
+```
+
+#### config 包：配置管理
+
+**多数据源配置**:
+
+1. **H2Initializer**: H2 数据库初始化配置
+   - 自动执行 `ddns4j_h2.sql` 脚本
+   - 创建表结构和初始数据
+
+2. **MySQLInitializer**: MySQL 数据库初始化配置
+   - 自动执行 `ddns4j_mysql.sql` 脚本
+   - 支持数据库迁移
+
+3. **DnsServiceTypeConfig**: DNS 服务商类型配置
+   ```java
+   @Configuration
+   @ConfigurationProperties(prefix = "dns")
+   public class DnsServiceTypeConfig {
+       private Map<Integer, String> serviceTypes;
+   }
+   ```
+   从 `application.yml` 读取服务商 ID 与 Bean 名称的映射关系
+
+4. **MybatisPlusConfig**: MyBatis-Plus 配置
+   - 分页插件
+   - 乐观锁插件
+   - SQL 注入器
+
+5. **WebConfig**: Web 配置
+   - 拦截器注册
+   - 静态资源映射
+
+6. **RestTemplateConfig**: RestTemplate 配置
+   - 配置连接超时、读取超时
+   - 消息转换器
+
+#### controller 包：REST API 接口
+
+- **ParsingRecordController**: 解析记录的 CRUD 操作
+- **ChangedLogController**: 变更日志查询
+- **PublicAccessController**: 公共接口（如获取可用网卡列表）
+
+#### service 包：业务逻辑层
+
+- **IParsingRecordService**: 解析记录服务接口
+- **IJobTaskService**: 定时任务管理服务接口
+- **ChangedLogService**: 变更日志服务接口
+- **NetWorkService**: 网络信息服务接口
+
+#### utils 包：DNS API 工具类
+
+- **AliDnsUtils**: 阿里云 DNS API 封装
+- **TencentDnsUtils**: 腾讯云 DNS API 封装（包含 TC3 签名算法）
+- **CloudflareUtils**: Cloudflare DNS API 封装
+- **HuaweiDnsUtils**: 华为云 DNS API 封装
+- **TencentCloudAPITC3Singer**: 腾讯云 API v3 签名算法实现
+
+---
+
+## 4. 核心功能流程
+
+### 4.1 IP 获取机制
+
+系统支持两种 IP 获取模式：**网络接口模式** 和 **网卡模式**。
+
+#### 4.1.1 获取模式枚举
+
+```java
+// 常量定义
+public static final Integer IP_MODE_INTERFACE = 1;  // 网络接口模式
+public static final Integer IP_MODE_NETWORK = 2;    // 网卡模式
+```
+
+#### 4.1.2 网络接口模式 (Interface Mode)
+
+通过调用外部公共接口获取公网 IP：
+
+**IPv4 接口**:
+- `https://ipv4.icanhazip.com`
+- `https://api.ipify.org`
+- `https://ip.sb`
+
+**IPv6 接口**:
+- `https://ipv6.icanhazip.com`
+- `https://api6.ipify.org`
+
+**实现逻辑** (`ParsingRecordServiceImpl.handleIpv4/handleIpv6`):
+
+```java
+private String handleIpv4(Integer getIpMode, String getIpModeValue, ParsingRecord parsingRecord) {
+    if (IP_MODE_INTERFACE.equals(getIpMode)) {
+        // 通过 RestTemplate 调用外部接口获取 IP
+        String ipv4 = restTemplate.getForObject(getIpModeValue, String.class);
+        if (!StringUtils.hasText(ipv4)) {
+            throw new BizException("通过网络接口获取ipv4地址失败");
+        }
+        parsingRecord.setIp(ipv4);
+        return ipv4.trim();
+    } else if (IP_MODE_NETWORK.equals(getIpMode)) {
+        // 直接使用配置的网卡 IP
+        parsingRecord.setIp(getIpModeValue);
+        return getIpModeValue;
+    }
+}
+```
+
+#### 4.1.3 网卡模式 (Network Mode)
+
+直接从本地网卡获取 IP 地址：
+
+**NetWorkServiceImpl.networks()** 实现：
+
+```java
+@Override
+public List<NetWorkSelectResponse> networks(Integer recordType) throws SocketException {
+    LinkedList<NetWorkSelectResponse> networkList = new LinkedList<>();
+    
+    // 遍历所有网络接口
+    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+    while (interfaces.hasMoreElements()) {
+        NetworkInterface iface = interfaces.nextElement();
+        Enumeration<InetAddress> addresses = iface.getInetAddresses();
+        
+        while (addresses.hasMoreElements()) {
+            InetAddress addr = addresses.nextElement();
+            
+            // 根据记录类型筛选 IPv4 或 IPv6
+            if (recordType.equals(RECORD_TYPE_A) && addr instanceof Inet4Address) {
+                NetWorkSelectResponse response = new NetWorkSelectResponse();
+                response.setLabel(iface.getName() + "-" + addr.getHostAddress());
+                response.setValue(addr.getHostAddress());
+                networkList.add(response);
+            } else if (recordType.equals(RECORD_TYPE_AAAA) && addr instanceof Inet6Address) {
+                String hostAddress = addr.getHostAddress();
+                // 过滤掉含 % 的链路本地地址
+                if (hostAddress.contains("%")) {
+                    continue;
+                }
+                NetWorkSelectResponse response = new NetWorkSelectResponse();
+                response.setLabel(iface.getName() + "-" + addr.getHostAddress());
+                response.setValue(hostAddress);
+                networkList.add(response);
+            }
+        }
+    }
+    return networkList;
+}
+```
+
+**关键点**:
+- 使用 Java 标准库 `NetworkInterface` 枚举所有网卡
+- 根据 `recordType` 区分 IPv4 (`Inet4Address`) 和 IPv6 (`Inet6Address`)
+- 过滤掉 IPv6 链路本地地址（含 `%` 的地址）
+- 返回网卡名称和 IP 地址的组合，便于用户识别
+
+#### 4.1.4 IP 获取流程总结
+
+```
+用户选择获取模式
+    ↓
+┌─────────────────┬──────────────────┐
+│  网络接口模式    │    网卡模式       │
+│  (Interface)    │   (Network)      │
+└────────┬────────┴────────┬─────────┘
+         │                 │
+    调用外部API       遍历本地网卡
+         │                 │
+    RestTemplate     NetworkInterface
+         │                 │
+    返回公网IP       返回网卡IP列表
+         │                 │
+         └────────┬────────┘
+                  ↓
+          设置到 ParsingRecord
+```
+
+### 4.2 DNS 更新流程
+
+DNS 更新是整个系统的核心业务流程，涉及多个组件的协同工作。
+
+#### 4.2.1 完整更新链路
+
+```
+1. 定时任务触发 (DynamicDnsJob)
+         ↓
+2. 获取当前云端 IP (strategy.getIpBySubDomainWithType)
+         ↓
+3. 获取本地当前 IP (parsingRecordService.getIp)
+         ↓
+4. 比较 IP 是否变化
+         ↓
+    ┌────┴────┐
+    │  未变化  │ → 记录日志，结束
+    └─────────┘
+         ↓
+    IP 已变化
+         ↓
+5. 执行更新 (parsingRecordService.modify)
+         ↓
+6. 获取策略实例 (dnsServiceFactory.getServiceInstance)
+         ↓
+7. 调用云厂商 API 更新 (strategy.update)
+         ↓
+8. 更新数据库记录
+         ↓
+9. 重启定时任务
+         ↓
+10. 记录变更日志
+```
+
+#### 4.2.2 详细步骤解析
+
+**步骤 1: 定时任务触发**
+
+Quartz 根据 Cron 表达式触发 `DynamicDnsJob.execute()` 方法。
+
+**步骤 2: 获取云端 IP**
+
+以腾讯云为例 (`TencentDynamicDnsStrategyImpl`):
+
+```java
+@Override
+public String getIpBySubDomainWithType(ParsingRecord parsingRecord) throws Exception {
+    return TencentDnsUtils.getIpBySubDomainWithType(
+        parsingRecord.getDomain(),
+        parsingRecord.getSubDomain(),
+        RecordTypeEnum.getNameByIndex(parsingRecord.getRecordType()),
+        parsingRecord.getServiceProviderId(),
+        parsingRecord.getServiceProviderSecret()
+    );
+}
+```
+
+底层调用 `TencentDnsUtils.getIpBySubDomainWithType()`:
+
+```java
+public static String getIpBySubDomainWithType(String domain, String subDomain, 
+                                              String recordType, String secretId, 
+                                              String secretKey) throws Exception {
+    // 1. 调用 DescribeRecordList API 获取解析记录列表
+    ListRecordResponse response = getRecordList(domain, subDomain, recordType, 
+                                                secretId, secretKey);
+    
+    // 2. 解析响应，提取第一条记录的 IP 值
+    List<RecordListItem> recordList = response.getResponse().getRecordList();
+    return recordList.get(0).getValue();
+}
+```
+
+**腾讯云 API 调用细节**:
+
+```java
+public static ListRecordResponse getRecordList(String domain, String subDomain, 
+                                               String recordType, String secretId, 
+                                               String secretKey) throws Exception {
+    // 1. 构建请求对象
+    ListRecordRequest request = new ListRecordRequest()
+        .setDomain(domain)
+        .setSubDomain(subDomain)
+        .setRecordType(recordType);
+    
+    // 2. 序列化为 JSON
+    String jsonBody = getObjectMapper().writeValueAsString(request);
+    
+    // 3. 生成 TC3 签名 Header
+    TreeMap<String, String> headerMap = TencentCloudAPITC3Singer
+        .buildSignRequestHeaderWithBody(secretId, secretKey, 
+                                       DESCRIBE_RECORD_LIST_ACTION, jsonBody);
+    
+    // 4. 构建 HTTP 请求
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAll(headerMap);
+    UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(PROTOCOL + HOST);
+    RequestEntity<String> requestEntity = new RequestEntity<>(jsonBody, headers, 
+                                                              HttpMethod.POST, 
+                                                              builder.build().toUri());
+    
+    // 5. 发送请求并接收响应
+    ResponseEntity<ListRecordResponse> response = getRestTemplate()
+        .exchange(requestEntity, ListRecordResponse.class);
+    
+    return response.getBody();
+}
+```
+
+**步骤 3: 获取本地 IP**
+
+```java
+String nowIp = parsingRecordService.getIp(parsingRecord);
+```
+
+根据配置的获取模式（接口/网卡）获取当前 IP。
+
+**步骤 4: 比较 IP**
+
+```java
+if (nowIp.equals(dnsIp)) {
+    log.info("IP 未发生改变");
+    insertLog("域名为:" + parsingRecord.getDomain() + "的记录,未发生改变");
+    return;
+}
+```
+
+**步骤 5-7: 执行更新**
+
+```java
+parsingRecordService.modify(parsingRecord);
+```
+
+内部实现：
+
+```java
+@Override
+public void modify(ParsingRecord parsingRecord) throws Exception {
+    // 1. 获取策略实例
+    DynamicDnsStrategy dynamicDnsService = dnsServiceFactory
+        .getServiceInstance(parsingRecord.getServiceProvider());
+    
+    // 2. 查询数据库中的旧记录
+    ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
+    
+    // 3. 获取云端记录 ID
+    String dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
+    String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
+    
+    // 4. 获取本地新 IP
+    String ip = getIp(parsingRecord);
+    
+    // 5. 判断是否需要更新（服务商信息变化或 IP 变化）
+    if (updatedServiceProvider(dbParsingRecord, parsingRecord) || !ip.equals(dnsIp)) {
+        dynamicDnsService.update(parsingRecord, ip, recordId);
+    }
+    
+    // 6. 更新数据库
+    this.updateById(parsingRecord);
+    
+    // 7. 删除旧定时任务
+    JobTask oldTask = jobTaskService.lambdaQuery()
+        .eq(JobTask::getName, dbParsingRecord.getId().toString())
+        .one();
+    if (Objects.nonNull(oldTask)) {
+        jobTaskService.deleteJobTask(oldTask.getId());
+    }
+    
+    // 8. 创建新定时任务
+    addWithStartTask(parsingRecord);
+}
+```
+
+**腾讯云更新 API 调用** (`TencentDnsUtils.updateRecord`):
+
+```java
+public static UpdateRecordResponse updateRecord(String domain, String subDomain, 
+                                                String recordType, String secretId, 
+                                                String secretKey, String ip, 
+                                                Integer recordId) throws Exception {
+    // 1. 构建更新请求
+    UpdateRecordRequest request = new UpdateRecordRequest()
+        .setDomain(domain)
+        .setValue(ip)
+        .setSubDomain(subDomain)
+        .setRecordType(recordType)
+        .setRecordId(recordId);
+    
+    // 2. 序列化
+    String jsonBody = getObjectMapper().writeValueAsString(request);
+    
+    // 3. 生成签名（ModifyRecord 动作）
+    TreeMap<String, String> headerMap = TencentCloudAPITC3Singer
+        .buildSignRequestHeaderWithBody(secretId, secretKey, 
+                                       MODIFY_RECORD_ACTION, jsonBody);
+    
+    // 4. 发送 POST 请求
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAll(headerMap);
+    RequestEntity<String> requestEntity = new RequestEntity<>(jsonBody, headers, 
+                                                              HttpMethod.POST, 
+                                                              UriComponentsBuilder
+                                                                  .fromUriString(PROTOCOL + HOST)
+                                                                  .build().toUri());
+    
+    ResponseEntity<UpdateRecordResponse> response = getRestTemplate()
+        .exchange(requestEntity, UpdateRecordResponse.class);
+    
+    return response.getBody();
+}
+```
+
+**步骤 8-10: 后续处理**
+
+- 更新数据库中的解析记录
+- 删除旧的定时任务并创建新的定时任务（确保使用最新的配置）
+- 插入变更日志到 `changed_log` 表
+
+#### 4.2.3 各云厂商 API 对比
+
+| 操作 | 阿里云 | 腾讯云 | Cloudflare | 华为云 |
+|------|--------|--------|------------|--------|
+| 查询记录 | DescribeSubDomainRecords | DescribeRecordList | GET /zones/{zone_id}/dns_records | ListRecordSets |
+| 添加记录 | AddDomainRecord | CreateRecord | POST /zones/{zone_id}/dns_records | CreateRecordSet |
+| 更新记录 | UpdateDomainRecord | ModifyRecord | PATCH /zones/{zone_id}/dns_records/{record_id} | UpdateRecordSet |
+| 删除记录 | DeleteDomainRecord | DeleteRecord | DELETE /zones/{zone_id}/dns_records/{record_id} | DeleteRecordSet |
+| SDK | alidns20150109 | 自定义 HTTP + TC3 签名 | 自定义 HTTP | huaweicloud-sdk-dns |
+
+---
+
+## 5. 配置与部署
+
+### 5.1 配置文件详解
+
+#### application.yml（主配置）
+
+```yaml
+server:
+  port: 10000  # 服务端口
+
+spring:
+  profiles:
+    active: h2  # 激活的配置文件：h2 或 mysql
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+logging:
+  file:
+    path: ./
+    name: ddns4j.log
+
+dns:
+  serviceTypes:
+    1: aliDynamicDnsStrategyImpl        # 阿里云
+    2: tencentDynamicDnsStrategyImpl    # 腾讯云
+    3: cloudflareDynamicDnsStrategyImpl # Cloudflare
+    4: huaweiDynamicDnsStrategyImpl     # 华为云
+```
+
+#### application-h2.yml（H2 数据库配置）
+
+```yaml
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:./data/ddns4j  # 文件路径
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true  # 启用 H2 控制台
+      path: /h2-console
+```
+
+#### application-mysql.yml（MySQL 数据库配置）
+
+```yaml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ddns4j?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: your_password
+```
+
+### 5.2 关键配置项说明
+
+| 配置项 | 说明 | 默认值 |
+|--------|------|--------|
+| server.port | 服务监听端口 | 10000 |
+| spring.profiles.active | 激活的配置文件 | h2 |
+| logging.file.name | 日志文件名 | ddns4j.log |
+| dns.serviceTypes | 服务商 ID 与 Bean 名称映射 | 见上文 |
+
+### 5.3 部署方式
+
+#### 5.3.1 Docker 部署
+
+**Dockerfile**:
+
+```dockerfile
+FROM openjdk:11-jdk-slim
+
+WORKDIR /usr/local/
+
+COPY ddns-v1.6.5-RELEASE.jar /usr/local/ddns-v1.6.5-RELEASE.jar
+
+# 设置上海时区
+RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
+
+CMD ["java", "-Xmx256m", "-Xms256m", "-jar", "ddns-v1.6.5-RELEASE.jar"]
+```
+
+**运行命令**:
+
+```bash
+# 使用阿里云镜像
+docker run -itd --name=ddns4j --restart=always --network=host \
+  registry.cn-hangzhou.aliyuncs.com/sssd/ddns4j:v1.6.5
+
+# 使用 Docker Hub 镜像
+docker run -itd --name=ddns4j --restart=always --network=host \
+  topsssd/ddns4j:v1.6.5
+```
+
+**参数说明**:
+- `-itd`: 交互式、分配伪终端、后台运行
+- `--name=ddns4j`: 容器名称
+- `--restart=always`: 自动重启策略
+- `--network=host`: 使用主机网络（便于获取本机 IP）
+
+**访问**: `http://your-server-ip:10000`
+
+#### 5.3.2 Linux systemd 部署
+
+**安装脚本** (`ddns4j.sh install`):
+
+```bash
+#!/bin/bash
+
+JAR_VERSION="ddns-v1.6.5-RELEASE.jar"
+
+# 1. 检测系统并安装 JDK
+if [ -f /etc/os-release ]; then
+    source /etc/os-release
+    if [[ "$ID" == "centos" ]]; then
+        sudo yum install java-1.8.0-openjdk -y
+    elif [[ "$ID" == "ubuntu" ]]; then
+        sudo apt-get install openjdk-8-jdk -y
+    fi
+fi
+
+# 2. 创建 systemd 服务文件
+sudo tee /etc/systemd/system/ddns4j.service > /dev/null << EOF
+[Unit]
+Description=ddns4j service
+After=network.target
+
+[Service]
+User=root
+Type=simple
+WorkingDirectory=/path/to/ddns4j
+ExecStart=/usr/bin/java -jar -Xmx500m -Xms500m /path/to/ddns4j/$JAR_VERSION
+ExecStop=/bin/kill -s QUIT $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 3. 重新加载 systemd
+sudo systemctl daemon-reload
+
+# 4. 启用并启动服务
+sudo systemctl enable ddns4j.service
+sudo systemctl start ddns4j.service
+```
+
+**卸载脚本** (`ddns4j.sh uninstall`):
+
+```bash
+sudo systemctl stop ddns4j.service
+sudo systemctl disable ddns4j.service
+# 可选：卸载 JDK
+sudo yum remove java-1.8.0-openjdk -y  # CentOS
+sudo apt-get remove openjdk-8-jdk -y   # Ubuntu
+```
+
+**常用命令**:
+
+```bash
+# 查看服务状态
+systemctl status ddns4j
+
+# 查看日志
+journalctl -u ddns4j -f
+
+# 重启服务
+systemctl restart ddns4j
+
+# 停止服务
+systemctl stop ddns4j
+```
+
+#### 5.3.3 Windows 部署
+
+1. 下载 `ddns4j_setup.exe` 安装包
+2. 双击运行，按照向导完成安装
+3. 服务会自动注册为 Windows 服务
+4. 访问 `http://localhost:10000`
+
+### 5.4 数据库初始化
+
+#### H2 数据库
+
+首次启动时自动执行 `src/main/resources/sql/ddns4j_h2.sql`，创建以下表：
+
+- `parsing_record`: 解析记录表
+- `job_task`: 定时任务表
+- `changed_log`: 变更日志表
+
+#### MySQL 数据库
+
+首次启动时自动执行 `src/main/resources/sql/ddns4j_mysql.sql`，表结构与 H2 相同。
+
+**主要表结构**:
+
+```sql
+-- 解析记录表
+CREATE TABLE parsing_record (
+    id BIGINT PRIMARY KEY,
+    service_provider INT NOT NULL,        -- 服务商类型
+    service_provider_id VARCHAR(255),     -- AccessKey ID
+    service_provider_secret VARCHAR(255), -- AccessKey Secret
+    record_type INT NOT NULL,             -- 记录类型 (1: AAAA, 2: A)
+    ip VARCHAR(255),                      -- IP 地址
+    get_ip_mode INT,                      -- 获取 IP 模式
+    get_ip_mode_value VARCHAR(255),       -- 获取 IP 模式的值
+    domain VARCHAR(255) NOT NULL,         -- 域名
+    update_frequency INT NOT NULL,        -- 更新频率
+    create_date DATETIME,                 -- 创建时间
+    update_date DATETIME,                 -- 更新时间
+    creator BIGINT,                       -- 创建人
+    updater BIGINT                        -- 更新人
+);
+
+-- 定时任务表
+CREATE TABLE job_task (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,           -- 任务名称
+    status INT,                           -- 状态 (0: 停止, 1: 运行)
+    class_name VARCHAR(255),              -- 任务类名
+    cron_expression VARCHAR(255),         -- Cron 表达式
+    execute_params TEXT,                  -- 执行参数 (JSON)
+    create_date DATETIME,
+    update_date DATETIME
+);
+
+-- 变更日志表
+CREATE TABLE changed_log (
+    id BIGINT PRIMARY KEY,
+    content TEXT,                         -- 日志内容
+    insert_date DATETIME                  -- 插入时间
+);
+```
+
+---
+
+## 6. 开发指南
+
+### 6.1 新增 DNS 服务商支持
+
+如果需要添加新的 DNS 服务商（例如百度云），按以下步骤操作：
+
+#### 步骤 1: 创建策略实现类
+
+```java
+@Component
+public class BaiduDynamicDnsStrategyImpl implements DynamicDnsStrategy {
+    
+    @Override
+    public boolean exist(String serviceProviderId, String serviceProviderSecret, 
+                        String subDomain, String recordType) throws Exception {
+        // 实现查询逻辑
+    }
+    
+    @Override
+    public void add(ParsingRecord parsingRecord, String ip) throws Exception {
+        // 实现添加逻辑
+    }
+    
+    @Override
+    public void update(ParsingRecord parsingRecord, String ip, String recordId) throws Exception {
+        // 实现更新逻辑
+    }
+    
+    @Override
+    public String getRecordId(ParsingRecord parsingRecord, String ip) throws Exception {
+        // 实现获取记录 ID 逻辑
+    }
+    
+    @Override
+    public void remove(ParsingRecord parsingRecord, String ip) throws Exception {
+        // 实现删除逻辑
+    }
+    
+    @Override
+    public String getIpBySubDomainWithType(ParsingRecord parsingRecord) throws Exception {
+        // 实现获取 IP 逻辑
+    }
+}
+```
+
+#### 步骤 2: 添加工具类（可选）
+
+如果云厂商提供了 SDK，可以直接使用；否则需要自行封装 HTTP 请求：
+
+```java
+@Component
+public class BaiduDnsUtils {
+    // 封装百度云 DNS API 调用
+}
+```
+
+#### 步骤 3: 注册枚举
+
+在 `ServiceProviderEnum` 中添加新服务商：
+
+```java
+public enum ServiceProviderEnum {
+    ALI_YUN(1, "阿里云"),
+    TENCENT(2, "腾讯云"),
+    CLOUD_FLARE(3, "cloudflare"),
+    HUAWEI_YUN(4, "华为云"),
+    BAIDU_YUN(5, "百度云");  // 新增
+    
+    // ...
+}
+```
+
+#### 步骤 4: 配置映射关系
+
+在 `application.yml` 中添加映射：
+
+```yaml
+dns:
+  serviceTypes:
+    1: aliDynamicDnsStrategyImpl
+    2: tencentDynamicDnsStrategyImpl
+    3: cloudflareDynamicDnsStrategyImpl
+    4: huaweiDynamicDnsStrategyImpl
+    5: baiduDynamicDnsStrategyImpl  # 新增
+```
+
+#### 步骤 5: 更新前端配置
+
+修改 `index.html` 中的服务商下拉选项，添加新服务商。
+
+### 6.2 调试技巧
+
+#### 日志查看
+
+```bash
+# Linux
+tail -f ddns4j.log
+
+# Docker
+docker logs -f ddns4j
+
+# systemd
+journalctl -u ddns4j -f
+```
+
+#### H2 控制台访问
+
+如果使用 H2 数据库，可以访问 `http://your-server-ip:10000/h2-console` 查看数据库内容：
+
+- JDBC URL: `jdbc:h2:file:./data/ddns4j`
+- Username: `sa`
+- Password: (空)
+
+#### 常见问题排查
+
+1. **IP 获取失败**
+   - 检查网络接口模式下的 API 地址是否可访问
+   - 检查网卡模式下是否正确选择了网卡
+
+2. **DNS 更新失败**
+   - 检查 AccessKey ID 和 Secret 是否正确
+   - 检查域名是否在对应云账号下
+   - 查看日志中的错误信息
+
+3. **定时任务不执行**
+   - 检查 Quartz 配置
+   - 查看 `job_task` 表中的任务状态
+   - 检查 Cron 表达式是否正确
+
+---
+
+## 7. 总结
+
+DDNS4J 是一个设计精良的动态域名解析解决方案，具有以下特点：
+
+### 技术亮点
+
+1. **优雅的设计模式应用**
+   - 策略模式 + 工厂模式实现多服务商适配
+   - 高度可扩展，新增服务商无需修改核心代码
+
+2. **灵活的 IP 获取机制**
+   - 支持网络接口和网卡两种模式
+   - 完美支持 IPv4/IPv6 双栈
+
+3. **可靠的定时任务调度**
+   - 基于 Quartz 实现精准调度
+   - 每个解析记录独立任务，互不影响
+
+4. **简洁的前后端分离**
+   - Amis 低代码框架降低前端开发成本
+   - RESTful API 设计规范
+
+5. **多环境支持**
+   - H2/MySQL 双数据库支持
+   - Docker/Linux/Windows 多平台部署
+
+### 适用场景
+
+- 家庭 NAS 服务器外网访问
+- 个人网站动态域名解析
+- IoT 设备远程管理
+- 开发测试环境快速搭建
+
+### 未来展望
+
+- 支持更多 DNS 服务商（如 DNSPod、GoDaddy 等）
+- 增加 webhook 通知功能
+- 支持批量操作和导入导出
+- 增强监控和告警机制
+
+---
+
+**文档版本**: v1.0  
+**最后更新**: 2026-05-02  
+**维护者**: DDNS4J 开发团队
