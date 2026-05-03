@@ -1,0 +1,38 @@
+{
+  "name": "ddns4j-web",
+  "private": true,
+  "version": "1.6.5",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:open": "cross-env BROWSER=open vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "start:backend": "cmd /c \"cd /d %INITIALDIR%..\\..\\..\\.. && mvn spring-boot:run -pl ddns4j-web\"",
+    "wait:backend": "wait-on http-get://localhost:10000 --timeout 60000 || echo Waiting for backend...",
+    "dev:all": "concurrently -k -n \"Backend,Frontend\" -c \"cyan,magenta\" \"npm run start:backend\" \"npm run wait:backend && cross-env BROWSER=open vite\""
+  },
+  "dependencies": {
+    "@vueuse/core": "^10.9.0",
+    "axios": "^1.6.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "lucide-vue-next": "^0.344.0",
+    "pinia": "^2.1.7",
+    "tailwind-merge": "^2.2.1",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "autoprefixer": "^10.4.18",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.4.2",
+    "vite": "^5.1.5",
+    "vue-tsc": "^2.0.6",
+    "wait-on": "^9.0.5"
+  }
+}
