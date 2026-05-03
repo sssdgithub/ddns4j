@@ -1,0 +1,110 @@
+2026-05-03 15:32:05.317  INFO 10772 --- [main] top.sssd.ddns.DynamicDnsApplication      : Starting DynamicDnsApplication using Java 17.0.9 on DESKTOP-UGUBL0L with PID 10772 (D:\codes\projects\ddns4j\ddns4j-web\target\classes started by SSSD in D:\codes\projects\ddns4j\ddns4j-web)
+2026-05-03 15:32:05.321  INFO 10772 --- [main] top.sssd.ddns.DynamicDnsApplication      : The following 1 profile is active: "h2"
+2026-05-03 15:32:06.414  INFO 10772 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 10000 (http)
+2026-05-03 15:32:06.425  INFO 10772 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-03 15:32:06.425  INFO 10772 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.80]
+2026-05-03 15:32:06.554  INFO 10772 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-03 15:32:06.554  INFO 10772 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1177 ms
+2026-05-03 15:32:07.048  INFO 10772 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-03 15:32:07.240  INFO 10772 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-03 15:32:07.303  INFO 10772 --- [main] org.quartz.impl.StdSchedulerFactory      : Using default implementation for ThreadExecutor
+2026-05-03 15:32:07.305  INFO 10772 --- [main] org.quartz.simpl.SimpleThreadPool        : Job execution threads will use class loader of thread: main
+2026-05-03 15:32:07.313  INFO 10772 --- [main] org.quartz.core.SchedulerSignalerImpl    : Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2026-05-03 15:32:07.314  INFO 10772 --- [main] org.quartz.core.QuartzScheduler          : Quartz Scheduler v.2.3.2 created.
+2026-05-03 15:32:07.315  INFO 10772 --- [main] o.s.s.quartz.LocalDataSourceJobStore     : Using db table-based data access locking (synchronization).
+2026-05-03 15:32:07.317  INFO 10772 --- [main] o.s.s.quartz.LocalDataSourceJobStore     : JobStoreCMT initialized.
+2026-05-03 15:32:07.318  INFO 10772 --- [main] org.quartz.core.QuartzScheduler          : Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2026-05-03 15:32:07.318  INFO 10772 --- [main] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2026-05-03 15:32:07.318  INFO 10772 --- [main] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler version: 2.3.2
+2026-05-03 15:32:07.318  INFO 10772 --- [main] org.quartz.core.QuartzScheduler          : JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@5bfc79cb
+2026-05-03 15:32:07.412  INFO 10772 --- [main] top.sssd.ddns.config.H2Initializer       : 开始检查项目是否是第一次启动
+2026-05-03 15:32:07.441  INFO 10772 --- [main] top.sssd.ddns.config.H2Initializer       : 初始化h2数据库脚本开始...
+2026-05-03 15:32:07.481  INFO 10772 --- [main] top.sssd.ddns.config.H2Initializer       : 初始化h2数据库脚本结束...
+2026-05-03 15:32:07.594  INFO 10772 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-05-03 15:32:07.738  WARN 10772 --- [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'; nested exception is org.springframework.boot.web.server.PortInUseException: Port 10000 is already in use
+2026-05-03 15:32:07.739  INFO 10772 --- [main] o.s.s.quartz.SchedulerFactoryBean        : Shutting down Quartz Scheduler
+2026-05-03 15:32:07.739  INFO 10772 --- [main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2026-05-03 15:32:07.739  INFO 10772 --- [main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2026-05-03 15:32:07.739  INFO 10772 --- [main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2026-05-03 15:32:07.740  INFO 10772 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-03 15:32:07.742  INFO 10772 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-05-03 15:32:07.745  INFO 10772 --- [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-05-03 15:32:07.753  INFO 10772 --- [main] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2026-05-03 15:32:07.767 ERROR 10772 --- [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 10000 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 10000 or configure this application to listen on another port.
+
+2026-05-03 15:32:35.496  INFO 11968 --- [main] top.sssd.ddns.DynamicDnsApplication      : Starting DynamicDnsApplication using Java 17.0.9 on DESKTOP-UGUBL0L with PID 11968 (D:\codes\projects\ddns4j\ddns4j-web\target\classes started by SSSD in D:\codes\projects\ddns4j\ddns4j-web)
+2026-05-03 15:32:35.499  INFO 11968 --- [main] top.sssd.ddns.DynamicDnsApplication      : The following 1 profile is active: "h2"
+2026-05-03 15:32:36.557  INFO 11968 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 10000 (http)
+2026-05-03 15:32:36.567  INFO 11968 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-03 15:32:36.568  INFO 11968 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.80]
+2026-05-03 15:32:36.695  INFO 11968 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-03 15:32:36.695  INFO 11968 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1144 ms
+2026-05-03 15:32:37.141  INFO 11968 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-03 15:32:37.350  INFO 11968 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-03 15:32:37.410  INFO 11968 --- [main] org.quartz.impl.StdSchedulerFactory      : Using default implementation for ThreadExecutor
+2026-05-03 15:32:37.412  INFO 11968 --- [main] org.quartz.simpl.SimpleThreadPool        : Job execution threads will use class loader of thread: main
+2026-05-03 15:32:37.421  INFO 11968 --- [main] org.quartz.core.SchedulerSignalerImpl    : Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2026-05-03 15:32:37.422  INFO 11968 --- [main] org.quartz.core.QuartzScheduler          : Quartz Scheduler v.2.3.2 created.
+2026-05-03 15:32:37.423  INFO 11968 --- [main] o.s.s.quartz.LocalDataSourceJobStore     : Using db table-based data access locking (synchronization).
+2026-05-03 15:32:37.425  INFO 11968 --- [main] o.s.s.quartz.LocalDataSourceJobStore     : JobStoreCMT initialized.
+2026-05-03 15:32:37.426  INFO 11968 --- [main] org.quartz.core.QuartzScheduler          : Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2026-05-03 15:32:37.426  INFO 11968 --- [main] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2026-05-03 15:32:37.427  INFO 11968 --- [main] org.quartz.impl.StdSchedulerFactory      : Quartz scheduler version: 2.3.2
+2026-05-03 15:32:37.427  INFO 11968 --- [main] org.quartz.core.QuartzScheduler          : JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@236c098
+2026-05-03 15:32:37.515  INFO 11968 --- [main] top.sssd.ddns.config.H2Initializer       : 开始检查项目是否是第一次启动
+2026-05-03 15:32:37.542  INFO 11968 --- [main] top.sssd.ddns.config.H2Initializer       : 初始化h2数据库脚本开始...
+2026-05-03 15:32:37.549  INFO 11968 --- [main] top.sssd.ddns.config.H2Initializer       : 初始化h2数据库脚本结束...
+2026-05-03 15:32:37.652  INFO 11968 --- [main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-05-03 15:32:37.794  WARN 11968 --- [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'; nested exception is org.springframework.boot.web.server.PortInUseException: Port 10000 is already in use
+2026-05-03 15:32:37.796  INFO 11968 --- [main] o.s.s.quartz.SchedulerFactoryBean        : Shutting down Quartz Scheduler
+2026-05-03 15:32:37.796  INFO 11968 --- [main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED shutting down.
+2026-05-03 15:32:37.796  INFO 11968 --- [main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED paused.
+2026-05-03 15:32:37.796  INFO 11968 --- [main] org.quartz.core.QuartzScheduler          : Scheduler quartzScheduler_$_NON_CLUSTERED shutdown complete.
+2026-05-03 15:32:37.797  INFO 11968 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-03 15:32:37.799  INFO 11968 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-05-03 15:32:37.801  INFO 11968 --- [main] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+2026-05-03 15:32:37.810  INFO 11968 --- [main] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2026-05-03 15:32:37.822 ERROR 11968 --- [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 10000 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 10000 or configure this application to listen on another port.
+

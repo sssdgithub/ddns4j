@@ -4,12 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>top.sssd</groupId>
-    <artifactId>ddns</artifactId>
+    <artifactId>ddns4j-parent</artifactId>
     <version>v1.6.5-RELEASE</version>
     <name>ddns4j</name>
     <description>使用java实现动态域名解析</description>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
+    <modules>
+        <module>ddns4j-common</module>
+        <module>ddns4j-core</module>
+        <module>ddns4j-web</module>
+    </modules>
 
     <properties>
         <java.version>1.8</java.version>
@@ -18,6 +23,8 @@
         <spring-boot.version>2.7.16</spring-boot.version>
         <mybatis-plus.version>3.5.1</mybatis-plus.version>
         <mysql.version>8.0.23</mysql.version>
+        <aliyun-sdk.version>3.0.1</aliyun-sdk.version>
+        <huawei-sdk.version>3.1.65</huawei-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -41,93 +48,41 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
             </dependency>
+            <!--阿里云DNS SDK-->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>alidns20150109</artifactId>
+                <version>${aliyun-sdk.version}</version>
+            </dependency>
+            <!--华为云DNS SDK-->
+            <dependency>
+                <groupId>com.huaweicloud.sdk</groupId>
+                <artifactId>huaweicloud-sdk-dns</artifactId>
+                <version>${huawei-sdk.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-        <!--持久层框架 mybatis plus-->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-        </dependency>
-        <!--mysql 驱动-->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-        <!--h2-->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!--服务商sdk-->
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>alidns20150109</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.huaweicloud.sdk</groupId>
-            <artifactId>huaweicloud-sdk-dns</artifactId>
-            <version>3.1.65</version>
-        </dependency>
-
-    </dependencies>
-
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.7.16</version>
-                <configuration>
-                    <executable>true</executable>
-                    <layout>ZIP</layout>
-                    <mainClass>top.sssd.ddns.DynamicDnsApplication</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>2.7.16</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
