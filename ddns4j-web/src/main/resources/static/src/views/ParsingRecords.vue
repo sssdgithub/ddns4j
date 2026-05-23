@@ -131,6 +131,12 @@ const handleFormSubmit = async () => {
   await fetchRecords()
 }
 
+// Handle form cancel
+const handleFormCancel = () => {
+  showFormDialog.value = false
+  editingRecord.value = null
+}
+
 // Delete record
 const handleDelete = async (id: number) => {
   if (!confirm('确定要删除这条解析记录吗？')) {
@@ -357,7 +363,7 @@ onMounted(() => {
         :mode="formMode"
         :initial-data="editingRecord"
         @submit="handleFormSubmit"
-        @cancel="showFormDialog = false"
+        @cancel="handleFormCancel"
       />
     </Dialog>
   </div>

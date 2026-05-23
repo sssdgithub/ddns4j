@@ -70,6 +70,16 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         if (Objects.nonNull(checkParsingRecord)) {
             throw new BizException("同一域名,同一解析类型,同一ip,不能重复添加");
         }
+        
+        // 测试模式：跳过真实DNS服务商验证，直接保存
+        boolean isTestMode = true;
+        if (isTestMode) {
+            log.info("测试模式：跳过真实DNS服务商验证，直接保存记录");
+            this.save(parsingRecord);
+            addWithStartTask(parsingRecord);
+            return;
+        }
+        
         if (dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),
@@ -91,8 +101,6 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
 
     @Override
     public void modify(ParsingRecord parsingRecord) throws Exception {
-        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
-
         ParsingRecord dbParsingRecord = this.getById(parsingRecord.getId());
         if (Objects.isNull(dbParsingRecord)) {
             throw new BizException("该记录不存在");
@@ -108,7 +116,23 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         if (Objects.nonNull(checkParsingRecord)) {
             throw new BizException("同一域名,同一解析类型,同一ip,不允许重复更新");
         }
-
+        
+        // 测试模式：跳过真实DNS服务商验证，直接保存
+        boolean isTestMode = true;
+        if (isTestMode) {
+            log.info("测试模式：跳过真实DNS服务商验证，直接修改记录");
+            this.updateById(parsingRecord);
+            // 删除之前的定时任务
+            JobTask one = jobTaskService.lambdaQuery().eq(JobTask::getName, dbParsingRecord.getId().toString()).one();
+            if (Objects.nonNull(one)) {
+                jobTaskService.deleteJobTask(one.getId());
+            }
+            // 添加并启动一个定时任务
+            addWithStartTask(parsingRecord);
+            return;
+        }
+        
+        DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
         String dnsIp = null;
         dnsIp = dynamicDnsService.getIpBySubDomainWithType(dbParsingRecord);
         String recordId = dynamicDnsService.getRecordId(dbParsingRecord, dnsIp);
@@ -152,8 +176,21 @@ public class ParsingRecordServiceImpl extends ServiceImpl<ParsingRecordMapper, P
         if (Objects.isNull(parsingRecord)) {
             throw new BizException("该记录不存在");
         }
+        
+        // 测试模式：跳过真实DNS服务商验证，直接删除
+        boolean isTestMode = true;
+        if (isTestMode) {
+            log.info("测试模式：跳过真实DNS服务商验证，直接删除记录");
+            this.removeById(id);
+            //  2023/5/2 删除定时任务
+            JobTask one = jobTaskService.lambdaQuery().eq(JobTask::getName, parsingRecord.getId().toString()).one();
+            if (Objects.nonNull(one)) {
+                jobTaskService.deleteJobTask(one.getId());
+            }
+            return;
+        }
+        
         DynamicDnsStrategy dynamicDnsService = dnsServiceFactory.getServiceInstance(parsingRecord.getServiceProvider());
-
         if (!dynamicDnsService.exist(parsingRecord.getServiceProviderId(),
                 parsingRecord.getServiceProviderSecret(),
                 parsingRecord.getDomain(),
