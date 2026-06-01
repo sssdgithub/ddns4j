@@ -16,7 +16,7 @@ DDNS4J 是一个开源的动态域名解析解决方案，旨在为个人开发�
 **核心功能**:
 - 多 DNS 服务商支持（阿里云、腾讯云、Cloudflare、华为云）
 - IPv4/IPv6 双栈解析
-- 多种 IP 获取方式（网络接口、网卡）
+- 多种 IP 获取方式（网络接口、网卡、命令行）
 - 可配置的更新频率（1/2/5/10分钟）
 - 操作日志记录与查询
 - 公网访问控制
@@ -49,10 +49,10 @@ DDNS4J 是一个开源的动态域名解析解决方案，旨在为个人开发�
 | MySQL | 生产环境 | application-mysql.yml | 推荐 MySQL 8.0+ |
 
 **数据库规范**:
-- 所有表使用 BIGINT 作为主键类型
-- 使用 MyBatis-Plus 的逻辑删除功能
+- 所有表使用 BIGINT 或 INT 作为主键类型
+- 使用 MyBatis-Plus 的自动填充功能处理时间戳和操作人字段
 - 时间字段使用 DATETIME 类型
-- 敏感字段（如密钥）加密存储
+- 敏感字段（如密钥）当前以明文存储，后续版本应考虑加密
 
 #### 2.1.3 网络通信
 
@@ -92,9 +92,12 @@ DDNS4J 是一个开源的动态域名解析解决方案，旨在为个人开发�
 
 | 组件库 | 用途 | 约束 |
 |--------|------|------|
-| 自定义 UI 组件 | 基础组件 | 在 src/components/ui/ 下开发 |
-| Lucide Vue | 图标库 | 统一使用 Lucide 图标 |
-| Axios | HTTP 客户端 | 必须有拦截器 |
+| 自定义 UI 组件 | 基础组件（Button, Card, Input, Select, Dialog, Toast） | 在 src/components/ui/ 下开发，变体样式使用对象映射 |
+| Lucide Vue | 图标库（已安装，当前组件内使用内联 SVG） | 统一使用 SVG 图标 |
+| Axios | HTTP 客户端 | 必须有响应拦截器 |
+| clsx + tailwind-merge | CSS 类名条件合并 | 封装为 `cn()` 工具函数 |
+
+> **注意**: `@vueuse/core` 和 `class-variance-authority` 虽在 `package.json` 依赖中，但当前代码未实际引用。Pinia 已安装初始化（`app.use(createPinia())`），但项目中未定义任何 Store，状态管理全部通过组件内 `ref/reactive` 和 `useToast` composable 实现。
 
 ---
 
@@ -103,9 +106,8 @@ DDNS4J 是一个开源的动态域名解析解决方案，旨在为个人开发�
 ### 3.1 Maven 多模块结构
 
 ```
-ddns4j/
-├── ddns4j-parent/          # 父模块，定义依赖版本
-│   └── pom.xml
+ddns4j/                        # 项目根目录（父POM，artifactId: ddns4j-parent）
+├── pom.xml                    # 父模块 POM，定义依赖版本
 ├── ddns4j-common/          # 公共模块
 │   ├── src/main/java/
 │   │   └── top/sssd/ddns/common/
@@ -152,7 +154,7 @@ ddns4j/
 src/
 ├── main.ts                 # 应用入口
 ├── App.vue                 # 根组件
-├── index.css               # 全局样式（Tailwind 入口）
+├── index.css               # 全局样式（设计系统，含 CSS 变量定义）
 ├── api/                    # API 层
 │   ├── client.ts          # Axios 实例配置
 │   ├── parsingRecord.ts   # 解析记录 API
@@ -189,10 +191,9 @@ src/
 
 ### 4.1 表设计原则
 
-1. **主键设计**: 使用 BIGINT 类型主键，配合 MyBatis-Plus 的 ID 生成器
-2. **时间戳**: 所有表包含 create_date 和 update_date 字段
-3. **逻辑删除**: 使用 deleted 字段进行逻辑删除
-4. **乐观锁**: 需要并发控制的表使用 version 字段
+1. **主键设计**: 使用 BIGINT 或 INT 类型主键，配合 MyBatis-Plus 的 ID 生成器（parsing_record 使用雪花算法 ASSIGN_ID，job_task 使用自增 AUTO）
+2. **时间戳**: parsing_record 表包含 create_date 和 update_date 字段，由 MyMetaObjectHandler 自动填充
+3. **自动填充**: create_date、update_date、creator、updater 字段通过 MyBatis-Plus 的 @TableField(fill=...) 注解自动填充
 
 ### 4.2 核心表结构
 
@@ -200,24 +201,20 @@ src/
 
 ```sql
 CREATE TABLE parsing_record (
-    id BIGINT PRIMARY KEY,                    -- 主键
-    service_provider INT NOT NULL COMMENT '服务商类型(1:阿里云 2:腾讯云 3:Cloudflare 4:华为云)',
-    service_provider_id VARCHAR(255) COMMENT 'AccessKey ID',
-    service_provider_secret VARCHAR(255) COMMENT 'AccessKey Secret(加密存储)',
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
+    service_provider INT NOT NULL COMMENT '服务商类型(1:阿里云 2:腾讯云 3:Cloudflare)',
+    service_provider_id VARCHAR(64) COMMENT 'AccessKey ID',
+    service_provider_secret VARCHAR(64) COMMENT 'AccessKey Secret',
     record_type INT NOT NULL COMMENT '记录类型(1:AAAA 2:A)',
-    ip VARCHAR(255) COMMENT '当前解析的IP地址',
-    get_ip_mode INT NOT NULL COMMENT '获取IP模式(1:网络接口 2:网卡)',
-    get_ip_mode_value VARCHAR(255) COMMENT '获取IP模式的配置值',
-    domain VARCHAR(255) NOT NULL COMMENT '完整域名',
+    get_ip_mode INT NOT NULL COMMENT '获取IP模式(1:interface 2:network 3:cmd)',
+    get_ip_mode_value VARCHAR(255) NOT NULL COMMENT '获取IP模式的配置值',
+    ip VARCHAR(255) NOT NULL COMMENT '当前解析的IP地址',
+    domain VARCHAR(100) NOT NULL COMMENT '完整域名',
     update_frequency INT NOT NULL COMMENT '更新频率(分钟)',
-    deleted TINYINT DEFAULT 0,                -- 逻辑删除
-    version INT DEFAULT 0,                   -- 乐观锁
-    create_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    creator BIGINT,
-    updater BIGINT,
-    INDEX idx_domain (domain),
-    INDEX idx_service_provider (service_provider)
+    create_date DATETIME COMMENT '创建时间',
+    update_date DATETIME COMMENT '更新时间',
+    creator BIGINT COMMENT '创建者',
+    updater BIGINT COMMENT '更新者'
 );
 ```
 
@@ -225,17 +222,13 @@ CREATE TABLE parsing_record (
 
 ```sql
 CREATE TABLE job_task (
-    id BIGINT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL COMMENT '任务名称(关联parsing_record.id)',
-    status INT NOT NULL COMMENT '状态(0:停止 1:运行)',
-    class_name VARCHAR(255) NOT NULL COMMENT '任务类名',
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) COMMENT '任务名称',
+    group_name VARCHAR(255) COMMENT '任务分组',
     cron_expression VARCHAR(255) COMMENT 'Cron表达式',
-    execute_params TEXT COMMENT '执行参数(JSON)',
-    deleted TINYINT DEFAULT 0,
-    create_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_name (name),
-    INDEX idx_status (status)
+    class_name VARCHAR(255) COMMENT '任务类名',
+    description VARCHAR(255) COMMENT '任务描述',
+    status INT DEFAULT 0 COMMENT '状态(0:停止 1:运行)'
 );
 ```
 
@@ -243,10 +236,9 @@ CREATE TABLE job_task (
 
 ```sql
 CREATE TABLE changed_log (
-    id BIGINT PRIMARY KEY,
-    content TEXT COMMENT '日志内容',
-    insert_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_insert_date (insert_date)
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    content VARCHAR(255) NOT NULL COMMENT '日志内容',
+    insert_date DATETIME NOT NULL COMMENT '插入时间'
 );
 ```
 
@@ -259,7 +251,7 @@ CREATE TABLE changed_log (
 | 主键 | id | id |
 | 外键 | {表名}_id | parsing_record_id |
 | 时间戳 | create_date/update_date | create_date |
-| 布尔值 | is_{状态}/{状态}_flag | is_deleted |
+| 布尔值 | 描述性名称 | publicAccessDisabled |
 
 ---
 
@@ -277,8 +269,8 @@ CREATE TABLE changed_log (
 **成功响应**:
 ```json
 {
-  "code": 200,
-  "message": "success",
+  "status": 0,
+  "msg": "成功",
   "data": { ... }
 }
 ```
@@ -286,13 +278,12 @@ CREATE TABLE changed_log (
 **分页响应**:
 ```json
 {
-  "code": 200,
-  "message": "success",
+  "status": 0,
+  "msg": "成功",
   "data": {
     "items": [...],
     "total": 100,
-    "page": 1,
-    "perPage": 10
+    "page": 1
   }
 }
 ```
@@ -300,8 +291,8 @@ CREATE TABLE changed_log (
 **错误响应**:
 ```json
 {
-  "code": 400,
-  "message": "参数错误",
+  "status": 201,
+  "msg": "参数错误",
   "data": null
 }
 ```
@@ -312,25 +303,25 @@ CREATE TABLE changed_log (
 
 | 接口 | 方法 | 说明 | 请求参数 |
 |------|------|------|----------|
-| /parsingRecord/page | GET | 分页查询 | page, perPage, serviceProvider, recordType, domain |
+| /parsingRecord/page | GET | 分页查询 | ParsingRecord 对象（含 page, perPage, serviceProvider, recordType, domain 等查询条件） |
 | /parsingRecord/add | POST | 新增记录 | ParsingRecord 对象 |
 | /parsingRecord/modify | POST | 修改记录 | ParsingRecord 对象 |
 | /parsingRecord/delete/{id} | DELETE | 删除记录 | id |
-| /parsingRecord/copy | POST | 复制记录 | id |
-| /parsingRecord/getIpModeValue | GET | 获取IP模式值 | 无 |
+| /parsingRecord/copy | POST | 复制记录 | ParsingRecord 对象 |
+| /parsingRecord/getIpModeValue | GET | 获取IP模式值 | getIpMode, recordType |
 
 #### 5.3.2 变更日志接口
 
 | 接口 | 方法 | 说明 | 请求参数 |
 |------|------|------|----------|
-| /changedLog/logs | POST | 查询日志 | page, perPage, startDate, endDate |
+| /changedLog/logs | POST | 查询日志 | 无（固定查询最近1天日志，返回格式化字符串） |
 
 #### 5.3.3 公共接口
 
 | 接口 | 方法 | 说明 | 请求参数 |
 |------|------|------|----------|
 | /publicAccess/publicAccessDisabled | GET | 获取公网访问状态 | 无 |
-| /publicAccess/publicAccessDisabled | POST | 设置公网访问状态 | disabled: boolean |
+| /publicAccess/publicAccessDisabled | POST | 设置公网访问状态 | {value: boolean} |
 
 ---
 
@@ -375,32 +366,57 @@ public class DynamicDnsServiceFactory implements ApplicationContextAware {
 - 在 application.yml 中配置服务商 ID 与 Bean 名称的映射
 - 无需修改工厂类或业务代码
 
-### 6.2 模板方法模式
+### 6.2 直接方法实现（IP 获取逻辑）
 
 **应用场景**: IP 获取逻辑
 
-**抽象类定义**:
+**实现方式**: IP 获取逻辑直接在 `ParsingRecordServiceImpl` 中通过私有方法实现，根据 `recordType` 和 `getIpMode` 分发到不同的处理逻辑。
+
 ```java
-public abstract class AbstractIpGetter {
-    public final String getIp(ParsingRecord record) {
-        validate(record);
-        return doGetIp(record);
+// ParsingRecordServiceImpl 中的 IP 获取实现
+public String getIp(ParsingRecord parsingRecord) {
+    Integer recordType = parsingRecord.getRecordType();
+    Integer getIpMode = parsingRecord.getGetIpMode();
+    String getIpModeValue = parsingRecord.getGetIpModeValue().trim();
+
+    if (recordType.equals(RECORD_TYPE_AAAA)) {
+        return handleIpv6(getIpMode, getIpModeValue, parsingRecord);
+    } else if (recordType.equals(RECORD_TYPE_A)) {
+        return handleIpv4(getIpMode, getIpModeValue, parsingRecord);
+    } else {
+        throw new BizException("参数错误-recordType:" + recordType);
     }
-    
-    protected abstract void validate(ParsingRecord record);
-    protected abstract String doGetIp(ParsingRecord record);
 }
 ```
 
-**具体实现**:
-- InterfaceIpGetter: 通过网络接口获取 IP
-- NetworkIpGetter: 通过网卡获取 IP
+**IP 获取模式**:
+- interface 模式: 通过 RestTemplate 调用外部接口获取 IP
+- network 模式: 直接使用本地网卡信息作为 IP
+- cmd 模式: 通过执行 shell/bash 命令获取 IP
 
 ### 6.3 单例模式
 
 **应用场景**: 
 - DNS API 工具类（AliDnsUtils, TencentDnsUtils 等）
 - RestTemplate 实例配置
+
+### 6.4 基础设施组件
+
+项目包含以下基础设施组件，为业务功能提供支撑：
+
+| 组件 | 所在模块 | 说明 |
+|------|----------|------|
+| ClearLogJob | ddns4j-core (task) | 定时任务，每小时清除3天前的变更日志 |
+| StartupRunner | ddns4j-core (config) | 应用启动时自动创建并启动 ClearLogJob（实现 CommandLineRunner） |
+| ApplicationContextProvider | ddns4j-core (config) | 提供 Spring ApplicationContext 全局访问 |
+| IdentifierGeneratorConfig | ddns4j-core (config) | 配置 MyBatis-Plus 的雪花算法 ID 生成器 |
+| MyMetaObjectHandler | ddns4j-core (handler) | 处理 MyBatis-Plus 自动填充字段（createDate, updateDate, creator, updater） |
+| EasySqlInjector | ddns4j-core (handler) | 支持批量插入 SQL 的 MyBatis-Plus SQL 注入器 |
+| MybatisPlusConfig | ddns4j-core (config) | 按数据库类型条件配置分页插件（MySQL 和 H2 分别配置） |
+| ExcludeIndexPageInterceptor | ddns4j-web (interceptor) | 公网访问控制拦截器，根据 publicAccessDisabled 配置拦截请求 |
+| AmisResult | ddns4j-common | Amis 格式的统一响应类，包含 status, msg, data 字段 |
+| AmisPageEntity | ddns4j-core (model) | 分页查询基类，包含 page 和 perPage 字段（非数据库字段） |
+| AmisPageUtils | ddns4j-common (utils) | Amis 格式的分页工具类，包含 total, page, items 字段 |
 
 ---
 
@@ -425,21 +441,23 @@ export interface ParsingRecord {
   updateFrequency: number
   createDate?: string
   updateDate?: string
+  creator?: number
+  updater?: number
+  serviceProviderName?: string
+  recordTypeName?: string
+  page?: number
+  perPage?: number
 }
 
-export interface ParsingRecordQuery {
-  page: number
-  perPage: number
-  serviceProvider?: number
-  recordType?: number
-  domain?: string
-}
-
-export interface ParsingRecordPageResponse {
-  items: ParsingRecord[]
+export interface AmisPageResult<T> {
   total: number
   page: number
-  perPage: number
+  items: T[]
+}
+
+export interface NetWorkSelectResponse {
+  label: string
+  value: string
 }
 ```
 
@@ -448,8 +466,8 @@ export interface ParsingRecordPageResponse {
 ```typescript
 // src/api/client.ts
 export interface ApiResponse<T = any> {
-  code: number
-  message: string
+  status: number
+  msg: string
   data: T
 }
 ```
@@ -462,37 +480,62 @@ export interface ApiResponse<T = any> {
 <!-- src/components/ui/Button.vue -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Variant, Size } from '@/types'
+import { cn } from '@/lib/utils'
 
 interface Props {
-  variant?: Variant
-  size?: Size
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
   disabled?: boolean
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'primary',
-  size: 'md',
-  disabled: false
+  variant: 'default',
+  size: 'default',
+  disabled: false,
+  loading: false,
 })
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
 }>()
 
+const baseClasses = 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+
+const variantClasses = {
+  default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm',
+  destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
+  outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+  ghost: 'hover:bg-accent hover:text-accent-foreground',
+  link: 'text-primary underline-offset-4 hover:underline',
+}
+
+const sizeClasses = {
+  default: 'h-10 px-4 py-2',
+  sm: 'h-9 rounded-md px-3',
+  lg: 'h-11 rounded-md px-8',
+  icon: 'h-10 w-10',
+}
+
 const classes = computed(() => {
-  // 组合类名逻辑
+  return cn(baseClasses, variantClasses[props.variant], sizeClasses[props.size])
 })
 
 const handleClick = (event: MouseEvent) => {
-  if (!props.disabled) {
+  if (!props.disabled && !props.loading) {
     emit('click', event)
   }
 }
 </script>
 
 <template>
-  <button :class="classes" :disabled="disabled" @click="handleClick">
+  <button :class="classes" :disabled="disabled || loading" @click="handleClick">
+    <span v-if="loading" class="mr-2 animate-spin">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+    </span>
     <slot />
   </button>
 </template>
@@ -539,25 +582,34 @@ onMounted(() => {
 
 #### 7.3.1 颜色系统
 
+项目使用基于 HSL 的 CSS 变量定义语义化颜色令牌，在 `index.css` 中通过 `@layer base { :root {} }` 定义，由 `tailwind.config.ts` 通过 CSS 变量引用：
+
+```css
+/* index.css 中的颜色变量定义（实际代码） */
+:root {
+  --primary: 221.2 83% 53.3%;         /* Professional Blue */
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83% 53.3%;
+  --radius: 0.5rem;
+}
+```
+
 ```typescript
-// tailwind.config.ts
-module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          // ... 其他色阶
-          600: '#0284c7',
-          700: '#0369a1',
-        },
-        secondary: {
-          // ... 次要色定义
-        }
-      }
-    }
-  }
+// tailwind.config.ts 中的引用（实际代码）
+colors: {
+  primary: {
+    DEFAULT: "hsl(var(--primary))",
+    foreground: "hsl(var(--primary-foreground))",
+  },
+  // ...
 }
 ```
 
@@ -572,30 +624,18 @@ module.exports = {
 
 ### 7.4 状态管理规范
 
-#### 7.4.1 Store 定义
+#### 7.4.1 组件内直接调用 API
+
+项目前端在 `main.ts` 中通过 `app.use(createPinia())` 初始化了 Pinia，但当前未定义任何 Pinia Store。状态管理全部通过组件内 `ref/reactive` 结合组合式函数（composables）实现。API 调用统一封装在 `src/api/` 目录下，组件通过 composables（如 `useToast`）或直接在 `<script setup>` 中调用。
 
 ```typescript
-// src/stores/parsingRecord.ts
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+// 组件中直接使用 API 示例
 import { parsingRecordApi, type ParsingRecord } from '@/api/parsingRecord'
 
-export const useParsingRecordStore = defineStore('parsingRecord', () => {
-  const records = ref<ParsingRecord[]>([])
-  const loading = ref(false)
-  
-  const fetchRecords = async () => {
-    loading.value = true
-    try {
-      const result = await parsingRecordApi.getPage({ page: 1, perPage: 10 })
-      records.value = result.items
-    } finally {
-      loading.value = false
-    }
-  }
-  
-  return { records, loading, fetchRecords }
-})
+const fetchData = async () => {
+  const result = await parsingRecordApi.getPage(params)
+  // result 类型为 AmisPageResult<ParsingRecord>
+}
 ```
 
 ---
@@ -604,7 +644,7 @@ export const useParsingRecordStore = defineStore('parsingRecord', () => {
 
 ### 8.1 后端安全
 
-1. **密钥加密**: AccessKey Secret 必须加密存储，使用 AES 或 DES 加密
+1. **密钥存储**: AccessKey Secret 当前以明文形式存储在数据库中（后续版本应考虑加密存储）
 2. **参数校验**: 所有接口参数必须经过 Hibernate Validator 校验
 3. **异常处理**: 统一异常处理器，避免敏感信息泄露
 4. **SQL 注入**: 使用 MyBatis-Plus 的 Lambda 查询，避免 SQL 注入
@@ -614,7 +654,6 @@ export const useParsingRecordStore = defineStore('parsingRecord', () => {
 
 1. **敏感信息**: AccessKey 等敏感信息不存储在 localStorage
 2. **HTTPS**: 生产环境必须使用 HTTPS
-3. **CSRF**: 请求携带 CSRF Token
 
 ### 8.3 部署安全
 
@@ -635,7 +674,7 @@ export const useParsingRecordStore = defineStore('parsingRecord', () => {
 
 ### 9.2 前端优化
 
-1. **路由懒加载**: 使用 defineAsyncComponent 懒加载路由组件
+1. **路由懒加载**: 使用动态 `import()` 语法懒加载路由组件（如 `component: () => import('@/views/ParsingRecords.vue')`）
 2. **图片优化**: 合理压缩图片，使用 WebP 格式
 3. **代码分割**: 使用 Vite 的代码分割功能
 4. **Tree Shaking**: 确保只引入使用的组件和工具函数
@@ -702,10 +741,7 @@ describe('formatDate', () => {
 
 ### 11.2 API 文档
 
-使用 Swagger/OpenAPI 自动生成 API 文档：
-- 添加 springdoc-openapi 依赖
-- 使用 @Api, @ApiOperation 等注解标注接口
-- 访问 /swagger-ui.html 查看文档
+当前项目未引入 Swagger/OpenAPI 自动生成 API 文档。API 文档通过本规格文档的接口清单（5.3节）进行维护。如需自动生成 API 文档，可后续引入 springdoc-openapi 依赖并添加相关注解。
 
 ### 11.3 项目文档
 
@@ -773,9 +809,8 @@ docs(api): 更新 API 文档
 
 | 环境 | 用途 | 数据库 | 配置 |
 |------|------|--------|------|
-| 开发环境 | 本地开发 | H2 | application-dev.yml |
-| 测试环境 | 功能测试 | MySQL | application-test.yml |
-| 生产环境 | 正式运行 | MySQL | application-prod.yml |
+| H2 模式 | 开发/轻量部署 | H2 嵌入式 | application-h2.yml |
+| MySQL 模式 | 生产环境 | MySQL | application-mysql.yml |
 
 ### 13.2 Docker 部署
 
@@ -821,10 +856,9 @@ ENTRYPOINT ["java", "-Xmx256m", "-Xms256m", "-jar", "app.jar"]
 
 按以下步骤添加新的 IP 获取方式：
 
-1. **创建获取器类**: 继承 AbstractIpGetter 或实现 IpGetter 接口
-2. **注册获取器**: 在 IP 获取工厂中注册
-3. **更新枚举**: 在 GetIpModeEnum 中添加新模式
-4. **更新前端**: 添加相应的 UI 选项
+1. **修改 ParsingRecordServiceImpl**: 在 handleIpv4/handleIpv6 私有方法中添加新的 getIpMode 分支逻辑
+2. **更新枚举**: 在 GetIpModeEnum 中添加新模式
+3. **更新前端**: 添加相应的 UI 选项
 
 ### 14.3 新增页面功能
 
@@ -860,6 +894,6 @@ ENTRYPOINT ["java", "-Xmx256m", "-Xms256m", "-jar", "app.jar"]
 
 ---
 
-**文档版本**: v1.0
-**最后更新**: 2026-05-23
+**文档版本**: v1.1
+**最后更新**: 2026-06-01
 **维护者**: DDNS4J 开发团队
