@@ -1,0 +1,29 @@
+# 构建产物
+target/
+build/
+out/
+dist/
+*.class
+*.jar
+!gradle-wrapper.jar
+*.log
+*.tmp
+*.db
+*.mv.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 运行时
+plugins/
+data/
+*.pid

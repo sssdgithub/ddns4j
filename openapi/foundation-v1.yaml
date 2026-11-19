@@ -1,0 +1,744 @@
+openapi: 3.1.0
+info:
+  title: Foundation API
+  version: 1.0.0
+  description: |
+    Foundation v1 控制面与 Endpoint 接入 API。
+    所有响应使用统一信封 { code, message, data, traceId }。
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: auth
+  - name: endpoints
+  - name: modules
+  - name: plugins
+  - name: apps
+  - name: packages
+  - name: audit
+  - name: endpoint-agent
+
+paths:
+  /healthz:
+    get:
+      tags: [auth]
+      summary: 存活探针
+      responses:
+        "200": { description: alive }
+
+  /readyz:
+    get:
+      tags: [auth]
+      summary: 就绪探针
+      responses:
+        "200": { description: ready }
+        "503": { description: not ready }
+
+  /api/v1/auth/login:
+    post:
+      tags: [auth]
+      summary: 登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string, format: password }
+      responses:
+        "200":
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token: { type: string }
+                          expiresAt: { type: string, format: date-time }
+
+  /api/v1/endpoints:
+    get:
+      tags: [endpoints]
+      summary: 端点列表
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: status, schema: { type: string, enum: [online, offline] } }
+        - { in: query, name: profile, schema: { type: string, enum: [edge, desktop, mobile, relay] } }
+        - { in: query, name: label, schema: { type: string } }
+        - { in: query, name: cursor, schema: { type: string } }
+        - { in: query, name: limit, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        "200":
+          description: 端点分页
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: "#/components/schemas/Endpoint" }
+                          nextCursor: { type: string }
+
+  /api/v1/endpoints/{id}:
+    get:
+      tags: [endpoints]
+      summary: 端点详情
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 端点
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Endpoint" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [endpoints]
+      summary: 更新名称或标签
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                labels: { type: object, additionalProperties: { type: string } }
+      responses:
+        "200": { description: updated }
+
+  /api/v1/endpoints/{id}/twin:
+    get:
+      tags: [endpoints]
+      summary: 读取 desired/reported
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: twin
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Twin" }
+    put:
+      tags: [endpoints]
+      summary: 写入 desired（revision 递增）
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: header, name: If-Match, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                config: { type: object }
+                modules: { type: array, items: { type: object } }
+      responses:
+        "200": { description: updated }
+        "412": { description: revision mismatch }
+
+  /api/v1/endpoints/{id}/token:rotate:
+    post:
+      tags: [endpoints]
+      summary: 轮换 Endpoint Token
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 新 Token
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token: { type: string }
+
+  /api/v1/enroll-tokens:
+    post:
+      tags: [endpoints]
+      summary: 创建一次性 Enroll Token
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiresInSec: { type: integer, default: 86400 }
+                labels: { type: object, additionalProperties: { type: string } }
+      responses:
+        "201":
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token: { type: string }
+                          expiresAt: { type: string, format: date-time }
+
+  /api/v1/modules:
+    get:
+      tags: [modules]
+      summary: 模块列表
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: endpointId, schema: { type: string } }
+        - { in: query, name: state, schema: { type: string } }
+      responses:
+        "200":
+          description: 模块列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: "#/components/schemas/Module" }
+    post:
+      tags: [modules]
+      summary: 部署模块
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pluginId, version]
+              properties:
+                pluginId: { type: string }
+                version: { type: string }
+                target:
+                  type: object
+                  properties:
+                    host: { type: boolean }
+                    endpointId: { type: string }
+                config: { type: object }
+      responses:
+        "201": { description: deployed }
+
+  /api/v1/modules/{id}:start:
+    post:
+      tags: [modules]
+      summary: 激活模块
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: started }
+
+  /api/v1/modules/{id}:stop:
+    post:
+      tags: [modules]
+      summary: 停用并回滚
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: stopped }
+
+  /api/v1/modules/{id}:reload:
+    post:
+      tags: [modules]
+      summary: 卸载后重建
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: reloaded }
+        "409": { description: dependency not ready }
+
+  /api/v1/plugins:
+    get:
+      tags: [plugins]
+      summary: 制品列表
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: 制品列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: "#/components/schemas/Plugin" }
+
+  /api/v1/apps:
+    get:
+      tags: [apps]
+      summary: 应用列表
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: 应用列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: "#/components/schemas/App" }
+    post:
+      tags: [apps]
+      summary: 安装应用包
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [packageId, version]
+              properties:
+                packageId: { type: string }
+                version: { type: string }
+                config: { type: object }
+      responses:
+        "201": { description: installed }
+
+  /api/v1/packages:
+    get:
+      tags: [packages]
+      summary: 包列表
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: type, schema: { type: string, enum: [server-plugin, endpoint-package, app-bundle, config-bundle] } }
+        - { in: query, name: channel, schema: { type: string, enum: [stable, beta] } }
+      responses:
+        "200":
+          description: 包列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: "#/components/schemas/Package" }
+
+  /api/v1/packages/{id}:rollout:
+    post:
+      tags: [packages]
+      summary: 灰度下发
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version]
+              properties:
+                version: { type: string }
+                targetLabels: { type: object, additionalProperties: { type: string } }
+                batchPercent: { type: integer, minimum: 1, maximum: 100 }
+      responses:
+        "202": { description: accepted }
+
+  /api/v1/audit:
+    get:
+      tags: [audit]
+      summary: 查询审计
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: query, name: actor, schema: { type: string } }
+        - { in: query, name: action, schema: { type: string } }
+        - { in: query, name: target, schema: { type: string } }
+        - { in: query, name: from, schema: { type: string, format: date-time } }
+        - { in: query, name: to, schema: { type: string, format: date-time } }
+        - { in: query, name: cursor, schema: { type: string } }
+        - { in: query, name: limit, schema: { type: integer, maximum: 100, default: 20 } }
+      responses:
+        "200":
+          description: 审计分页
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { $ref: "#/components/schemas/AuditEvent" }
+                          nextCursor: { type: string }
+
+  /endpoint/v1/enroll:
+    post:
+      tags: [endpoint-agent]
+      summary: 用一次性 Token 换取端点身份
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enrollToken, profile, platform]
+              properties:
+                enrollToken: { type: string }
+                profile: { type: string, enum: [edge, desktop, mobile, relay] }
+                platform:
+                  type: object
+                  properties:
+                    os: { type: string }
+                    arch: { type: string }
+                    runtime: { type: string }
+      responses:
+        "200":
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          endpointId: { type: string }
+                          endpointToken: { type: string }
+
+  /endpoint/v1/heartbeat:
+    post:
+      tags: [endpoint-agent]
+      summary: 心跳
+      security: [{ endpointToken: [] }]
+      responses:
+        "200":
+          description: 心跳响应
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          serverTime: { type: string, format: date-time }
+                          desiredRevision: { type: integer }
+                          intervalSec: { type: integer }
+
+  /endpoint/v1/twin:
+    get:
+      tags: [endpoint-agent]
+      summary: 拉取 desired
+      security: [{ endpointToken: [] }]
+      parameters:
+        - { in: query, name: rev, schema: { type: integer } }
+        - { in: header, name: If-None-Match, schema: { type: string } }
+      responses:
+        "200": { description: twin }
+        "304": { description: not modified }
+
+  /endpoint/v1/twin/report:
+    post:
+      tags: [endpoint-agent]
+      summary: 上报 reported
+      security: [{ endpointToken: [] }]
+      parameters:
+        - { in: header, name: Idempotency-Key, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TwinReport" }
+      responses:
+        "202": { description: accepted }
+
+  /endpoint/v1/report:
+    post:
+      tags: [endpoint-agent]
+      summary: 上报 IP、健康与任务结果
+      security: [{ endpointToken: [] }]
+      parameters:
+        - { in: header, name: Idempotency-Key, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EndpointReport" }
+      responses:
+        "202": { description: accepted }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    endpointToken:
+      type: http
+      scheme: bearer
+
+  responses:
+    NotFound:
+      description: 不存在
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Envelope:
+      type: object
+      required: [code, traceId]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        data: {}
+        traceId: { type: string }
+
+    Error:
+      type: object
+      required: [code, message, traceId]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { type: object }
+        traceId: { type: string }
+
+    Platform:
+      type: object
+      properties:
+        os: { type: string }
+        arch: { type: string }
+        runtime: { type: string }
+
+    Capability:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string }
+        modes:
+          type: array
+          items: { type: string }
+        providers:
+          type: array
+          items: { type: string }
+
+    Endpoint:
+      type: object
+      required: [id, profile, status]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        profile: { type: string, enum: [edge, desktop, mobile, relay] }
+        platform: { $ref: "#/components/schemas/Platform" }
+        version: { type: string }
+        capabilities:
+          type: array
+          items: { $ref: "#/components/schemas/Capability" }
+        labels:
+          type: object
+          additionalProperties: { type: string }
+        status: { type: string, enum: [online, offline] }
+        lastSeen: { type: string, format: date-time }
+        tenantId: { type: string }
+        desired: { $ref: "#/components/schemas/TwinSide" }
+        reported: { $ref: "#/components/schemas/TwinSide" }
+
+    TwinSide:
+      type: object
+      properties:
+        revision: { type: integer }
+        config: { type: object }
+        modules: { type: array, items: { type: object } }
+        appliedAt: { type: string, format: date-time }
+
+    Twin:
+      type: object
+      properties:
+        desired: { $ref: "#/components/schemas/TwinSide" }
+        reported: { $ref: "#/components/schemas/TwinSide" }
+
+    Module:
+      type: object
+      required: [moduleId, pluginId, version, state]
+      properties:
+        moduleId: { type: string }
+        endpointId: { type: string }
+        pluginId: { type: string }
+        version: { type: string }
+        state: { type: string, enum: [installed, resolved, active, stopped, failed] }
+        desired: { $ref: "#/components/schemas/TwinSide" }
+        reported: { $ref: "#/components/schemas/TwinSide" }
+
+    Plugin:
+      type: object
+      required: [id, version, kind]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        version: { type: string }
+        kind: { type: string, enum: [server, endpoint, app] }
+        capabilities:
+          type: array
+          items: { $ref: "#/components/schemas/Capability" }
+        provides:
+          type: array
+          items: { type: string }
+        requires:
+          type: array
+          items: { type: string }
+
+    App:
+      type: object
+      required: [id, version, state]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        version: { type: string }
+        state: { type: string, enum: [installed, active, stopped, failed] }
+        modules:
+          type: array
+          items: { type: string }
+        pages:
+          type: array
+          items:
+            type: object
+            properties:
+              path: { type: string }
+              title: { type: string }
+
+    Package:
+      type: object
+      required: [id, type, version, platform, sha256]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [server-plugin, endpoint-package, app-bundle, config-bundle] }
+        version: { type: string }
+        channel: { type: string, enum: [stable, beta] }
+        platform: { type: string }
+        sha256: { type: string }
+        signature: { type: string }
+        minHost: { type: string }
+        download: { type: string }
+
+    TwinReport:
+      type: object
+      required: [endpointId, revision]
+      properties:
+        endpointId: { type: string }
+        revision: { type: integer }
+        config: { type: object }
+        modules:
+          type: array
+          items:
+            type: object
+            properties:
+              moduleId: { type: string }
+              revision: { type: integer }
+              state: { type: string }
+              lastError: { type: string }
+
+    EndpointReport:
+      type: object
+      required: [endpointId, reportedAt]
+      properties:
+        endpointId: { type: string }
+        reportedAt: { type: string, format: date-time }
+        publicIp:
+          type: object
+          properties:
+            v4: { type: string }
+            v6: { type: string }
+        health:
+          type: object
+          properties:
+            state: { type: string, enum: [ok, degraded, error] }
+            uptimeSec: { type: integer }
+        metrics:
+          type: object
+          additionalProperties: true
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              taskId: { type: string }
+              status: { type: string }
+              detail: { type: string }
+
+    AuditEvent:
+      type: object
+      required: [id, actor, action, at]
+      properties:
+        id: { type: string }
+        actor: { type: string }
+        action: { type: string }
+        target: { type: string }
+        before: { type: object }
+        after: { type: object }
+        at: { type: string, format: date-time }
+        ip: { type: string }
+        traceId: { type: string }

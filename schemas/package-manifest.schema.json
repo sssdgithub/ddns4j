@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foundation.dev/schemas/package-manifest.schema.json",
+  "title": "Foundation Package Manifest",
+  "type": "object",
+  "required": [
+    "apiVersion",
+    "id",
+    "type",
+    "version",
+    "channel",
+    "platform",
+    "sha256",
+    "size",
+    "minHost"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": { "type": "string", "const": "foundation/v1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$" },
+    "type": {
+      "type": "string",
+      "enum": ["server-plugin", "endpoint-package", "app-bundle", "config-bundle"]
+    },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+([-+].*)?$" },
+    "channel": { "type": "string", "enum": ["stable", "beta"], "default": "stable" },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "any",
+        "linux-amd64",
+        "linux-arm64",
+        "linux-armv7",
+        "windows-amd64",
+        "darwin-arm64"
+      ]
+    },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "size": { "type": "integer", "minimum": 1 },
+    "signature": { "type": "string", "description": "ed25519:<base64>" },
+    "minHost": { "type": "string" },
+    "maxHost": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "changelog": { "type": "string" },
+    "shared": { "type": "boolean", "default": false },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "sha256", "url"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "url": { "type": "string", "format": "uri" },
+          "size": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "inline": { "type": "string", "description": "包内 plugin.yaml 的相对路径" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "enum": ["endpoint-package"] } }, "required": ["type"] },
+      "then": { "properties": { "platform": { "not": { "const": "any" } } } }
+    }
+  ]
+}

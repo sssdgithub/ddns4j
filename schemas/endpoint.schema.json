@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foundation.dev/schemas/endpoint.schema.json",
+  "title": "Foundation Endpoint / Module / Twin",
+  "$defs": {
+    "Platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "os": { "type": "string" },
+        "arch": { "type": "string" },
+        "runtime": { "type": "string" }
+      }
+    },
+    "Capability": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "modes": { "type": "array", "items": { "type": "string" } },
+        "providers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "TwinSide": {
+      "type": "object",
+      "required": ["revision"],
+      "properties": {
+        "revision": { "type": "integer", "minimum": 0 },
+        "config": { "type": "object" },
+        "modules": { "type": "array", "items": { "type": "object" } },
+        "appliedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Endpoint": {
+      "type": "object",
+      "required": ["id", "profile", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "profile": { "type": "string", "enum": ["edge", "desktop", "mobile", "relay"] },
+        "platform": { "$ref": "#/$defs/Platform" },
+        "version": { "type": "string" },
+        "capabilities": { "type": "array", "items": { "$ref": "#/$defs/Capability" } },
+        "labels": { "type": "object", "additionalProperties": { "type": "string" } },
+        "status": { "type": "string", "enum": ["online", "offline"] },
+        "lastSeen": { "type": "string", "format": "date-time" },
+        "tenantId": { "type": "string" },
+        "desired": { "$ref": "#/$defs/TwinSide" },
+        "reported": { "$ref": "#/$defs/TwinSide" }
+      }
+    },
+    "Module": {
+      "type": "object",
+      "required": ["moduleId", "pluginId", "version", "state"],
+      "additionalProperties": false,
+      "properties": {
+        "moduleId": { "type": "string" },
+        "endpointId": { "type": "string" },
+        "pluginId": { "type": "string" },
+        "version": { "type": "string" },
+        "state": {
+          "type": "string",
+          "enum": ["installed", "resolved", "active", "stopped", "failed"]
+        },
+        "desired": { "$ref": "#/$defs/TwinSide" },
+        "reported": { "$ref": "#/$defs/TwinSide" }
+      }
+    },
+    "TwinReport": {
+      "type": "object",
+      "required": ["endpointId", "revision"],
+      "properties": {
+        "endpointId": { "type": "string" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "config": { "type": "object" },
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["moduleId", "revision", "state"],
+            "properties": {
+              "moduleId": { "type": "string" },
+              "revision": { "type": "integer", "minimum": 0 },
+              "state": { "type": "string" },
+              "lastError": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "EndpointReport": {
+      "type": "object",
+      "required": ["endpointId", "reportedAt"],
+      "properties": {
+        "endpointId": { "type": "string" },
+        "reportedAt": { "type": "string", "format": "date-time" },
+        "publicIp": {
+          "type": "object",
+          "properties": {
+            "v4": { "type": "string" },
+            "v6": { "type": "string" }
+          }
+        },
+        "health": {
+          "type": "object",
+          "properties": {
+            "state": { "type": "string", "enum": ["ok", "degraded", "error"] },
+            "uptimeSec": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "metrics": { "type": "object", "additionalProperties": true },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": { "type": "string" },
+              "status": { "type": "string" },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

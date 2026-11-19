@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foundation.dev/schemas/plugin-manifest.schema.json",
+  "title": "Foundation Plugin Manifest",
+  "type": "object",
+  "required": ["apiVersion", "id", "version", "kind", "runtime", "compatibility"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": { "type": "string", "const": "foundation/v1" },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$",
+      "description": "反向域名风格，全局唯一"
+    },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+([-+].*)?$" },
+    "kind": { "type": "string", "enum": ["server", "endpoint", "app"] },
+    "runtime": { "$ref": "#/$defs/Runtime" },
+    "provides": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "requires": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Capability" }
+    },
+    "configSchema": { "type": "string" },
+    "twin": { "$ref": "#/$defs/TwinSchema" },
+    "profiles": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["edge", "desktop", "mobile", "relay"] },
+      "uniqueItems": true
+    },
+    "escapeHatch": {
+      "type": "boolean",
+      "default": false,
+      "description": "为 true 表示使用了 get() 绕过 requires，需在文档中说明原因"
+    },
+    "compatibility": { "$ref": "#/$defs/Compatibility" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "endpoint" } }, "required": ["kind"] },
+      "then": { "required": ["profiles"] }
+    }
+  ],
+  "$defs": {
+    "Runtime": {
+      "type": "object",
+      "required": ["type", "entry"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["java", "rust-native", "tauri", "shell", "wasm"]
+        },
+        "entry": { "type": "string" },
+        "args": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "Capability": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "recordTypes": { "type": "array", "items": { "type": "string" } },
+        "modes": { "type": "array", "items": { "type": "string" } },
+        "providers": { "type": "array", "items": { "type": "string" } },
+        "credentialFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "key": { "type": "string" },
+              "label": { "type": "string" },
+              "required": { "type": "boolean", "default": false },
+              "secret": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    },
+    "TwinSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "desiredSchema": { "type": "string" },
+        "reportedSchema": { "type": "string" }
+      }
+    },
+    "Compatibility": {
+      "type": "object",
+      "required": ["minHost", "apiVersion"],
+      "additionalProperties": false,
+      "properties": {
+        "minHost": { "type": "string" },
+        "maxHost": { "type": "string" },
+        "apiVersion": { "type": "string", "const": "foundation/v1" }
+      }
+    }
+  }
+}
