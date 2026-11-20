@@ -27,3 +27,7 @@ Thumbs.db
 plugins/
 data/
 *.pid
+
+# 工作区工具（不提交 JDK）
+tools/jdk21/
+tools/*.zip
