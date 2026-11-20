@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.2.0</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>io.foundation</groupId>
+  <artifactId>foundation-reference</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+  <name>Foundation Reference</name>
+  <description>Foundation v1 minimal loop reference implementation</description>
+
+  <modules>
+    <module>api</module>
+    <module>kernel</module>
+    <module>plugins/demo-greeting</module>
+    <module>host</module>
+    <module>endpoint-cli</module>
+  </modules>
+
+  <properties>
+    <java.version>21</java.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <pf4j.version>3.16.1</pf4j.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.foundation</groupId>
+        <artifactId>foundation-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.foundation</groupId>
+        <artifactId>foundation-kernel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.pf4j</groupId>
+        <artifactId>pf4j</artifactId>
+        <version>${pf4j.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

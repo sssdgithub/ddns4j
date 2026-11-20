@@ -1,0 +1,14 @@
+apiVersion: foundation/v1
+id: ddns4j.lite
+name: ddns4j Lite
+version: 0.1.0
+kind: app
+modules:
+  - foundation.demo.greeting
+pages:
+  - /endpoints
+  - /modules
+compatibility:
+  minHost: 0.1.0
+  maxHost: 0.x
+  apiVersion: foundation/v1

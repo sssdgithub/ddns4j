@@ -1,0 +1,26 @@
+server:
+  port: 8080
+  address: 127.0.0.1
+
+spring:
+  application:
+    name: foundation-host
+  main:
+    banner-mode: off
+  jmx:
+    enabled: false
+  thymeleaf:
+    cache: false
+
+foundation:
+  plugins-dir: ./plugins
+  apps-dir: ./apps
+  admin-user: admin
+  admin-password: admin
+  endpoint-offline-seconds: 90
+
+logging:
+  level:
+    root: INFO
+    org.pf4j: WARN
+    io.foundation: INFO

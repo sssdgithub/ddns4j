@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.foundation</groupId>
+    <artifactId>foundation-reference</artifactId>
+    <version>0.1.0</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>foundation-demo-greeting</artifactId>
+  <name>Foundation Demo Greeting Plugin</name>
+  <description>Server plugin used by the v1 minimal loop</description>
+
+  <properties>
+    <finalName>demo-greeting-plugin</finalName>
+  </properties>
+
+  <build>
+    <finalName>${finalName}</finalName>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.foundation</groupId>
+      <artifactId>foundation-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>

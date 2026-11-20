@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('模块')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main>
+  <h1>模块</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th><th>Plugin</th><th>目标</th><th>状态</th><th>最后错误</th><th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="m : ${modules}">
+      <td class="mono" th:text="${m.moduleId}"></td>
+      <td th:text="${m.pluginId}"></td>
+      <td>
+        <span th:text="${m.target}"></span>
+        <span class="muted" th:if="${m.target == 'endpoint'}" th:text="' · ' + ${m.endpointId}"></span>
+      </td>
+      <td><span class="badge" th:classappend="${m.state}" th:text="${m.state}"></span></td>
+      <td class="mono" th:text="${m.lastError} ?: ''"></td>
+      <td>
+        <form th:if="${m.target == 'host'}" method="post" style="display:inline"
+              th:action="@{'/modules/' + ${m.moduleId} + '/start'}">
+          <button class="ghost" type="submit">start</button>
+        </form>
+        <form th:if="${m.target == 'host'}" method="post" style="display:inline"
+              th:action="@{'/modules/' + ${m.moduleId} + '/stop'}">
+          <button class="ghost danger" type="submit">stop</button>
+        </form>
+        <form th:if="${m.target == 'host'}" method="post" style="display:inline"
+              th:action="@{'/modules/' + ${m.moduleId} + '/reload'}">
+          <button class="ghost" type="submit">reload</button>
+        </form>
+        <span class="muted" th:if="${m.target != 'host'}">仅契约</span>
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(modules)}">
+      <td colspan="6" class="muted">还没有模块。POST /api/v1/modules 部署一个宿主模块。</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

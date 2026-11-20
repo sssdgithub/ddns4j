@@ -1,0 +1,20 @@
+apiVersion: foundation/v1
+id: foundation.demo.greeting
+name: Demo Greeting
+version: 1.0.0
+kind: server
+runtime:
+  type: java
+  entry: io.foundation.plugin.demo.DemoGreetingPlugin
+provides:
+  - demo.greeting
+requires:
+  - foundation.http.router
+capabilities:
+  - id: demo.greeting
+    description: Returns the configured greeting
+configSchema: ./config.schema.json
+compatibility:
+  minHost: 0.1.0
+  maxHost: 0.x
+  apiVersion: foundation/v1

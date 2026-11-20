@@ -67,24 +67,36 @@
 - 多端点批量下发与 UI（模型支持，但只验收 1 个）；
 - 命令下发与升级。
 
-## 6. 运行步骤（参考）
+## 6. 运行步骤
 
-> `reference/` 为 v1 实施时创建的参考实现目录，当前仓库尚未生成。
+> `reference/` 是 v1 参考实现（api / kernel / host / plugins / endpoint-cli / apps），已完成并通过 A1–A16。
 
-```bash
-# 1. 准备 JDK21 与 Maven（工作区已带 tools/jdk21）
-.\tools\mvn21.ps1 -v
+```powershell
+# 1. 构建：产出 host、插件、CLI 到 reference/dist
+.\tools\build.ps1
 
-# 2. 构建
-.\tools\mvn21.ps1 -q -f reference/pom.xml package
+# 2. 启动（工作目录决定 plugins/ 与 apps/ 的相对路径）
+cd reference\dist
+..\..\tools\jdk21\bin\java.exe -jar foundation-host.jar
 
-# 3. 启动
-.\tools\jdk21\bin\java.exe -jar reference/host/target/foundation-host.jar
+# 3. 验证
+curl.exe -s http://127.0.0.1:8080/readyz
+# 控制台：http://127.0.0.1:8080/login（admin / admin）
 
-# 4. 验证
-curl -s localhost:8080/readyz
-curl -s localhost:8080/api/v1/demo/greeting
+# 4. 一键验收 A1–A16
+cd ..\..
+.\tools\verify.ps1
 ```
+
+CLI 子命令（`reference/dist/endpoint-cli.jar`）：
+
+```powershell
+java -jar endpoint-cli.jar enroll --token <enroll-token> --server http://127.0.0.1:8080 --state state.json
+java -jar endpoint-cli.jar twin   --server http://127.0.0.1:8080 --state state.json
+java -jar endpoint-cli.jar report --server http://127.0.0.1:8080 --state state.json
+```
+
+退出码：0 成功、1 网络/服务端错误、2 参数错误、3 本地状态错误。
 
 ## 7. 记录
 

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('登录')}"></head>
+<body>
+<div class="login">
+  <div class="panel">
+    <h1>Foundation 控制台</h1>
+    <form method="post" action="/login">
+      <label for="username">用户名</label>
+      <input id="username" type="text" name="username" value="admin" autocomplete="username"/>
+      <label for="password">密码</label>
+      <input id="password" type="password" name="password" autocomplete="current-password"/>
+      <p class="error" th:if="${error}" th:text="${error}"></p>
+      <p style="margin-top:16px"><button type="submit">登录</button></p>
+    </form>
+    <p class="muted" style="margin-top:12px">v1 单管理员；默认 admin / admin。</p>
+  </div>
+</div>
+</body>
+</html>

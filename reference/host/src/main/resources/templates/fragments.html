@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title th:text="${title} + ' · Foundation'">Foundation</title>
+  <link rel="stylesheet" th:href="@{/console.css}"/>
+</head>
+<body>
+<nav th:fragment="nav" class="nav">
+  <span class="brand">Foundation</span>
+  <a href="/endpoints">端点</a>
+  <a href="/modules">模块</a>
+  <a href="/audit">审计</a>
+  <span class="spacer"></span>
+  <a href="/logout">退出</a>
+</nav>
+</body>
+</html>

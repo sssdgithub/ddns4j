@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('端点')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main>
+  <h1>端点</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th><th>名称</th><th>Profile</th><th>状态</th>
+      <th>desired</th><th>reported</th><th>漂移</th><th>最后心跳</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="ep : ${endpoints}">
+      <td><a th:href="@{'/endpoints/' + ${ep.id}}" th:text="${ep.id}">ep</a></td>
+      <td th:text="${ep.name}"></td>
+      <td th:text="${ep.profile}"></td>
+      <td>
+        <span class="badge" th:classappend="${ep.status}" th:text="${ep.status}">offline</span>
+      </td>
+      <td th:text="${ep.desiredRevision}"></td>
+      <td th:text="${ep.reportedRevision}"></td>
+      <td>
+        <span class="badge drift" th:if="${ep.drift}">drift</span>
+        <span class="badge ok" th:unless="${ep.drift}">in-sync</span>
+      </td>
+      <td class="mono" th:text="${ep.lastSeen} ?: 'never'"></td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(endpoints)}">
+      <td colspan="8" class="muted">还没有端点。创建 Enroll Token 后用 endpoint-cli enroll。</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h2>应用包</h2>
+  <table>
+    <thead><tr><th>ID</th><th>版本</th><th>模块</th><th>页面</th><th>来源</th></tr></thead>
+    <tbody>
+    <tr th:each="app : ${apps}">
+      <td th:text="${app.id}"></td>
+      <td th:text="${app.version}"></td>
+      <td th:text="${app.modules}"></td>
+      <td th:text="${app.pages}"></td>
+      <td class="mono" th:text="${app.source}"></td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(apps)}">
+      <td colspan="5" class="muted">apps 目录为空。</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

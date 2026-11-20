@@ -1,7 +1,7 @@
 # Foundation — 语言无关的插件化数字底座
 
-> 状态：契约 v1；产品 0.x（不承诺 API 稳定）
-> 分支：`feat/foundation`
+> 状态：契约 v1；产品 0.x（不承诺 API 稳定）；参考实现已通过 A1–A16
+> 分支：`feat/foundation-v1`
 > 参考实现：Java 21（LTS） + Spring Boot 4.x + PF4J 3.16.x
 > 许可证：Apache-2.0 + CLA
 
@@ -33,7 +33,8 @@ Foundation 是一个通用插件平台：内核只负责**装配、生命周期�
 ```
 GLOSSARY.md                      术语表（Endpoint/Plugin/Module/Twin…）
 AGENTS.md                        agent 协作约定（issue tracker / triage / domain docs）
-tools/                           工作区 JDK 21 与 Maven 包装脚本（JDK 不入库）
+tools/                           工作区 JDK 21、Maven 包装、build/verify 脚本（JDK 不入库）
+reference/                       v1 参考实现（api / kernel / host / plugins / endpoint-cli / apps）
 docs/
   agents/                        issue-tracker / triage-labels / domain 使用规则
   01-overview.md                 定位、原则、术语、能力面、边界

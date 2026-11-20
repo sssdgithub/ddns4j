@@ -3,10 +3,13 @@ target/
 build/
 out/
 dist/
+.m2repo/
+.scratch/
 *.class
 *.jar
 !gradle-wrapper.jar
 *.log
+*.log.err
 *.tmp
 *.db
 *.mv.db
@@ -23,10 +26,14 @@ dist/
 .DS_Store
 Thumbs.db
 
-# 运行时
-plugins/
-data/
+# 运行时（仅仓库根目录）
+/plugins/
+/data/
 *.pid
+endpoint-state.json
+
+# 验收脚本产物
+reference/verify/
 
 # 工作区工具（不提交 JDK）
 tools/jdk21/

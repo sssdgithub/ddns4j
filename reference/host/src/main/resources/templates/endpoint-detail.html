@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('端点详情')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main>
+  <h1 th:text="'端点 ' + ${endpoint.id}">端点</h1>
+
+  <div class="panel">
+    <dl class="grid">
+      <dt>名称</dt><dd th:text="${endpoint.name}"></dd>
+      <dt>Profile</dt><dd th:text="${endpoint.profile}"></dd>
+      <dt>平台</dt><dd class="mono" th:text="${endpoint.platform}"></dd>
+      <dt>版本</dt><dd th:text="${endpoint.version}"></dd>
+      <dt>状态</dt>
+      <dd><span class="badge" th:classappend="${endpoint.status}" th:text="${endpoint.status}"></span></dd>
+      <dt>desired / reported</dt>
+      <dd>
+        <span th:text="${endpoint.desiredRevision} + ' / ' + ${endpoint.reportedRevision}"></span>
+        <span class="badge drift" th:if="${endpoint.drift}">drift</span>
+        <span class="badge ok" th:unless="${endpoint.drift}">in-sync</span>
+      </dd>
+      <dt>最后错误</dt>
+      <dd th:text="${endpoint.lastError} ?: '无'" th:classappend="${endpoint.lastError} != null ? 'error' : 'muted'"></dd>
+      <dt>最后心跳</dt><dd class="mono" th:text="${endpoint.lastSeen} ?: 'never'"></dd>
+      <dt>租户</dt><dd th:text="${endpoint.tenantId}"></dd>
+    </dl>
+  </div>
+
+  <h2>调整 desired（JSON Merge Patch）</h2>
+  <div class="panel">
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <form method="post" th:action="@{'/endpoints/' + ${endpoint.id} + '/twin'}">
+      <input type="hidden" name="revision" th:value="${endpoint.desiredRevision}"/>
+      <label class="muted">config（对象，递归合并；空对象表示清空）</label>
+      <textarea name="config">{}</textarea>
+      <p style="margin-top:10px">
+        <button type="submit">提交（If-Match = <span th:text="${endpoint.desiredRevision}"></span>）</button>
+      </p>
+    </form>
+  </div>
+
+  <h2>desired</h2>
+  <pre th:text="${desiredJson}"></pre>
+  <h2>reported</h2>
+  <pre th:text="${reportedJson}"></pre>
+</main>
+</body>
+</html>

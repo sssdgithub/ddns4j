@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('审计')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main>
+  <h1>审计</h1>
+  <table>
+    <thead>
+    <tr><th>时间</th><th>操作者</th><th>动作</th><th>对象</th><th>详情</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="r : ${records}">
+      <td class="mono" th:text="${r.at}"></td>
+      <td th:text="${r.actor}"></td>
+      <td th:text="${r.action}"></td>
+      <td class="mono" th:text="${r.subject}"></td>
+      <td class="mono" th:text="${r.detail}"></td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(records)}">
+      <td colspan="5" class="muted">还没有审计记录。</td>
+    </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>
