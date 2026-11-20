@@ -195,9 +195,19 @@ requires:
 ## 10. 配置与 Twin
 
 - 配置优先级：`intercept` 链 > 应用包默认值 > 插件默认值。
-- 配置变更 → `deactivate → 校验 → activate`；失败保留旧配置并记审计。
-- 每个模块有 `desired` 与 `reported`：控制台写 desired，模块回报 reported；差异可计算。
+- 写入方式：控制面 `PUT /api/v1/endpoints/{id}/twin` 或 `.../modules/{id}/twin` 使用 **JSON Merge Patch**（`application/merge-patch+json`），必须带 `If-Match: <revision>`；`config` 递归合并，`modules` 数组整体替换。
+- 冲突：revision 不匹配返回 `412`，不静默覆盖。
+- 应用：模块应用后上报 `reported.revision` 与 `reported.config`；控制台以 desired ≠ reported 判定漂移。
+- 失败：保留旧配置，记录 `lastError` 与审计，不阻塞其他模块。
 - `secret: true` 字段控制台不回显、日志脱敏、API 返回掩码。
+- 一次性凭据不进入 Twin：走 `POST /api/v1/modules/{id}:deliver-credential`，单次有效、60s TTL、仅内存、不落库、不落日志（见 ADR-0003）。
+
+### 10.1 端点自治与跨端边界
+
+- 周期任务由端点按 desired 中的 cron **本地调度**；宿主不承担调度，只下发配置与一次性命令。
+- 宿主命令带 `commandId` 与 `expiresAt`，端点执行后 `ack`；超时重投最多 3 次。
+- Service **只在进程内可见**，不跨端调用；跨端交互只能通过 Twin 与命令。
+- 端点离线时按最后一次 desired 继续运行；恢复后按 revision 对齐，漂移可见。
 
 ## 11. 错误码
 

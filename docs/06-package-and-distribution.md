@@ -93,7 +93,7 @@ manifest:
 ## 7. 安全
 
 1. 包上传需要 `packages:write`；灰度需要 `packages:rollout`。
-2. 默认拒绝未签名包（Enterprise 可强制；Core 可配置警告）。
+2. 签名策略：Core 强制校验 `sha256`，签名可选（缺失时记录警告）；Enterprise 强制签名，缺失拒绝安装。
 3. 包元数据与制品分离：数据库存元数据，制品存对象存储。
 4. 禁止在包 manifest 中出现明文凭据；引用通过 `credentialRef`。
 5. 供应链：记录构建来源（commit、CI 运行号），可选 SBOM。

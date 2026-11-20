@@ -68,6 +68,8 @@ POST /api/v1/auth/login
 | POST | `/api/v1/endpoints/{id}/token:rotate` | 轮换 Endpoint Token |
 | POST | `/api/v1/enroll-tokens` | 创建一次性 Enroll Token |
 
+Twin 写入统一使用 `Content-Type: application/merge-patch+json` + `If-Match: <revision>`；`config` 递归合并，`modules` 数组整体替换；冲突返回 `412`。
+
 ## 5. 模块
 
 | 方法 | 路径 | 说明 |
@@ -81,6 +83,7 @@ POST /api/v1/auth/login
 | POST | `/api/v1/modules/{id}:reload` | 卸载后重建 |
 | GET/PUT | `/api/v1/modules/{id}/config` | 读取/更新配置 |
 | GET/PUT | `/api/v1/modules/{id}/twin` | 读取/写入 desired |
+| POST | `/api/v1/modules/{id}:deliver-credential` | 一次性交付凭据（单次、60s、不落库；端点离线返回 409） |
 
 ## 6. 插件（制品目录）
 

@@ -156,7 +156,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          application/merge-patch+json:
             schema:
               type: object
               properties:
@@ -165,6 +165,28 @@ paths:
       responses:
         "200": { description: updated }
         "412": { description: revision mismatch }
+
+  /api/v1/modules/{id}:deliver-credential:
+    post:
+      tags: [modules]
+      summary: 一次性交付凭据（不落库、不落日志）
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fields]
+              properties:
+                fields:
+                  type: object
+                  additionalProperties: { type: string }
+      responses:
+        "204": { description: delivered }
+        "409": { description: endpoint offline or already delivered }
 
   /api/v1/endpoints/{id}/token:rotate:
     post:

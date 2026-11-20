@@ -102,6 +102,14 @@ Endpoint 上的模块是 Plugin 的实例：
 2. Endpoint 应用后必须回报 `reported.revision`；不等于 desired 即为"漂移"。
 3. 控制台必须展示漂移（desired ≠ reported）与最后错误。
 4. 冲突以控制面为准，但不得静默覆盖：失败保留旧值并记审计。
+5. 写入使用 JSON Merge Patch（`application/merge-patch+json`）+ `If-Match`；`config` 递归合并，`modules` 数组整体替换。
+
+### 5.1 端点自治
+
+- 周期任务由端点按 desired 中的 cron **本地调度**；控制面不承担调度。
+- 控制面只下发 desired 与一次性命令；命令带 `commandId` 与 `expiresAt`。
+- 端点离线时按最后一次 desired 继续运行；恢复后按 revision 对齐。
+- 端点不得跨进程调用宿主服务；跨端只走 Twin 与命令。
 
 ## 6. 心跳与离线
 
@@ -161,6 +169,7 @@ Endpoint 上的模块是 Plugin 的实例：
 | Endpoint Token | 只可访问 `/endpoint/v1/*`；可轮换、可吊销 |
 | 传输 | 强制 HTTPS；Enterprise 可启 mTLS |
 | 凭据 | 只下发引用；明文不入库、不上报 |
+| 一次性交付 | 控制台经 TLS 转发给在线端点，单次有效、60s TTL、仅内存、不落库、不落日志；端点离线时返回冲突 |
 | 审计 | 注册、吊销、升级、命令下发全部留痕 |
 
 ## 11. 最小实现要求

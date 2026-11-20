@@ -49,6 +49,8 @@ Enterprise 能力以**服务端插件**形式提供，通过 `requires` 声明�
 
 Profile 只决定**允许出现的字段与策略**，不决定语言。任何 profile 都必须实现同一套 Endpoint 协议。
 
+> v1 只实现 `edge`；`desktop` / `mobile` / `relay` 仅保留规范字段与扩展位，不写协议实现、不做客户端。
+
 ## 4. 兼容性
 
 - 契约版本：`foundation/v1`；manifest 必填 `apiVersion`。

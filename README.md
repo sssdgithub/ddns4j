@@ -31,6 +31,7 @@ Foundation 是一个通用插件平台：内核只负责**装配、生命周期�
 ## 目录
 
 ```
+GLOSSARY.md                      术语表（Endpoint/Plugin/Module/Twin…）
 docs/
   00-principles.md               定位、原则、术语、边界
   01-capability-map.md           能力面、分层、兼容性
@@ -40,7 +41,11 @@ docs/
   05-console-and-governance.md   控制台 IA、RBAC、多租户、审计
   06-package-and-distribution.md 包类型、manifest、签名、灰度
   07-minimal-loop.md             最小闭环与验收
-  08-decisions.md                决策记录、假设、与旧方案的差异
+  08-decisions.md                决策记录、假设、遗留问题
+  adr/
+    0001-foundation-is-independent.md
+    0002-twin-and-endpoint-autonomy.md
+    0003-credential-handoff.md
 openapi/
   foundation-v1.yaml             机器可读 API
 schemas/
@@ -48,6 +53,14 @@ schemas/
   package-manifest.schema.json   分发包 manifest
   endpoint.schema.json           Endpoint、Module、Twin
 ```
+
+## v1 收敛范围（拷问结论）
+
+- 只实现 `edge` profile；desktop/mobile/relay 仅保留字段。
+- 业务只做 demo 插件，不接真实 DNS。
+- 验收 1 个端点；模型支持多端点，但不做批量 UI。
+- 控制台用 Thymeleaf 四页；Core 只强制 sha256，签名可选。
+- 周期任务由端点本地调度；跨端只走 Twin 与命令；凭据一次性下发、不落库。
 
 ## 阅读顺序
 
