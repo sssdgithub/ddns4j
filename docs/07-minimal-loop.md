@@ -14,10 +14,10 @@
 |---|---|---|
 | `foundation-host` | Java 21 + Spring Boot 4 + PF4J | 内核、REST API、极简管理页 |
 | `plugin-demo-greeting` | 服务端插件 jar | `provides: demo.greeting`，一个 HTTP 端点 |
-| `endpoint-sim` | Java 21 CLI（测试替身） | 实现 enroll / heartbeat / twin / report |
+| `endpoint-cli` | Java 21 CLI（测试替身） | 实现 enroll / heartbeat / twin / report |
 | `app-ddns4j-lite` | app-bundle manifest | 引用 `plugin-demo-greeting` + 一个页面 |
 
-> 端点侧的正式实现（Rust）不在本期；`endpoint-sim` 只用于验证协议，不代表边缘技术选型。
+> 端点侧的正式实现（Rust）不在本期；`endpoint-cli` 只用于验证协议，不代表边缘技术选型。
 
 ## 3. 场景
 
@@ -25,11 +25,11 @@
 1. 启动 host → /readyz 200
 2. host 发现 plugin-demo-greeting → 部署为宿主 Module → ACTIVE
 3. GET /api/v1/demo/greeting → 200 + 插件返回值
-4. 创建 Enroll Token → endpoint-sim enroll → 获得 endpointId + token
-5. endpoint-sim heartbeat → 返回 desiredRevision=1
-6. endpoint-sim GET /endpoint/v1/twin → 拿到 desired
-7. endpoint-sim 应用后 POST /twin/report → reported.revision=1
-8. 控制台 PUT twin（revision 2）→ endpoint-sim 拉取 → 回报 revision 2
+4. 创建 Enroll Token → endpoint-cli enroll → 获得 endpointId + token
+5. endpoint-cli heartbeat → 返回 desiredRevision=1
+6. endpoint-cli GET /endpoint/v1/twin → 拿到 desired
+7. endpoint-cli 应用后 POST /twin/report → reported.revision=1
+8. 控制台 PUT twin（revision 2）→ endpoint-cli 拉取 → 回报 revision 2
 9. 控制台 stop module → /api/v1/demo/greeting 返回 503
 10. 控制台 start module → 恢复 200；连续 reload 100 次仍稳定
 ```
@@ -51,6 +51,7 @@
 | A11 | 极简页可用 | 登录后能看到端点列表与模块状态 |
 | A12 | 构建 | `mvn -q package` 与 `java -jar` 全部通过 |
 | A13 | 凭据一次性交付 | 端点在线时可交付一次；重复交付被拒；服务端数据库与日志中查不到明文；端点离线返回 409 |
+| A14 | 端点 CLI | `enroll` / `twin` / `report` 三个子命令可独立执行，退出码与错误信息可判读 |
 
 ## 5. 明确不做
 
