@@ -83,6 +83,6 @@ ddns4j 目前是 Java 8 + Spring Boot 2.7 的单体：DNS 服务商、调度、�
 
 ## Further Notes
 
-- 旧方案 `ddns4j-architecture-v2.md` 与 P0 manifest 已作废；差异见 `docs/08-decisions.md`。
+- 旧方案 `ddns4j-architecture-v2.md` 与 P0 manifest 已作废；差异见 `docs/07-decisions.md`。
 - 术语以 `GLOSSARY.md` 为准；决策记录见 `docs/adr/`。
-- v1 完成的判定以 `docs/07-minimal-loop.md` 的 A1–A16 为准。
+- v1 完成的判定以 `docs/06-minimal-loop.md` 的 A1–A16 为准。

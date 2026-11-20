@@ -36,19 +36,18 @@ AGENTS.md                        agent 协作约定（issue tracker / triage / d
 tools/                           工作区 JDK 21 与 Maven 包装脚本（JDK 不入库）
 docs/
   agents/                        issue-tracker / triage-labels / domain 使用规则
-  00-principles.md               定位、原则、术语、边界
-  01-capability-map.md           能力面、分层、兼容性
+  01-overview.md                 定位、原则、术语、能力面、边界
   02-plugin-contract.md          统一插件契约（核心）
   03-endpoint-contract.md        Endpoint 模型、profile、模块、双状态与接入协议
-  04-http-api.md                 HTTP API 约定与端点
-  05-console-and-governance.md   控制台 IA、RBAC、多租户、审计
-  06-package-and-distribution.md 包类型、manifest、签名、灰度
-  07-minimal-loop.md             最小闭环与验收
-  08-decisions.md                决策记录、假设、遗留问题
+  04-api.md                      API 公共约定（路径以 OpenAPI 为准）
+  05-operations.md               控制台、治理、包与分发
+  06-minimal-loop.md             最小闭环与验收
+  07-decisions.md                决策记录、假设、风险
   adr/
     0001-foundation-is-independent.md
     0002-twin-and-endpoint-autonomy.md
     0003-credential-handoff.md
+  baseline.md                    实测基线（唯一记录位置）
 openapi/
   foundation-v1.yaml             机器可读 API
 schemas/
@@ -56,6 +55,8 @@ schemas/
   package-manifest.schema.json   分发包 manifest
   endpoint.schema.json           Endpoint、Module、Twin
 ```
+
+> issue 草稿在 `.scratch/foundation-v1/spec.md`，创建 Gitee issue 时粘贴，不作为长期文档。
 
 ## v1 收敛范围（拷问结论）
 
@@ -69,11 +70,11 @@ schemas/
 
 ## 阅读顺序
 
-1. `00-principles.md`：边界与术语（先确认 Endpoint 不是 Node.js）。
+1. `01-overview.md`：边界与术语（先确认 Endpoint 不是 Node.js）。
 2. `02-plugin-contract.md` + `03-endpoint-contract.md`：全部实现的基础。
-3. `04`–`06`：API、控制台与治理、包分发。
-4. `07`：最小闭环；`08`：取舍与遗留问题。
+3. `04`–`05`：API 约定、控制台与分发。
+4. `06`：最小闭环；`07`：决策与风险。
 
 ## 与旧方案的关系
 
-`../ddns4j-architecture-v2.md`（仓库外历史文档）是"DDNS 控制面"方案（JDK17 + Spring Boot 3 + Node 概念）。本规范将其取代：改用 Java 21 + Spring Boot 4，Node 更名 Endpoint，DDNS 收敛为应用包。差异见 `docs/08-decisions.md`。
+`../ddns4j-architecture-v2.md`（仓库外历史文档）是"DDNS 控制面"方案（JDK17 + Spring Boot 3 + Node 概念）。本规范将其取代：改用 Java 21 + Spring Boot 4，Node 更名 Endpoint，DDNS 收敛为应用包。差异见 `docs/07-decisions.md`。
