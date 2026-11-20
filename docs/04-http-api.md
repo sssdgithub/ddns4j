@@ -42,6 +42,7 @@
 | 429 | `RATE_LIMITED` | 限流 |
 | 500 | `INTERNAL` | 未预期错误 |
 | 503 | `DEPENDENCY_UNAVAILABLE` | 依赖服务未就绪 |
+| 503 | `MODULE_INACTIVE` | 模块未激活或已停用 |
 
 ## 3. 认证
 
@@ -64,11 +65,13 @@ POST /api/v1/auth/login
 | PATCH | `/api/v1/endpoints/{id}` | 改名、改标签 |
 | DELETE | `/api/v1/endpoints/{id}` | 移除（软删） |
 | GET | `/api/v1/endpoints/{id}/twin` | 读取 desired 与 reported |
-| PUT | `/api/v1/endpoints/{id}/twin` | 写入 desired（revision +1） |
+| PATCH | `/api/v1/endpoints/{id}/twin` | 写入 desired（revision +1） |
 | POST | `/api/v1/endpoints/{id}/token:rotate` | 轮换 Endpoint Token |
 | POST | `/api/v1/enroll-tokens` | 创建一次性 Enroll Token |
 
-Twin 写入统一使用 `Content-Type: application/merge-patch+json` + `If-Match: <revision>`；`config` 递归合并，`modules` 数组整体替换；冲突返回 `412`。
+Twin 写入统一使用 `PATCH` + `Content-Type: application/merge-patch+json` + `If-Match: <revision>`；`config` 递归合并，`modules` 数组整体替换；冲突返回 `412`。
+
+> OpenAPI 只列出路径与核心字段；`X-Foundation-Tenant`、`X-Trace-Id`、`Idempotency-Key`、`sort` 等公共头/参数以本节约定为准，未在每个 path 上重复声明。
 
 ## 5. 模块
 
@@ -81,19 +84,20 @@ Twin 写入统一使用 `Content-Type: application/merge-patch+json` + `If-Match
 | POST | `/api/v1/modules/{id}:start` | 激活 |
 | POST | `/api/v1/modules/{id}:stop` | 停用并回滚 |
 | POST | `/api/v1/modules/{id}:reload` | 卸载后重建 |
-| GET/PUT | `/api/v1/modules/{id}/config` | 读取/更新配置 |
-| GET/PUT | `/api/v1/modules/{id}/twin` | 读取/写入 desired |
-| POST | `/api/v1/modules/{id}:deliver-credential` | 一次性交付凭据（单次、60s、不落库；端点离线返回 409） |
+| GET/PATCH | `/api/v1/modules/{id}/config` | 读取/更新配置 |
+| GET | `/api/v1/modules/{id}/twin` | 读取 desired/reported |
+| PATCH | `/api/v1/modules/{id}/twin` | 写入 desired |
+| POST | `/api/v1/modules/{id}:deliver-credential` | 一次性交付凭据（单次、60s、不落库；端点离线或已交付返回 409） |
 
-## 6. 插件（制品目录）
+## 6. 插件（包目录）
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| GET | `/api/v1/plugins` | 制品列表（版本、capabilities、依赖） |
-| GET | `/api/v1/plugins/{id}` | 详情（manifest） |
-| GET | `/api/v1/plugins/{id}/versions` | 已安装制品版本 |
+| GET | `/api/v1/plugins` | 插件包列表（版本、capabilities、依赖） |
+| GET | `/api/v1/plugins/{id}` | 插件包详情（manifest） |
+| GET | `/api/v1/plugins/{id}/versions` | 已安装插件包版本 |
 
-> 启停/重载针对 Module，不针对 Plugin 制品。制品只做安装/卸载。
+> 启停/重载针对 Module，不针对 Plugin。插件包只做安装/卸载。
 
 ## 7. 应用
 
@@ -111,7 +115,7 @@ Twin 写入统一使用 `Content-Type: application/merge-patch+json` + `If-Match
 |---|---|---|
 | GET | `/api/v1/packages` | 过滤 `type`、`channel`、`platform` |
 | POST | `/api/v1/packages` | 上传（multipart 或 URL 导入） |
-| GET | `/api/v1/packages/{id}` | 详情 + 版本列表 |
+| GET | `/api/v1/packages/{id}` | 详情 |
 | POST | `/api/v1/packages/{id}:rollout` | 灰度（targetLabels、batchPercent） |
 
 ## 9. 审计

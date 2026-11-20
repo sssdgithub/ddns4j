@@ -17,7 +17,7 @@
   "additionalProperties": false,
   "properties": {
     "apiVersion": { "type": "string", "const": "foundation/v1" },
-    "id": { "type": "string", "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$" },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+([.-][a-z0-9-]+)*$" },
     "type": {
       "type": "string",
       "enum": ["server-plugin", "endpoint-package", "app-bundle", "config-bundle"]
@@ -62,6 +62,36 @@
       "additionalProperties": false,
       "properties": {
         "inline": { "type": "string", "description": "包内 plugin.yaml 的相对路径" }
+      }
+    },
+    "contents": {
+      "type": "object",
+      "description": "app-bundle 声明包含的模块与页面",
+      "additionalProperties": false,
+      "properties": {
+        "modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pluginId"],
+            "properties": {
+              "pluginId": { "type": "string" },
+              "version": { "type": "string" },
+              "target": { "type": "string", "enum": ["host", "endpoint"] }
+            }
+          }
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "title"],
+            "properties": {
+              "path": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          }
+        }
       }
     }
   },

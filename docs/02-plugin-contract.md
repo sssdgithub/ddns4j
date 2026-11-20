@@ -2,12 +2,12 @@
 
 > 服务端插件、端点模块、应用包遵循同一套 manifest 与生命周期语义；差异只在 runtime adapter。
 
-## 1. 制品与实例
+## 1. 包与部署单元
 
 | 概念 | 定义 | 例子 |
 |---|---|---|
-| **Plugin** | 可分发的代码制品（manifest + 入口 + 依赖） | `foundation.dns.aliyun` 1.0.0 |
-| **Module** | Plugin 的一次部署实例，位于宿主或某个 Endpoint 上 | 宿主上的 `aliyun-1`；endpoint `ep_01` 上的 `dns-1` |
+| **Plugin** | 可分发的包（manifest + 入口 + 依赖） | `foundation.dns.aliyun` 1.0.0 |
+| **Module** | Plugin 在宿主或某个 Endpoint 上的一次部署单元 | 宿主上的 `aliyun-1`；endpoint `ep_01` 上的 `dns-1` |
 | **App** | 聚合型 Plugin，声明包含哪些模块与页面 | `ddns4j` |
 
 规则：
@@ -57,13 +57,14 @@ compatibility:
 | `id` | 是 | 全局唯一，反向域名风格 |
 | `version` | 是 | SemVer |
 | `kind` | 是 | `server`（宿主）、`endpoint`（端上）、`app`（聚合） |
-| `runtime` | 是 | 运行形态与入口 |
+| `runtime` | 条件 | `server` / `endpoint` 必填；`app` 可省略 |
 | `provides` / `requires` | 否 | 服务提供与依赖，AND 语义 |
 | `capabilities` | 否 | 能力描述，驱动控制台与匹配 |
 | `configSchema` | 否 | JSON Schema 2020-12 |
 | `twin` | 否 | desired/reported 的 Schema |
 | `profiles` | 条件 | `kind=endpoint` 必填 |
-| `compatibility` | 是 | 宿主与契约版本约束 |
+| `pages` / `modules` | 条件 | `kind=app` 必填，声明应用包含的页面与模块 |
+| `compatibility` | 条件 | `server` / `endpoint` 必填；`app` 可省略 |
 
 ## 3. 生命周期
 
@@ -195,7 +196,7 @@ requires:
 ## 10. 配置与 Twin
 
 - 配置优先级：`intercept` 链 > 应用包默认值 > 插件默认值。
-- 写入方式：控制面 `PUT /api/v1/endpoints/{id}/twin` 或 `.../modules/{id}/twin` 使用 **JSON Merge Patch**（`application/merge-patch+json`），必须带 `If-Match: <revision>`；`config` 递归合并，`modules` 数组整体替换。
+- 写入方式：控制面 `PATCH /api/v1/endpoints/{id}/twin` 或 `.../modules/{id}/twin` 使用 **JSON Merge Patch**（`application/merge-patch+json`），必须带 `If-Match: <revision>`；`config` 递归合并，`modules` 数组整体替换。
 - 冲突：revision 不匹配返回 `412`，不静默覆盖。
 - 应用：模块应用后上报 `reported.revision` 与 `reported.config`；控制台以 desired ≠ reported 判定漂移。
 - 失败：保留旧配置，记录 `lastError` 与审计，不阻塞其他模块。
@@ -206,7 +207,7 @@ requires:
 
 - 周期任务由端点按 desired 中的 cron **本地调度**；宿主不承担调度，只下发配置与一次性命令。
 - 宿主命令带 `commandId` 与 `expiresAt`，端点执行后 `ack`；超时重投最多 3 次。
-- Service **只在进程内可见**，不跨端调用；跨端交互只能通过 Twin 与命令。
+- Service **只在进程内可见**，不跨端调用；跨端只能通过 Endpoint 协议（注册/心跳/Twin/命令/上报/升级）。
 - 端点离线时按最后一次 desired 继续运行；恢复后按 revision 对齐，漂移可见。
 
 ## 11. 错误码

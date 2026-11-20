@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Foundation API
-  version: 1.0.0
+  version: v1
   description: |
     Foundation v1 控制面与 Endpoint 接入 API。
     所有响应使用统一信封 { code, message, data, traceId }。
@@ -9,25 +9,26 @@ servers:
   - url: http://localhost:8080
 tags:
   - name: auth
+  - name: health
   - name: endpoints
   - name: modules
   - name: plugins
   - name: apps
   - name: packages
   - name: audit
-  - name: endpoint-agent
+  - name: endpoint
 
 paths:
   /healthz:
     get:
-      tags: [auth]
+      tags: [health]
       summary: 存活探针
       responses:
         "200": { description: alive }
 
   /readyz:
     get:
-      tags: [auth]
+      tags: [health]
       summary: 就绪探针
       responses:
         "200": { description: ready }
@@ -127,6 +128,14 @@ paths:
                 labels: { type: object, additionalProperties: { type: string } }
       responses:
         "200": { description: updated }
+    delete:
+      tags: [endpoints]
+      summary: 移除端点（软删）
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "204": { description: deleted }
 
   /api/v1/endpoints/{id}/twin:
     get:
@@ -146,7 +155,7 @@ paths:
                   - type: object
                     properties:
                       data: { $ref: "#/components/schemas/Twin" }
-    put:
+    patch:
       tags: [endpoints]
       summary: 写入 desired（revision 递增）
       security: [{ bearerAuth: [] }]
@@ -386,6 +395,7 @@ paths:
       parameters:
         - { in: query, name: type, schema: { type: string, enum: [server-plugin, endpoint-package, app-bundle, config-bundle] } }
         - { in: query, name: channel, schema: { type: string, enum: [stable, beta] } }
+        - { in: query, name: platform, schema: { type: string } }
       responses:
         "200":
           description: 包列表
@@ -402,6 +412,27 @@ paths:
                           items:
                             type: array
                             items: { $ref: "#/components/schemas/Package" }
+    post:
+      tags: [packages]
+      summary: 上传包
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary }
+                manifest: { type: string }
+          application/json:
+            schema:
+              type: object
+              required: [url]
+              properties:
+                url: { type: string, format: uri }
+      responses:
+        "201": { description: uploaded }
 
   /api/v1/packages/{id}:rollout:
     post:
@@ -456,7 +487,7 @@ paths:
 
   /endpoint/v1/enroll:
     post:
-      tags: [endpoint-agent]
+      tags: [endpoint]
       summary: 用一次性 Token 换取端点身份
       requestBody:
         required: true
@@ -492,7 +523,7 @@ paths:
 
   /endpoint/v1/heartbeat:
     post:
-      tags: [endpoint-agent]
+      tags: [endpoint]
       summary: 心跳
       security: [{ endpointToken: [] }]
       responses:
@@ -514,19 +545,31 @@ paths:
 
   /endpoint/v1/twin:
     get:
-      tags: [endpoint-agent]
+      tags: [endpoint]
       summary: 拉取 desired
       security: [{ endpointToken: [] }]
       parameters:
         - { in: query, name: rev, schema: { type: integer } }
         - { in: header, name: If-None-Match, schema: { type: string } }
       responses:
-        "200": { description: twin }
+        "200":
+          description: twin
+          headers:
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Twin" }
         "304": { description: not modified }
 
   /endpoint/v1/twin/report:
     post:
-      tags: [endpoint-agent]
+      tags: [endpoint]
       summary: 上报 reported
       security: [{ endpointToken: [] }]
       parameters:
@@ -541,7 +584,7 @@ paths:
 
   /endpoint/v1/report:
     post:
-      tags: [endpoint-agent]
+      tags: [endpoint]
       summary: 上报 IP、健康与任务结果
       security: [{ endpointToken: [] }]
       parameters:
@@ -553,6 +596,315 @@ paths:
             schema: { $ref: "#/components/schemas/EndpointReport" }
       responses:
         "202": { description: accepted }
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [auth]
+      summary: 刷新会话
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: 新 token
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token: { type: string }
+                          expiresAt: { type: string, format: date-time }
+
+  /api/v1/modules/{id}:
+    get:
+      tags: [modules]
+      summary: 模块详情
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 模块
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Module" }
+    delete:
+      tags: [modules]
+      summary: 卸载模块
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "204": { description: deleted }
+
+  /api/v1/modules/{id}/config:
+    get:
+      tags: [modules]
+      summary: 读取模块配置
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: config }
+    patch:
+      tags: [modules]
+      summary: 更新模块配置
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { type: object }
+      responses:
+        "200": { description: updated }
+
+  /api/v1/modules/{id}/twin:
+    get:
+      tags: [modules]
+      summary: 读取模块 twin
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: twin
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Twin" }
+    patch:
+      tags: [modules]
+      summary: 写入模块 desired
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+        - { in: header, name: If-Match, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { type: object }
+      responses:
+        "200": { description: updated }
+        "412": { description: revision mismatch }
+
+  /api/v1/plugins/{id}:
+    get:
+      tags: [plugins]
+      summary: 插件包详情
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 制品
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Plugin" }
+
+  /api/v1/plugins/{id}/versions:
+    get:
+      tags: [plugins]
+      summary: 已安装插件包版本
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 版本列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { type: string }
+
+  /api/v1/apps/{id}:
+    get:
+      tags: [apps]
+      summary: 应用详情
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 应用
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/App" }
+
+  /api/v1/apps/{id}:disable:
+    post:
+      tags: [apps]
+      summary: 停用应用
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200": { description: disabled }
+
+  /api/v1/apps/{id}:upgrade:
+    post:
+      tags: [apps]
+      summary: 升级应用
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [version]
+              properties:
+                version: { type: string }
+      responses:
+        "202": { description: accepted }
+
+  /api/v1/packages/{id}:
+    get:
+      tags: [packages]
+      summary: 包详情与版本列表
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 包
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Package" }
+
+  /endpoint/v1/register:
+    post:
+      tags: [endpoint]
+      summary: 上报平台、版本与能力
+      security: [{ endpointToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [profile, platform]
+              properties:
+                profile: { type: string, enum: [edge, desktop, mobile, relay] }
+                platform: { $ref: "#/components/schemas/Platform" }
+                version: { type: string }
+                capabilities:
+                  type: array
+                  items: { $ref: "#/components/schemas/Capability" }
+      responses:
+        "200": { description: registered }
+
+  /endpoint/v1/commands:
+    get:
+      tags: [endpoint]
+      summary: 拉取待执行命令（长轮询）
+      security: [{ endpointToken: [] }]
+      parameters:
+        - { in: query, name: waitSec, schema: { type: integer, maximum: 30, default: 20 } }
+      responses:
+        "200":
+          description: 命令列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items: { type: object }
+
+  /endpoint/v1/ack:
+    post:
+      tags: [endpoint]
+      summary: 确认命令执行结果
+      security: [{ endpointToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [commandId, status]
+              properties:
+                commandId: { type: string }
+                status: { type: string, enum: [success, failed] }
+                detail: { type: string }
+      responses:
+        "202": { description: accepted }
+
+  /endpoint/v1/upgrade/plan:
+    post:
+      tags: [endpoint]
+      summary: 获取升级包
+      security: [{ endpointToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentVersion, channel, platform]
+              properties:
+                currentVersion: { type: string }
+                channel: { type: string, enum: [stable, beta] }
+                platform: { $ref: "#/components/schemas/Platform" }
+      responses:
+        "200":
+          description: 升级计划
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data: { $ref: "#/components/schemas/Package" }
+        "204": { description: no upgrade }
 
 components:
   securitySchemes:
@@ -607,6 +959,19 @@ components:
         providers:
           type: array
           items: { type: string }
+        recordTypes:
+          type: array
+          items: { type: string }
+        credentialFields:
+          type: array
+          items:
+            type: object
+            required: [key, label]
+            properties:
+              key: { type: string }
+              label: { type: string }
+              required: { type: boolean }
+              secret: { type: boolean }
 
     Endpoint:
       type: object
@@ -631,11 +996,27 @@ components:
 
     TwinSide:
       type: object
+      required: [revision]
       properties:
         revision: { type: integer }
         config: { type: object }
-        modules: { type: array, items: { type: object } }
+        modules:
+          type: array
+          items: { $ref: "#/components/schemas/ModuleEntry" }
+        state: { type: string, enum: [ok, degraded, error] }
+        lastError: { type: string }
         appliedAt: { type: string, format: date-time }
+
+    ModuleEntry:
+      type: object
+      required: [moduleId, pluginId]
+      properties:
+        moduleId: { type: string }
+        pluginId: { type: string }
+        version: { type: string }
+        config: { type: object }
+        state: { type: string }
+        lastError: { type: string }
 
     Twin:
       type: object
@@ -651,7 +1032,7 @@ components:
         endpointId: { type: string }
         pluginId: { type: string }
         version: { type: string }
-        state: { type: string, enum: [installed, resolved, active, stopped, failed] }
+        state: { type: string, enum: [installed, resolved, active, stopped, uninstalled, failed] }
         desired: { $ref: "#/components/schemas/TwinSide" }
         reported: { $ref: "#/components/schemas/TwinSide" }
 
@@ -672,6 +1053,21 @@ components:
         requires:
           type: array
           items: { type: string }
+        profiles:
+          type: array
+          items: { type: string, enum: [edge, desktop, mobile, relay] }
+        runtime:
+          type: object
+          properties:
+            type: { type: string }
+            entry: { type: string }
+        configSchema: { type: string }
+        compatibility:
+          type: object
+          properties:
+            minHost: { type: string }
+            maxHost: { type: string }
+            apiVersion: { type: string }
 
     App:
       type: object
@@ -694,7 +1090,7 @@ components:
 
     Package:
       type: object
-      required: [id, type, version, platform, sha256]
+      required: [id, type, version, channel, platform, sha256, size]
       properties:
         id: { type: string }
         type: { type: string, enum: [server-plugin, endpoint-package, app-bundle, config-bundle] }
@@ -702,9 +1098,19 @@ components:
         channel: { type: string, enum: [stable, beta] }
         platform: { type: string }
         sha256: { type: string }
+        size: { type: integer }
         signature: { type: string }
         minHost: { type: string }
         download: { type: string }
+        contents:
+          type: object
+          properties:
+            modules:
+              type: array
+              items: { type: object }
+            pages:
+              type: array
+              items: { type: object }
 
     TwinReport:
       type: object

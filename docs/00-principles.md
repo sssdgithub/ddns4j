@@ -31,8 +31,8 @@ Foundation 是**通用插件平台**，不是某个业务系统。它提供：
 | 术语 | 定义 |
 |---|---|
 | **Foundation Host** | 运行插件内核、控制台 API、治理能力的宿主进程 |
-| **Plugin** | 可分发的制品：一份 manifest + 一个入口，`kind` 为 `server` / `endpoint` / `app` |
-| **Module** | Plugin 的部署实例：部署在宿主上或某个 Endpoint 上，持有自己的配置与 desired/reported 状态 |
+| **Plugin** | 可分发的包：一份 manifest + 一个入口，`kind` 为 `server` / `endpoint` / `app` |
+| **Module** | Plugin 的部署单元：部署在宿主上或某个 Endpoint 上，持有自己的配置与 desired/reported 状态 |
 | **App（应用包）** | 聚合型 Plugin：服务端插件 + 控制台页面 + 端点模块 + 默认配置 |
 | **Endpoint** | 被纳管的端：`edge` / `desktop` / `mobile` / `relay` profile；注意与 Node.js 无关 |
 | **Profile** | Endpoint 的角色档案，决定可用能力与生命周期约束 |
@@ -54,7 +54,7 @@ Foundation 是**通用插件平台**，不是某个业务系统。它提供：
 ├──────────────────────────────────────────────┤
 │ 治理层  身份 · 角色 · 租户 · 审计 · 配额        │
 ├──────────────────────────────────────────────┤
-│ 控制面  控制台 · 应用/模块/插件/包 · 配置 · 编排 │
+│ 控制面  控制台 · 应用/模块/插件/包 · 配置 · 期望状态下发 │
 ├──────────────────────────────────────────────┤
 │ 内核    Contract · Runtime · Scope · Assembly │
 └──────────────────────────────────────────────┘
@@ -82,4 +82,4 @@ Foundation 是**通用插件平台**，不是某个业务系统。它提供：
 | 控制面 API P95 | ≤ 200ms | 本地单机，不含 Endpoint 网络 |
 | Endpoint 心跳 | 30s ± 20% 抖动 | 离线判定 3 个周期 |
 
-> 以上为建议值，参考实现必须在 `07-minimal-loop.md` 记录实测。
+> 以上为建议值，参考实现必须把实测写入 `docs/baseline.md`。

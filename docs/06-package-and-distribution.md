@@ -11,7 +11,7 @@
 
 ## 2. Package Manifest
 
-`package.yaml`（与 `package-manifest.schema.json` 一致）：
+`package.yaml`（与 `schemas/package-manifest.schema.json` 一致）：
 
 ```yaml
 apiVersion: foundation/v1
@@ -39,10 +39,12 @@ manifest:
 规则：
 
 1. `sha256` 与 `size` 必填；下载后必须校验。
-2. `signature` 使用 Ed25519 对 `sha256` 或包体签名；校验失败拒绝安装。
+2. 若提供 `signature`，使用 Ed25519 对 `sha256` 或包体签名；存在但校验失败则拒绝安装。
 3. `channel` 决定端点拉取策略；`stable` 默认。
 4. `minHost/maxHost` 不满足时拒绝加载。
 5. 同一 `id + version + platform` 不可重复发布；重发需新版本号。
+6. `app-bundle` 用 `contents.modules` 与 `contents.pages` 声明包内模块与页面。
+7. **platform 匹配规则**：包 manifest 的 `platform` 是字符串（如 `linux-arm64`、`windows-amd64`）；Endpoint 的 `platform` 是对象 `{os, arch, runtime}`。匹配时用 `os + "-" + arch` 拼接后与包字符串比较；`any` 匹配所有平台。runtime（如 musl）不参与 v1 匹配，留作 v1.1 细分。
 
 ## 3. 存储后端
 
@@ -95,9 +97,9 @@ manifest:
 1. 包上传需要 `packages:write`；灰度需要 `packages:rollout`。
 2. 签名策略：Core 强制校验 `sha256`，签名可选（缺失时记录警告）；Enterprise 强制签名，缺失拒绝安装。
 3. 包元数据与制品分离：数据库存元数据，制品存对象存储。
-4. 禁止在包 manifest 中出现明文凭据；引用通过 `credentialRef`。
+4. 禁止在包 manifest 中出现明文凭据；凭据只以配置字段引用，不进入包。
 5. 供应链：记录构建来源（commit、CI 运行号），可选 SBOM。
 
 ## 8. 与旧 P0 的关系
 
-旧 P0（JDK17 + Boot3 + PF4J 热重载）只验证"宿主能加载插件"，不覆盖包分发。Foundation v1 将包分发纳入规范，但参考实现只要求本地目录 + 一个 `endpoint-package`，不接制品库。
+旧 P0（JDK17 + Boot3 + PF4J 热重载）只验证"宿主能加载插件"，不覆盖包分发。Foundation v1 将包分发纳入规范，但参考实现只要求本地目录 + 一个 `server-plugin` 与一个 `app-bundle`，不接制品库。

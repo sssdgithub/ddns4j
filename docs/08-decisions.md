@@ -7,7 +7,7 @@
 | D1 | 定位 | 通用插件平台，ddns4j 是第一个应用包 | 避免平台被单一业务绑架 |
 | D2 | 规范形态 | 语言无关（HTTP/JSON/YAML），参考实现 Java | 保留多语言生态 |
 | D3 | 参考实现 | Java 21 LTS + Spring Boot 4.x + PF4J 3.16.x | 长期维护版 + 稳定框架 |
-| D4 | 插件模型 | Plugin 制品 + Module 实例 | 升级/回滚/多实例可表达 |
+| D4 | 插件模型 | Plugin 包 + Module 部署单元 | 升级/回滚/多实例可表达 |
 | D5 | 契约 | 服务端与端点共用 manifest/capability/twin 语义，双 adapter | 避免第二套扩展机制 |
 | D6 | 端点命名 | Endpoint（不是 Node） | 避开 Node.js 歧义 |
 | D7 | 端点模型 | Endpoint + profile + capability + module | 对齐 AWS/Azure/KubeEdge/Intune |
@@ -24,7 +24,7 @@
 | D18 | v1 业务深度 | 只做 demo 插件，不接真实 DNS | 验证底座，不验证 DNS |
 | D19 | Twin 写入语义 | JSON Merge Patch（RFC 7386）+ `If-Match`；`config` 递归合并，`modules` 数组整体替换 | 避免双方各实现一套合并 |
 | D20 | 调度归属 | 端点按 desired 本地调度；宿主只下发配置与一次性命令 | 断网可自转，控制面不做单点 |
-| D21 | 跨端边界 | Service 只在进程内可见；跨端只走 Twin 与命令 | 避免自建 RPC |
+| D21 | 跨端边界 | Service 只在进程内可见；跨端只走 Endpoint 协议（注册/心跳/Twin/命令/上报/升级） | 避免自建 RPC |
 | D22 | 凭据下发 | 一次性：单次有效、60s TTL、仅内存、不落库不落日志；同时支持本地配置 | 见 ADR-0003 |
 | D23 | 包签名 | Core 强制 sha256、签名可选；Enterprise 强制签名 | 降低个人用户门槛 |
 | D24 | 控制台技术 | Thymeleaf 服务端渲染，v1 只做登录/端点/模块/审计四页 | 零前端构建 |
@@ -52,7 +52,7 @@
 
 ## 3. 与旧方案的关系
 
-旧 `ddns4j-architecture-v2.md` 与 `manifest-20261119-ddns4j-p0.md`：
+旧文档（位于仓库外、未入库）：`ddns4j-architecture-v2.md` 与 `manifest-20261119-ddns4j-p0.md`：
 
 - 技术基线 JDK17 + Spring Boot 3：**作废**，改为 Java 21 + Boot 4；
 - 概念 `Node`：**更名** `Endpoint`；

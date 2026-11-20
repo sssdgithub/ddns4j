@@ -18,15 +18,15 @@ Foundation Console
 ├── 应用 Apps
 │   ├── 列表（版本、包含模块、页面）
 │   └── 动作：安装、停用、升级
-├── 插件 Plugins（制品目录）
+├── 插件 Plugins（包目录）
 │   ├── 列表（版本、capabilities、依赖）
 │   └── 详情：manifest、版本、被哪些模块使用
 ├── 包 Packages
 │   ├── 列表（type / channel / platform）
-│   └── 动作：上传、灰度、回滚
+│   └── 动作：上传、灰度、回滚（v1 仅 API，无页面）
 ├── 审计 Audit
 │   └── 查询 / 导出
-└── 设置 Settings
+└── 设置 Settings（v1 仅 API / 只读占位）
     ├── 用户与角色
     ├── 租户（Enterprise）
     ├── Token 与 Scope

@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://foundation.dev/schemas/endpoint.schema.json",
   "title": "Foundation Endpoint / Module / Twin",
+  "$ref": "#/$defs/Endpoint",
   "$defs": {
     "Platform": {
       "type": "object",
@@ -19,7 +20,33 @@
       "properties": {
         "id": { "type": "string" },
         "modes": { "type": "array", "items": { "type": "string" } },
-        "providers": { "type": "array", "items": { "type": "string" } }
+        "providers": { "type": "array", "items": { "type": "string" } },
+        "recordTypes": { "type": "array", "items": { "type": "string" } },
+        "credentialFields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["key", "label"],
+            "properties": {
+              "key": { "type": "string" },
+              "label": { "type": "string" },
+              "required": { "type": "boolean" },
+              "secret": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "ModuleEntry": {
+      "type": "object",
+      "required": ["moduleId", "pluginId"],
+      "properties": {
+        "moduleId": { "type": "string" },
+        "pluginId": { "type": "string" },
+        "version": { "type": "string" },
+        "config": { "type": "object" },
+        "state": { "type": "string" },
+        "lastError": { "type": "string" }
       }
     },
     "TwinSide": {
@@ -28,8 +55,18 @@
       "properties": {
         "revision": { "type": "integer", "minimum": 0 },
         "config": { "type": "object" },
-        "modules": { "type": "array", "items": { "type": "object" } },
+        "modules": { "type": "array", "items": { "$ref": "#/$defs/ModuleEntry" } },
+        "state": { "type": "string", "enum": ["ok", "degraded", "error"] },
+        "lastError": { "type": "string" },
         "appliedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Twin": {
+      "type": "object",
+      "required": ["desired", "reported"],
+      "properties": {
+        "desired": { "$ref": "#/$defs/TwinSide" },
+        "reported": { "$ref": "#/$defs/TwinSide" }
       }
     },
     "Endpoint": {
@@ -62,7 +99,7 @@
         "version": { "type": "string" },
         "state": {
           "type": "string",
-          "enum": ["installed", "resolved", "active", "stopped", "failed"]
+          "enum": ["installed", "resolved", "active", "stopped", "uninstalled", "failed"]
         },
         "desired": { "$ref": "#/$defs/TwinSide" },
         "reported": { "$ref": "#/$defs/TwinSide" }

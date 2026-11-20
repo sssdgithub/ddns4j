@@ -1,6 +1,6 @@
 # Foundation — 语言无关的插件化数字底座
 
-> 状态：v1 规范（完整草案，待评审）
+> 状态：契约 v1；产品 0.x（不承诺 API 稳定）
 > 分支：`feat/foundation`
 > 参考实现：Java 21（LTS） + Spring Boot 4.x + PF4J 3.16.x
 > 许可证：Apache-2.0 + CLA
@@ -12,7 +12,7 @@ Foundation 是一个通用插件平台：内核只负责**装配、生命周期�
 五句话概括：
 
 1. **一切皆插件**：服务端能力、控制台页面、端点能力都通过同一份 manifest 描述。
-2. **插件是制品，模块是实例**：Plugin 是可分发的代码包；Module 是它部署在宿主或端点上的运行实例。
+2. **Plugin 是可分发的包，Module 是部署单元**：Plugin 是可分发的代码包；Module 是它部署在宿主或端点上的运行单元。
 3. **一切副作用可回滚**：注册即副作用，卸载时逆序撤销。
 4. **依赖声明式**：服务就绪才激活，依赖变化自动重算。
 5. **端点统一建模**：边缘/桌面/移动/中继都是 Endpoint，差异由 `profile` 与 capability 表达；状态用 desired/reported 双状态描述。
@@ -32,7 +32,10 @@ Foundation 是一个通用插件平台：内核只负责**装配、生命周期�
 
 ```
 GLOSSARY.md                      术语表（Endpoint/Plugin/Module/Twin…）
+AGENTS.md                        agent 协作约定（issue tracker / triage / domain docs）
+tools/                           工作区 JDK 21 与 Maven 包装脚本（JDK 不入库）
 docs/
+  agents/                        issue-tracker / triage-labels / domain 使用规则
   00-principles.md               定位、原则、术语、边界
   01-capability-map.md           能力面、分层、兼容性
   02-plugin-contract.md          统一插件契约（核心）
@@ -60,7 +63,7 @@ schemas/
 - 业务只做 demo 插件，不接真实 DNS。
 - 验收 1 个端点；模型支持多端点，但不做批量 UI。
 - 控制台用 Thymeleaf 四页；Core 只强制 sha256，签名可选。
-- 周期任务由端点本地调度；跨端只走 Twin 与命令；凭据一次性下发、不落库。
+- 周期任务由端点本地调度；跨端只走 Endpoint 协议（注册/心跳/Twin/命令/上报/升级）；凭据一次性下发、不落库。
 - 端点侧提供 CLI（enroll / twin / report）；管理侧不做 CLI。
 - 平台独立演进：0.x 不承诺 API 稳定，1.0 才承诺；第二个应用候选为"设备巡检与告警"。
 
@@ -73,4 +76,4 @@ schemas/
 
 ## 与旧方案的关系
 
-`ddns4j-architecture-v2.md` 是"DDNS 控制面"方案（JDK17 + Spring Boot 3 + Node 概念）。本规范将其取代：改用 Java 21 + Spring Boot 4，Node 更名 Endpoint，DDNS 收敛为应用包。差异见 `08-decisions.md`。
+`../ddns4j-architecture-v2.md`（仓库外历史文档）是"DDNS 控制面"方案（JDK17 + Spring Boot 3 + Node 概念）。本规范将其取代：改用 Java 21 + Spring Boot 4，Node 更名 Endpoint，DDNS 收敛为应用包。差异见 `docs/08-decisions.md`。

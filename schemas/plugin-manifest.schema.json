@@ -3,13 +3,13 @@
   "$id": "https://foundation.dev/schemas/plugin-manifest.schema.json",
   "title": "Foundation Plugin Manifest",
   "type": "object",
-  "required": ["apiVersion", "id", "version", "kind", "runtime", "compatibility"],
+  "required": ["apiVersion", "id", "version", "kind"],
   "additionalProperties": false,
   "properties": {
     "apiVersion": { "type": "string", "const": "foundation/v1" },
     "id": {
       "type": "string",
-      "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$",
+      "pattern": "^[a-z0-9]+([.-][a-z0-9-]+)*$",
       "description": "反向域名风格，全局唯一"
     },
     "name": { "type": "string" },
@@ -32,6 +32,32 @@
       "items": { "$ref": "#/$defs/Capability" }
     },
     "configSchema": { "type": "string" },
+    "pages": {
+      "type": "array",
+      "description": "kind=app 时声明控制台页面",
+      "items": {
+        "type": "object",
+        "required": ["path", "title"],
+        "properties": {
+          "path": { "type": "string" },
+          "title": { "type": "string" }
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "description": "kind=app 时声明包含的模块",
+      "items": {
+        "type": "object",
+        "required": ["pluginId"],
+        "properties": {
+          "pluginId": { "type": "string" },
+          "version": { "type": "string" },
+          "target": { "type": "string", "enum": ["host", "endpoint"] },
+          "config": { "type": "object" }
+        }
+      }
+    },
     "twin": { "$ref": "#/$defs/TwinSchema" },
     "profiles": {
       "type": "array",
@@ -48,7 +74,15 @@
   "allOf": [
     {
       "if": { "properties": { "kind": { "const": "endpoint" } }, "required": ["kind"] },
-      "then": { "required": ["profiles"] }
+      "then": { "required": ["profiles", "runtime", "compatibility"] }
+    },
+    {
+      "if": { "properties": { "kind": { "enum": ["server", "endpoint"] } }, "required": ["kind"] },
+      "then": { "required": ["runtime", "compatibility"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "app" } }, "required": ["kind"] },
+      "then": { "required": ["pages", "modules"] }
     }
   ],
   "$defs": {
